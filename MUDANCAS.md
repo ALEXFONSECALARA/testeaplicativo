@@ -37,6 +37,15 @@ Nenhum bug novo encontrado nesta varredura além do que já foi corrigido nas ro
 um `@keyframes pulse` e o indicador no card do Kanban). `server.js` e o restante do sistema não
 foram tocados.
 
+**Complemento na mesma rodada: reserva de mesa pendente entrou no mesmo toque contínuo.**
+Reserva nova tocava uma vez só, igual pedido tocava antes desta versão — ficaria inconsistente
+deixar só pedido com o alerta "estilo iFood" e reserva de fora. Agora `checkNewOrderRing()`
+também varre reservas com `status:'pendente'`, toca no mesmo intervalo/som/volume configurado, e
+o card da reserva no painel (aba 📅 Reservas) mostra o mesmo aviso "🚨 Tocando até
+confirmar/recusar…" pulsando, com 🔕 pra silenciar só aquela reserva. Some sozinho assim que a
+reserva é confirmada ou recusada. Nenhuma mudança em `server.js` — a reserva já chegava em tempo
+real (evento `new-reservation`) exatamente como o pedido; só reaproveitei a mesma checagem.
+
 ---
 
 # v107 — Sistema de permissões por função: Caixa, Cozinha e Entrega
