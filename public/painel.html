@@ -2212,7 +2212,7 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
               <option value="12">12 segundos</option>
             </select>
           </div>
-          <div style="font-size:10px;color:var(--muted);margin-top:6px;">Enquanto o pedido estiver parado na coluna "Novos", o alerta sonoro escolhido acima toca sem parar — em TODOS os computadores/celulares com o Painel aberto ao mesmo tempo (cada aparelho recebe o pedido pelo mesmo tempo real e toca por conta própria, então tocam juntos). Some sozinho assim que o pedido é aceito; o botão 🔕 no card silencia só aquele pedido. Vale pra loja toda (salvo aqui, junto do resto de Configurações).</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;">Enquanto o pedido estiver parado na coluna "Novos" (ou uma reserva de mesa pendente de confirmar/recusar), o alerta sonoro escolhido acima toca sem parar — em TODOS os computadores/celulares com o Painel aberto ao mesmo tempo (cada aparelho recebe o pedido/reserva pelo mesmo tempo real e toca por conta própria, então tocam juntos). Some sozinho assim que o pedido é aceito ou a reserva é confirmada/recusada; o botão 🔕 no card silencia só aquele item. Vale pra loja toda (salvo aqui, junto do resto de Configurações).</div>
         </div>
 <div class="settings-card">
           <div class="settings-card-title">⏱️ Alerta de pedido atrasado</div>
@@ -4075,18 +4075,21 @@ const ringLastAlertAt = {};
 function checkNewOrderRing(){
   const c = newOrderRingCfg();
   const stillNovoIds = new Set(orders.filter(o=>(STATUS_FROM_SERVER[o.status]||'novo')==='novo').map(o=>o.id));
-  // limpa marcações de pedidos que já saíram de "Novo" (aceitos/cancelados), pra não acumular
-  // memória à toa numa loja com muito movimento.
+  (reservations||[]).filter(r=>r.status==='pendente').forEach(r=>stillNovoIds.add(r.id));
+  // limpa marcações de pedidos/reservas que já saíram do estado pendente (aceitos/recusados/
+  // cancelados), pra não acumular memória à toa numa loja com muito movimento.
   Object.keys(ringLastAlertAt).forEach(id=>{ if(!stillNovoIds.has(id)) delete ringLastAlertAt[id]; });
   if(!c.enabled || Number(cfg.sound)===0) return; // toque contínuo desligado, ou alerta sonoro geral desligado
   const intervalMs = Math.max(2, c.seconds) * 1000;
   const now = Date.now();
-  orders.filter(o => (STATUS_FROM_SERVER[o.status]||'novo')==='novo' && !silencedRingOrders.has(o.id)).forEach(o=>{
-    const last = ringLastAlertAt[o.id] || 0;
+  const ring = (id)=>{
+    const last = ringLastAlertAt[id] || 0;
     if (now - last < intervalMs) return;
-    ringLastAlertAt[o.id] = now;
+    ringLastAlertAt[id] = now;
     playAlertSound(alertSoundChoice());
-  });
+  };
+  orders.filter(o => (STATUS_FROM_SERVER[o.status]||'novo')==='novo' && !silencedRingOrders.has(o.id)).forEach(o=>ring(o.id));
+  (reservations||[]).filter(r => r.status==='pendente' && !silencedRingOrders.has(r.id)).forEach(r=>ring(r.id));
 }
 setInterval(checkNewOrderRing, 1000);
 
@@ -6274,8 +6277,14 @@ async function renderReservationsList(){
   const rsvStatusLabel = {pendente:'🕐 Pendente', confirmada:'🪑 Reservada', recusada:'✕ Recusada', cancelada:'✕ Cancelada'};
   div.innerHTML = list.length===0
     ? '<div style="text-align:center;padding:60px;color:var(--muted);">Nenhuma reserva encontrada</div>'
-    : list.map(r=>`
+    : list.map(r=>{
+      const ringing = r.status==='pendente' && newOrderRingCfg().enabled && Number(cfg.sound)!==0 && !silencedRingOrders.has(r.id);
+      return`
     <div class="order-card" style="margin-bottom:10px;">
+      ${ringing?`<div style="background:var(--red-lt,#d33);color:#fff;font-size:11px;font-weight:700;padding:3px 7px;border-radius:5px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;animation:pulse 1.2s infinite;">
+        <span>🚨 Tocando até confirmar/recusar…</span>
+        <span onclick="silenceRingOrder('${r.id}')" style="cursor:pointer;opacity:.85;" title="Silenciar esta reserva">🔕</span>
+      </div>`:''}
       <div class="order-header">
         <span class="order-id">${r.id}</span>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -6306,7 +6315,7 @@ async function renderReservationsList(){
       <div class="order-actions" id="rsv-actions-${r.id}">
         <button class="oa-btn whatsapp" onclick="window.open('https://wa.me/55${r.phone.replace(/\\D/g,'')}','_blank')">💬 WhatsApp</button>
       </div>`:''}
-    </div>`).join('');
+    </div>`;}).join('');
 }
 async function updateReservationStatus(id, status, ev){
   // BUG CORRIGIDO: o botão "Confirmar"/"Recusar"/"Cancelar" continuava clicável enquanto a
