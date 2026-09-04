@@ -702,19 +702,19 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
     <button class="nav-item" data-page="reservas" data-min-role="vendas" onclick="goPage('reservas')"><span class="ni">📅</span> Reservas <span class="nb" id="nb-reservas" style="display:none">0</span></button>
     <button class="nav-item" data-page="mensagens" data-min-role="vendas" onclick="goPage('mensagens')"><span class="ni">💬</span> Mensagens <span class="nb" id="nb-mensagens" style="display:none">0</span></button>
     <div class="nav-section" data-min-role="admin">Gestão</div>
-    <button class="nav-item" data-page="motoboys" data-min-role="admin" onclick="goPage('motoboys')"><span class="ni">🛵</span> Motoboys</button>
-    <button class="nav-item" data-page="cardapio" data-min-role="admin" onclick="goPage('cardapio')"><span class="ni">🍱</span> Cardápio</button>
+    <button class="nav-item" data-page="motoboys" data-min-role="admin" data-perm="restaurante.configurarSetores" onclick="goPage('motoboys')"><span class="ni">🛵</span> Motoboys</button>
+    <button class="nav-item" data-page="cardapio" data-min-role="admin" data-perm="cardapio.editarProduto" onclick="goPage('cardapio')"><span class="ni">🍱</span> Cardápio</button>
     <button class="nav-item" data-page="custos" data-min-role="admin" onclick="goPage('custos')"><span class="ni">💰</span> Custos</button>
     <!-- v99 — ferramenta isolada, abre em nova aba; não usa goPage()/roteamento do SPA, não mexe em nenhum outro item -->
-    <button class="nav-item" data-min-role="admin" onclick="window.open('/nota-fiscal.html','_blank')"><span class="ni">📷</span> Ler Nota Fiscal</button>
-    <button class="nav-item" data-page="ia" data-min-role="admin" onclick="goPage('ia')"><span class="ni">🤖</span> IA do Cardápio <span class="nb" id="nb-ia-aprovacoes" style="display:none">0</span></button>
+    <button class="nav-item" data-min-role="admin" data-perm="cardapio.editarProduto" onclick="window.open('/nota-fiscal.html','_blank')"><span class="ni">📷</span> Ler Nota Fiscal</button>
+    <button class="nav-item" data-page="ia" data-min-role="admin" data-perm="cardapio.editarProduto" onclick="goPage('ia')"><span class="ni">🤖</span> IA do Cardápio <span class="nb" id="nb-ia-aprovacoes" style="display:none">0</span></button>
     <button class="nav-item" data-page="qrlinks" data-min-role="admin" onclick="goPage('qrlinks')"><span class="ni">🔗</span> QR Code &amp; Links</button>
-    <button class="nav-item" data-page="relatorios" data-min-role="admin" onclick="goPage('relatorios')"><span class="ni">📈</span> Relatórios</button>
-    <button class="nav-item" data-page="avaliacoes" data-min-role="admin" onclick="goPage('avaliacoes')"><span class="ni">⭐</span> Avaliações</button>
+    <button class="nav-item" data-page="relatorios" data-min-role="admin" data-perm="relatorios.ver" onclick="goPage('relatorios')"><span class="ni">📈</span> Relatórios</button>
+    <button class="nav-item" data-page="avaliacoes" data-min-role="admin" data-perm="relatorios.ver" onclick="goPage('avaliacoes')"><span class="ni">⭐</span> Avaliações</button>
     <div class="nav-section" data-min-role="admin">Sistema</div>
-    <button class="nav-item" data-page="configuracoes" data-min-role="admin" onclick="goPage('configuracoes')"><span class="ni">⚙️</span> Configurações</button>
-    <button class="nav-item" data-page="impressao" data-min-role="admin" onclick="goPage('impressao')"><span class="ni">🖨</span> Central de Impressão</button>
-    <button class="nav-item" data-page="usuarios" data-min-role="master" onclick="goPage('usuarios')"><span class="ni">👥</span> Usuários</button>
+    <button class="nav-item" data-page="configuracoes" data-min-role="admin" data-perm="restaurante.editarInformacoes" onclick="goPage('configuracoes')"><span class="ni">⚙️</span> Configurações</button>
+    <button class="nav-item" data-page="impressao" data-min-role="admin" data-perm="restaurante.configurarImpressoras" onclick="goPage('impressao')"><span class="ni">🖨</span> Central de Impressão</button>
+    <button class="nav-item" data-page="usuarios" data-min-role="master" data-perm="usuarios.ver" onclick="goPage('usuarios')"><span class="ni">👥</span> Usuários</button>
     <button class="nav-item" onclick="toggleTheme()"><span class="ni" id="theme-icon">🌙</span> <span id="theme-label">Modo Escuro</span></button>
   </nav>
 
@@ -2212,7 +2212,7 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
               <option value="12">12 segundos</option>
             </select>
           </div>
-          <div style="font-size:10px;color:var(--muted);margin-top:6px;">Enquanto o pedido estiver parado na coluna "Novos" (ou uma reserva de mesa pendente de confirmar/recusar), o alerta sonoro escolhido acima toca sem parar — em TODOS os computadores/celulares com o Painel aberto ao mesmo tempo (cada aparelho recebe o pedido/reserva pelo mesmo tempo real e toca por conta própria, então tocam juntos). Some sozinho assim que o pedido é aceito ou a reserva é confirmada/recusada; o botão 🔕 no card silencia só aquele item. Vale pra loja toda (salvo aqui, junto do resto de Configurações).</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;">Enquanto o pedido estiver parado na coluna "Novos", o alerta sonoro escolhido acima toca sem parar — em TODOS os computadores/celulares com o Painel aberto ao mesmo tempo (cada aparelho recebe o pedido pelo mesmo tempo real e toca por conta própria, então tocam juntos). Some sozinho assim que o pedido é aceito; o botão 🔕 no card silencia só aquele pedido. Vale pra loja toda (salvo aqui, junto do resto de Configurações).</div>
         </div>
 <div class="settings-card">
           <div class="settings-card-title">⏱️ Alerta de pedido atrasado</div>
@@ -2318,28 +2318,54 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
         <div class="settings-card" style="grid-column:1/-1;">
           <div class="settings-card-title">👥 Usuários do Painel</div>
           <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
-            <b>Master</b>: acesso total, inclusive gerenciar outros usuários.
-            <b>Admin</b>: acesso total ao painel, menos gerenciar usuários.
-            <b>Vendas</b>: só Dashboard, Pedidos e Kanban — ideal pra quem só bate pedido no balcão/telefone.
+            <b>👑 Master</b>: acesso total, sempre — ninguém tira nem edita permissão de um master além de outro master.
+            Pra todo o resto, a <b>função</b> (Admin/Vendas/Caixa/Cozinha/Entrega/Personalizada) é só um <b>modelo inicial</b> — clique em
+            <b>🔐 Permissões</b> em qualquer usuário pra dar/tirar acesso caixinha por caixinha. Dois usuários com a mesma função podem
+            acabar com permissões bem diferentes, é assim mesmo que funciona.
           </div>
           <div id="users-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;"></div>
           <div class="settings-card-title" style="font-size:13px;">+ Novo Usuário</div>
           <div class="field-row">
-            <div class="field"><label style="font-size:10px;">Usuário</label><input id="nu-username" placeholder="ex: joana.vendas"/></div>
+            <div class="field"><label style="font-size:10px;">Nome (opcional, só pra identificar na lista)</label><input id="nu-name" placeholder="ex: Joana Silva"/></div>
+            <div class="field"><label style="font-size:10px;">Usuário (login)</label><input id="nu-username" placeholder="ex: joana.vendas"/></div>
             <div class="field"><label style="font-size:10px;">Senha</label><input id="nu-password" type="password" placeholder="mín. 4 caracteres"/></div>
-            <div class="field"><label style="font-size:10px;">Nível de acesso</label>
+            <div class="field"><label style="font-size:10px;">Função (modelo inicial de permissões)</label>
               <select id="nu-role">
-                <option value="cozinha">🧑‍🍳 Cozinha (só pedidos: aceitar → pronto)</option>
-                <option value="entrega">🛵 Entrega (só pedidos: saiu → entregue)</option>
-                <option value="caixa">🧾 Caixa (recebe, aceita, finaliza pedidos)</option>
+                <option value="cozinha">🧑‍🍳 Cozinha</option>
+                <option value="entrega">🛵 Entrega</option>
+                <option value="caixa">🧾 Caixa</option>
                 <option value="vendas">🛒 Vendas</option>
                 <option value="admin">🛠 Admin</option>
                 <option value="master">👑 Master</option>
               </select>
-              <div style="font-size:10px;color:var(--muted);margin-top:4px;">Cozinha/Entrega/Caixa só acessam a tela de Pedidos — sem cardápio, preços, configurações ou outros usuários.</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px;">Depois de criar, ajuste as permissões exatas em 🔐 Permissões — a função aqui é só o ponto de partida.</div>
             </div>
           </div>
           <button class="btn success" onclick="createUser()">+ Adicionar Usuário</button>
+        </div>
+        <div class="settings-card" style="grid-column:1/-1;">
+          <div class="settings-card-title" style="cursor:pointer;" onclick="togglePermissionLog()">📝 Histórico de Alterações de Permissão <span id="permlog-toggle-ic">▾</span></div>
+          <div id="permlog-box" style="display:none;font-size:11px;max-height:320px;overflow:auto;">Carregando…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- v109: modal de permissões granulares — Admin Master escolhe exatamente o que cada login pode usar -->
+    <div id="perm-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;align-items:center;justify-content:center;" onclick="if(event.target===this)closePermModal()">
+      <div style="background:var(--card,#1c1c22);border-radius:14px;max-width:820px;width:94%;max-height:88vh;overflow:auto;padding:22px;animation:modalPopIn .2s ease;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="font-size:16px;font-weight:700;">🔐 Permissões de <span id="perm-modal-username">—</span></div>
+          <span style="cursor:pointer;font-size:20px;opacity:.7;" onclick="closePermModal()">✕</span>
+        </div>
+        <div id="perm-modal-sub" style="font-size:11px;color:var(--muted);margin-bottom:14px;"></div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button class="btn secondary sm" onclick="permSelectAll(true)">☑ Selecionar Todas</button>
+          <button class="btn secondary sm" onclick="permSelectAll(false)">☐ Remover Todas</button>
+        </div>
+        <div id="perm-modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"></div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px;">
+          <button class="btn secondary" onclick="closePermModal()">Cancelar</button>
+          <button class="btn success" onclick="savePermModal()">💾 Salvar Permissões</button>
         </div>
       </div>
     </div>
@@ -2900,6 +2926,7 @@ function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&am
 let token = localStorage.getItem('shog_token') || null;
 let userRole = localStorage.getItem('shog_role') || 'admin';
 let userName = localStorage.getItem('shog_user') || '';
+let myPerms = (()=>{ try{ return JSON.parse(localStorage.getItem('shog_perms')||'null'); }catch(e){ return null; } })();
 let cfg = {};
 let menu = [];
 // v83: identifica esta aba/aparelho especificamente — só serve pra evitar imprimir 2x quando
@@ -3169,9 +3196,11 @@ async function doLogin(){
     token = data.token;
     userRole = data.role || 'admin';
     userName = data.username || user || 'admin';
+    myPerms = data.permissions || null;
     localStorage.setItem('shog_token', token);
     localStorage.setItem('shog_role', userRole);
     localStorage.setItem('shog_user', userName);
+    try{ localStorage.setItem('shog_perms', JSON.stringify(myPerms)); }catch(e){}
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app-shell').style.display='flex';
     boot();
@@ -3183,9 +3212,35 @@ function doLogout(){
   localStorage.removeItem('shog_token');
   localStorage.removeItem('shog_role');
   localStorage.removeItem('shog_user');
+  localStorage.removeItem('shog_perms');
   token=null;
   if(evtSource) evtSource.close();
   location.reload();
+}
+// v109 — permissão granular no lado do cliente: só pra decidir o que MOSTRAR na interface
+// (esconder botão/menu que o usuário não usa) — quem garante de verdade é sempre o backend,
+// que reconfere tudo de novo em cada chamada de API (ver hasPermission() em server.js).
+// master enxerga tudo sempre, mesmo se myPerms ainda não carregou por algum motivo.
+function hasPerm(cat, act){
+  if(userRole==='master') return true;
+  if(!myPerms || !myPerms[cat]) return false;
+  return !!myPerms[cat][act];
+}
+// v109 — confere com o servidor se a sessão ainda é válida e se as permissões mudaram
+// (Master pode ter alterado algo enquanto esta aba ficava aberta o dia inteiro) — sem precisar
+// deslogar ninguém. Se o usuário foi desativado nesse meio tempo, desloga sozinho na hora.
+async function refreshMyPermissions(){
+  try{
+    const r = await fetch('/api/me', { headers: authHeaders() });
+    if(r.status===401 || r.status===403){ if(token) doLogout(); return; }
+    const data = await r.json();
+    if(!r.ok) return;
+    userRole = data.role || userRole;
+    myPerms = data.permissions || myPerms;
+    localStorage.setItem('shog_role', userRole);
+    try{ localStorage.setItem('shog_perms', JSON.stringify(myPerms)); }catch(e){}
+    applyRoleUI();
+  }catch(e){ /* sem internet momentaneamente — mantém o que já tinha em memória */ }
 }
 
 // ═══════════════════════════════════════════
@@ -3193,6 +3248,7 @@ function doLogout(){
 // ═══════════════════════════════════════════
 async function boot(){
   await loadConfigAndMenu();
+  await refreshMyPermissions();
   await loadOrders();
   updateNewBadge();
   applyRoleUI();
@@ -3205,6 +3261,7 @@ async function boot(){
   updatePrintStationIndicator();
   loadReservations();
   setInterval(loadReservations, 30000);
+  setInterval(refreshMyPermissions, 120000); // confere a cada 2min se o Master mudou algo
   setupCardControls();
   initSettingsAccordions();
   restoreAllButtonOrders();
@@ -3580,7 +3637,13 @@ function hasRole(minRole){ return (ROLE_RANK_CLIENT[userRole]||0) >= (ROLE_RANK_
 function canCancelOrders(){ return !['cozinha','entrega'].includes(userRole); }
 function applyRoleUI(){
   document.querySelectorAll('[data-min-role]').forEach(el=>{
-    el.style.display = hasRole(el.dataset.minRole) ? '' : 'none';
+    // v109: se o elemento também declarar data-perm="categoria.acao", ele aparece quando
+    // QUALQUER uma das duas condições libera (nível mínimo OU permissão customizada concedida) —
+    // assim um usuário "caixa" sem rank de admin, mas que o Master deu "cardapio.ver" de
+    // propósito, ainda enxerga o item, sem precisar virar admin só por causa disso.
+    const byRole = hasRole(el.dataset.minRole);
+    const byPerm = el.dataset.perm ? (()=>{ const [c,a]=el.dataset.perm.split('.'); return hasPerm(c,a); })() : false;
+    el.style.display = (byRole || byPerm) ? '' : 'none';
   });
   const badge=document.getElementById('sidebar-user-badge');
   if(badge) badge.textContent = `${userName||'admin'} · ${({master:'Master',admin:'Admin',vendas:'Vendas',caixa:'Caixa',cozinha:'Cozinha',entrega:'Entrega'})[userRole]||userRole}`;
@@ -3827,8 +3890,13 @@ setInterval(tick,1000);tick();
 // ═══════════════════════════════════════════
 const pageTitles={pedidos:'Gerenciar Pedidos',reservas:'Reserva de Mesas',mensagens:'Mensagens',motoboys:'Motoboys',cardapio:'Editar Cardápio',custos:'Custos & Ficha Técnica',ia:'🤖 IA do Cardápio',qrlinks:'QR Code & Links',relatorios:'Relatórios',configuracoes:'Configurações',usuarios:'Usuários',avaliacoes:'Avaliações',impressao:'Central de Impressão'};
 const PAGE_MIN_ROLE = { cardapio:'admin', custos:'admin', ia:'admin', qrlinks:'admin', relatorios:'admin', configuracoes:'admin', usuarios:'master', avaliacoes:'admin', motoboys:'admin', impressao:'admin' };
+// v109: mesma lógica do data-perm dos itens de menu — página abre se o rank mínimo OU uma
+// permissão granular concedida pelo Master liberar (ver applyRoleUI()/hasPerm() acima).
+const PAGE_PERM = { motoboys:'restaurante.configurarSetores', cardapio:'cardapio.editarProduto', ia:'cardapio.editarProduto', relatorios:'relatorios.ver', avaliacoes:'relatorios.ver', configuracoes:'restaurante.editarInformacoes', impressao:'restaurante.configurarImpressoras', usuarios:'usuarios.ver' };
 function goPage(id, silent){
-  if(PAGE_MIN_ROLE[id] && !hasRole(PAGE_MIN_ROLE[id])){
+  const permKey = PAGE_PERM[id];
+  const byPerm = permKey ? (()=>{ const [c,a]=permKey.split('.'); return hasPerm(c,a); })() : false;
+  if(PAGE_MIN_ROLE[id] && !hasRole(PAGE_MIN_ROLE[id]) && !byPerm){
     showToast('🔒 Acesso restrito','Seu usuário não tem permissão pra essa área.');
     return;
   }
@@ -4075,21 +4143,18 @@ const ringLastAlertAt = {};
 function checkNewOrderRing(){
   const c = newOrderRingCfg();
   const stillNovoIds = new Set(orders.filter(o=>(STATUS_FROM_SERVER[o.status]||'novo')==='novo').map(o=>o.id));
-  (reservations||[]).filter(r=>r.status==='pendente').forEach(r=>stillNovoIds.add(r.id));
-  // limpa marcações de pedidos/reservas que já saíram do estado pendente (aceitos/recusados/
-  // cancelados), pra não acumular memória à toa numa loja com muito movimento.
+  // limpa marcações de pedidos que já saíram de "Novo" (aceitos/cancelados), pra não acumular
+  // memória à toa numa loja com muito movimento.
   Object.keys(ringLastAlertAt).forEach(id=>{ if(!stillNovoIds.has(id)) delete ringLastAlertAt[id]; });
   if(!c.enabled || Number(cfg.sound)===0) return; // toque contínuo desligado, ou alerta sonoro geral desligado
   const intervalMs = Math.max(2, c.seconds) * 1000;
   const now = Date.now();
-  const ring = (id)=>{
-    const last = ringLastAlertAt[id] || 0;
+  orders.filter(o => (STATUS_FROM_SERVER[o.status]||'novo')==='novo' && !silencedRingOrders.has(o.id)).forEach(o=>{
+    const last = ringLastAlertAt[o.id] || 0;
     if (now - last < intervalMs) return;
-    ringLastAlertAt[id] = now;
+    ringLastAlertAt[o.id] = now;
     playAlertSound(alertSoundChoice());
-  };
-  orders.filter(o => (STATUS_FROM_SERVER[o.status]||'novo')==='novo' && !silencedRingOrders.has(o.id)).forEach(o=>ring(o.id));
-  (reservations||[]).filter(r => r.status==='pendente' && !silencedRingOrders.has(r.id)).forEach(r=>ring(r.id));
+  });
 }
 setInterval(checkNewOrderRing, 1000);
 
@@ -6277,14 +6342,8 @@ async function renderReservationsList(){
   const rsvStatusLabel = {pendente:'🕐 Pendente', confirmada:'🪑 Reservada', recusada:'✕ Recusada', cancelada:'✕ Cancelada'};
   div.innerHTML = list.length===0
     ? '<div style="text-align:center;padding:60px;color:var(--muted);">Nenhuma reserva encontrada</div>'
-    : list.map(r=>{
-      const ringing = r.status==='pendente' && newOrderRingCfg().enabled && Number(cfg.sound)!==0 && !silencedRingOrders.has(r.id);
-      return`
+    : list.map(r=>`
     <div class="order-card" style="margin-bottom:10px;">
-      ${ringing?`<div style="background:var(--red-lt,#d33);color:#fff;font-size:11px;font-weight:700;padding:3px 7px;border-radius:5px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;animation:pulse 1.2s infinite;">
-        <span>🚨 Tocando até confirmar/recusar…</span>
-        <span onclick="silenceRingOrder('${r.id}')" style="cursor:pointer;opacity:.85;" title="Silenciar esta reserva">🔕</span>
-      </div>`:''}
       <div class="order-header">
         <span class="order-id">${r.id}</span>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -6315,7 +6374,7 @@ async function renderReservationsList(){
       <div class="order-actions" id="rsv-actions-${r.id}">
         <button class="oa-btn whatsapp" onclick="window.open('https://wa.me/55${r.phone.replace(/\\D/g,'')}','_blank')">💬 WhatsApp</button>
       </div>`:''}
-    </div>`;}).join('');
+    </div>`).join('');
 }
 async function updateReservationStatus(id, status, ev){
   // BUG CORRIGIDO: o botão "Confirmar"/"Recusar"/"Cancelar" continuava clicável enquanto a
@@ -9636,43 +9695,57 @@ async function toggleReviewVisibility(orderId, hide){
 }
 
 async function loadUsersPage(){
-  const res = await apiGet('/api/admin/users');
-  if(!Array.isArray(res?.users)){ document.getElementById('users-list').innerHTML=`<div style="font-size:12px;color:var(--red-lt);">${res?.error||'Não foi possível carregar os usuários.'}</div>`; return; }
-  renderUsersList(res.users);
+  const [usersRes, catRes] = await Promise.all([apiGet('/api/admin/users'), apiGet('/api/admin/permission-catalog')]);
+  if(!Array.isArray(usersRes?.users)){ document.getElementById('users-list').innerHTML=`<div style="font-size:12px;color:var(--red-lt);">${usersRes?.error||'Não foi possível carregar os usuários.'}</div>`; return; }
+  if(catRes?.catalog){ PERMISSION_CATALOG = catRes.catalog; }
+  renderUsersList(usersRes.users);
 }
 function renderUsersList(users){
+  window._lastUsersList = users;
   const roleLabel={master:'👑 Master',admin:'🛠 Admin',vendas:'🛒 Vendas',caixa:'🧾 Caixa',cozinha:'👨‍🍳 Cozinha',entrega:'🛵 Entrega'};
   document.getElementById('users-list').innerHTML = users.map(u=>`
-    <div class="vgroup" style="display:flex;align-items:center;gap:12px;">
-      <div style="flex:1;">
-        <div style="font-weight:600;font-size:13px;">${u.username}${u.username===userName?' <span style="color:var(--gold);font-size:10px;">(você)</span>':''}</div>
-        <div style="font-size:11px;color:var(--muted);">${roleLabel[u.role]||u.role}</div>
+    <div class="vgroup" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;${u.active===false?'opacity:.55;':''}">
+      <div style="flex:1;min-width:140px;">
+        <div style="font-weight:600;font-size:13px;">${esc(u.displayName||u.username)}${u.username===userName?' <span style="color:var(--gold);font-size:10px;">(você)</span>':''}${u.active===false?' <span style="color:var(--red-lt);font-size:10px;">· desativado</span>':''}</div>
+        <div style="font-size:11px;color:var(--muted);">${u.displayName?`@${u.username} · `:''}${roleLabel[u.role]||u.role}${u.permissions?' · <span style="color:var(--gold);">permissões customizadas</span>':''}</div>
       </div>
-      <button type="button" class="btn secondary sm" onclick="promptResetPassword('${u.username}')">🔑 Trocar senha</button>
+      <button type="button" class="btn secondary sm" onclick="openPermModal('${u.username}')" ${u.role==='master'?'disabled title="Master sempre tem acesso total — não dá pra restringir"':''}>🔐 Permissões</button>
+      <button type="button" class="btn secondary sm" onclick="promptResetPassword('${u.username}')">🔑 Senha</button>
+      <button type="button" class="btn secondary sm" onclick="toggleUserActive('${u.username}', ${u.active===false})" ${u.role==='master'?'disabled title="Não dá pra desativar um master"':''}>${u.active===false?'✅ Ativar':'🚫 Desativar'}</button>
       <button type="button" class="mi-btn del" onclick="deleteUser('${u.username}')" ${u.username===userName?'disabled title="Você não pode remover seu próprio usuário"':''}>🗑</button>
     </div>`).join('');
 }
 async function createUser(){
+  const displayName=document.getElementById('nu-name').value.trim();
   const username=document.getElementById('nu-username').value.trim();
   const password=document.getElementById('nu-password').value;
   const role=document.getElementById('nu-role').value;
   if(!username||username.length<3){ alert('Usuário precisa ter pelo menos 3 caracteres.'); return; }
   if(!password||password.length<4){ alert('Senha precisa ter pelo menos 4 caracteres.'); return; }
-  const res = await apiPost('/api/admin/users', { username, password, role });
+  const res = await apiPost('/api/admin/users', { username, password, role, displayName });
   if(!res.ok){ alert(res.data.error||'Erro ao criar usuário.'); return; }
+  document.getElementById('nu-name').value='';
   document.getElementById('nu-username').value='';
   document.getElementById('nu-password').value='';
   renderUsersList(res.data.users);
-  showToast('✅ Usuário criado!',`${username} agora tem acesso nível ${role}.`);
+  showToast('✅ Usuário criado!',`${displayName||username} agora começa com o modelo de "${role}" — ajuste em 🔐 Permissões se quiser.`);
 }
 async function promptResetPassword(username){
   const password = prompt(`Nova senha para "${username}" (mín. 4 caracteres):`);
   if(!password)return;
   if(password.length<4){ alert('Senha precisa ter pelo menos 4 caracteres.'); return; }
-  const current = (await apiGet('/api/admin/users')).users.find(u=>u.username===username);
+  const current = (window._lastUsersList||[]).find(u=>u.username===username);
   const res = await apiPost('/api/admin/users', { username, password, role: current?.role||'vendas' });
   if(!res.ok){ alert(res.data.error||'Erro ao trocar senha.'); return; }
   showToast('✅ Senha atualizada!',`Nova senha definida para ${username}.`);
+}
+async function toggleUserActive(username, activate){
+  const msg = activate ? `Reativar "${username}"? Ele volta a poder logar normalmente.` : `Desativar "${username}"? Ele não vai mais conseguir logar até alguém reativar.`;
+  if(!confirm(msg)) return;
+  const res = await apiPost(`/api/admin/users/${encodeURIComponent(username)}/active`, { active: activate });
+  if(!res.ok){ alert(res.data.error||'Erro ao alterar status.'); return; }
+  showToast(activate?'✅ Usuário reativado':'🚫 Usuário desativado', username);
+  loadUsersPage();
 }
 async function deleteUser(username){
   if(!confirm(`Remover o usuário "${username}"? Ele não vai mais conseguir entrar no painel.`))return;
@@ -9681,6 +9754,99 @@ async function deleteUser(username){
   if(!res.ok){ alert(data.error||'Erro ao remover usuário.'); return; }
   loadUsersPage();
   showToast('🗑 Usuário removido',username);
+}
+
+// ═══════════════════════════════════════════
+// v109 — MODAL DE PERMISSÕES GRANULARES: o Admin Master escolhe exatamente o que cada
+// login pode usar, caixinha por caixinha, item 21/22/23 do escopo de permissões.
+// ═══════════════════════════════════════════
+let PERMISSION_CATALOG = null;
+let permModalUser = null; // { username, role, permissions }
+function effectivePermsForRole(role){
+  // enquanto o catálogo não veio do servidor ainda, não desenha nada — evita mostrar tudo
+  // desmarcado por engano (que pareceria "sem nenhuma permissão" quando na real é só falta de dado)
+  return null;
+}
+async function openPermModal(username){
+  if(!PERMISSION_CATALOG){ const c = await apiGet('/api/admin/permission-catalog'); PERMISSION_CATALOG = c.catalog; }
+  const user = (window._lastUsersList||[]).find(u=>u.username===username);
+  if(!user) return;
+  if(user.role==='master'){ showToast('👑 Master','Master sempre tem acesso total — não dá pra restringir.'); return; }
+  permModalUser = { username: user.username, role: user.role, permissions: user.permissions ? JSON.parse(JSON.stringify(user.permissions)) : {} };
+  document.getElementById('perm-modal-username').textContent = user.displayName || user.username;
+  document.getElementById('perm-modal-sub').textContent = user.permissions
+    ? 'Este usuário já tem permissões customizadas — o que estiver marcado abaixo é exatamente o que ele pode usar.'
+    : `Este usuário ainda usa o padrão da função "${user.role}". Marque/desmarque abaixo pra customizar só pra ele — não afeta outros usuários da mesma função.`;
+  const body = document.getElementById('perm-modal-body');
+  body.innerHTML = Object.keys(PERMISSION_CATALOG).map(cat=>{
+    const c = PERMISSION_CATALOG[cat];
+    return `<div class="vgroup" style="padding:10px;">
+      <div style="font-weight:700;font-size:12px;margin-bottom:8px;">${c.label}</div>
+      ${Object.keys(c.actions).map(act=>{
+        const checked = permModalUser.permissions[cat] && permModalUser.permissions[cat][act];
+        return `<label style="display:flex;align-items:center;gap:7px;font-size:12px;padding:3px 0;cursor:pointer;">
+          <input type="checkbox" data-cat="${cat}" data-act="${act}" ${checked?'checked':''} onchange="permModalSetOverride('${cat}','${act}',this.checked)" style="width:15px;height:15px;"/>
+          ${c.actions[act]}
+        </label>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+  document.getElementById('perm-modal-backdrop').style.display='flex';
+}
+function permModalSetOverride(cat, act, val){
+  if(!permModalUser.permissions[cat]) permModalUser.permissions[cat] = {};
+  permModalUser.permissions[cat][act] = val;
+}
+function permSelectAll(val){
+  document.querySelectorAll('#perm-modal-body input[type=checkbox]').forEach(cb=>{
+    cb.checked = val;
+    permModalSetOverride(cb.dataset.cat, cb.dataset.act, val);
+  });
+}
+function closePermModal(){ document.getElementById('perm-modal-backdrop').style.display='none'; permModalUser=null; }
+async function savePermModal(){
+  if(!permModalUser) return;
+  if(!confirm(`Salvar as permissões de "${permModalUser.username}"? Isso passa a valer imediatamente, mesmo sem ele deslogar.`)) return;
+  const res = await fetch(`/api/admin/users/${encodeURIComponent(permModalUser.username)}/permissions`, {
+    method:'PATCH', headers:{'Content-Type':'application/json', ...authHeaders()}, body: JSON.stringify({ permissions: permModalUser.permissions })
+  });
+  const data = await res.json();
+  if(!res.ok){ alert(data.error||'Erro ao salvar permissões.'); return; }
+  closePermModal();
+  loadUsersPage();
+  showToast('🔐 Permissões salvas', `${(data.added||[]).length} concedida(s), ${(data.removed||[]).length} removida(s).`);
+}
+let permLogLoaded = false;
+async function togglePermissionLog(){
+  const box = document.getElementById('permlog-box');
+  const ic = document.getElementById('permlog-toggle-ic');
+  const opening = box.style.display==='none';
+  box.style.display = opening?'block':'none';
+  ic.textContent = opening?'▴':'▾';
+  if(opening && !permLogLoaded){
+    permLogLoaded = true;
+    const res = await apiGet('/api/admin/permission-log');
+    const log = res?.log||[];
+    box.innerHTML = log.length===0 ? '<div style="color:var(--muted);">Nenhuma alteração registrada ainda.</div>' : log.map(l=>{
+      const when = new Date(l.at).toLocaleString('pt-BR');
+      let desc = '';
+      if(l.changes?.criado) desc = `criou o usuário (função: ${l.changes.role})`;
+      else if(l.changes?.removido) desc = 'removeu o usuário';
+      else if(l.changes?.desativado) desc = 'desativou o usuário';
+      else if(l.changes?.reativado) desc = 'reativou o usuário';
+      else {
+        const parts = [];
+        if(l.changes?.added?.length) parts.push('Adicionou: '+l.changes.added.join(', '));
+        if(l.changes?.removed?.length) parts.push('Removeu: '+l.changes.removed.join(', '));
+        desc = parts.join(' · ') || 'sem alteração de permissão';
+      }
+      return `<div style="padding:8px 0;border-bottom:1px solid var(--border);">
+        <b>${esc(l.actor)}</b> → <b>${esc(l.target)}</b><br/>
+        <span style="color:var(--muted);">${esc(desc)}</span><br/>
+        <span style="color:var(--muted);font-size:10px;">${when}</span>
+      </div>`;
+    }).join('');
+  }
 }
 
 // ═══════════════════════════════════════════
