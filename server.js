@@ -42,6 +42,7 @@ const CUSTOS_CONFIG_FILE = path.join(DATA_DIR, 'custos-config.json');
 // APROVAÇÕES DA IA" mais abaixo.
 const APROVACOES_IA_FILE = path.join(DATA_DIR, 'aprovacoes-ia.json');
 const DELETE_LOG_FILE = path.join(DATA_DIR, 'delete-log.json'); // v32: histórico de exclusões de pedidos
+const PERMISSION_LOG_FILE = path.join(DATA_DIR, 'permission-log.json'); // v109: histórico de alteração de permissões de usuário
 const CONTATOS_IMPORTADOS_FILE = path.join(DATA_DIR, 'contatos-importados.json'); // v56: contatos importados de CSV/vCard/txt, separado dos clientes reais (que vêm de pedidos)
 const ATENDIMENTO_FILE = path.join(DATA_DIR, 'atendimento.json'); // v57: conversas do chat (IA e/ou atendente humano)
 // v60: sessões de login persistidas em disco (+ Supabase, ver FILE_TO_KEY) — antes viviam só em
@@ -442,7 +443,7 @@ function writeJSON(file, data) {
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 const SUPABASE_TABLE = process.env.SUPABASE_TABLE || 'shogatsu_kv';
-const FILE_TO_KEY = { [ORDERS_FILE]: 'orders', [CONFIG_FILE]: 'config', [CUSTOMERS_FILE]: 'customers', [RESERVATIONS_FILE]: 'reservations', [PUSH_SUBS_FILE]: 'push_subs', [ADMIN_PUSH_SUBS_FILE]: 'admin_push_subs', [SCHEDULED_PUSH_FILE]: 'scheduled_push', [COURIERS_FILE]: 'couriers', [DELETE_LOG_FILE]: 'delete_log', [INGREDIENTES_FILE]: 'ingredientes', [FICHAS_TECNICAS_FILE]: 'fichas_tecnicas', [CUSTOS_CONFIG_FILE]: 'custos_config', [SESSIONS_FILE]: 'sessions', [APROVACOES_IA_FILE]: 'aprovacoes_ia' };
+const FILE_TO_KEY = { [ORDERS_FILE]: 'orders', [CONFIG_FILE]: 'config', [CUSTOMERS_FILE]: 'customers', [RESERVATIONS_FILE]: 'reservations', [PUSH_SUBS_FILE]: 'push_subs', [ADMIN_PUSH_SUBS_FILE]: 'admin_push_subs', [SCHEDULED_PUSH_FILE]: 'scheduled_push', [COURIERS_FILE]: 'couriers', [DELETE_LOG_FILE]: 'delete_log', [PERMISSION_LOG_FILE]: 'permission_log', [INGREDIENTES_FILE]: 'ingredientes', [FICHAS_TECNICAS_FILE]: 'fichas_tecnicas', [CUSTOS_CONFIG_FILE]: 'custos_config', [SESSIONS_FILE]: 'sessions', [APROVACOES_IA_FILE]: 'aprovacoes_ia' };
 
 function supabaseRequest(method, subpath, body) {
   return new Promise((resolve, reject) => {
@@ -731,26 +732,281 @@ const ALL_ROLES = ['master', 'admin', 'vendas', ...OPERATIONAL_ROLES];
 // operacionais novos só podem fazer exatamente a transição da função deles — verificado aqui
 // no backend, nunca só na interface (o painel também esconde os botões que a função não usa,
 // mas quem manda é este check; ver "não confiar apenas no frontend" no pedido de auditoria).
+// v107 — SISTEMA DE PERMISSÕES: quem pode mudar um pedido de qual status pra qual. Evoluído na
+// v109 pra consultar hasPermission() em vez de olhar só o "rank" do papel — assim o Master pode
+// customizar isso usuário por usuário (item 20/21 do escopo: dois "caixa" podem ter permissões
+// diferentes). QUEM NÃO TEM UMA PERMISSÃO CUSTOMIZADA fica exatamente como sempre foi (nenhum
+// usuário existente perde acesso com esta atualização) — ver DEFAULT_PERMISSION_TEMPLATES acima.
 function canChangeOrderStatus(session, fromStatus, toStatus) {
   if (!session) return false;
-  if (ROLE_RANK[session.role]) return true; // master/admin/vendas — sem restrição, como sempre
-  if (session.role === 'cozinha') {
-    return (fromStatus === 'novo' && toStatus === 'preparando') || (fromStatus === 'preparando' && toStatus === 'saiu');
+  if (session.role === 'master') return true;
+  if (!hasPermission(session, 'pedidos', 'alterarStatus')) return false;
+  if (toStatus === 'cancelado') return hasPermission(session, 'pedidos', 'cancelar');
+  // Usuário SEM override de permissão (cfg.users[i].permissions não configurado pra "pedidos"):
+  // mantém a régua específica por função que sempre existiu, transição por transição — pra não
+  // mudar o comportamento de quem já opera assim há tempos.
+  const user = findUserBySession(session);
+  const hasCustomPedidos = !!(user && user.permissions && user.permissions.pedidos);
+  if (!hasCustomPedidos) {
+    if (ROLE_RANK[session.role]) return true; // master/admin/vendas — sem restrição, como sempre
+    if (session.role === 'cozinha') {
+      return (fromStatus === 'novo' && toStatus === 'preparando') || (fromStatus === 'preparando' && toStatus === 'saiu');
+    }
+    if (session.role === 'entrega') {
+      return fromStatus === 'saiu' && toStatus === 'entregue';
+    }
+    if (session.role === 'caixa') {
+      return ['preparando', 'saiu', 'entregue', 'cancelado'].includes(toStatus);
+    }
+    return false;
   }
-  if (session.role === 'entrega') {
-    return fromStatus === 'saiu' && toStatus === 'entregue';
-  }
-  if (session.role === 'caixa') {
-    // Caixa recebe, aceita e finaliza — inclusive retirada (preparando → entregue direto,
-    // sem etapa de entrega) — mas não é quem decide "saiu pra entrega" fisicamente nem cancela
-    // sozinho sem motivo (cancelamento passa por 'cancelado', liberado aqui também: caixa lida
-    // com o cliente na hora, é quem normalmente cancela um pedido a pedido do cliente).
-    return ['preparando', 'saiu', 'entregue', 'cancelado'].includes(toStatus);
-  }
-  return false;
+  // Usuário COM permissões customizadas pelo Master pra "pedidos": já passou no check geral de
+  // alterarStatus/cancelar acima — aqui é livre pra qualquer transição que não seja cancelamento
+  // (o Master decidiu dar acesso a "Alterar status" sem granularidade de transição individual;
+  // é a mesma simplicidade que a caixa de seleção do painel oferece).
+  return true;
 }
 
-// ─── Contas de cliente (telefone + senha de 4 dígitos) ───
+// ═══════════════════════════════════════════════════════════
+// v109 — SISTEMA DE PERMISSÕES GRANULARES (Admin Master decide o que cada login pode fazer)
+// ═══════════════════════════════════════════════════════════
+// Catálogo fixo de categorias/ações que existem no sistema — é a partir daqui que o painel
+// desenha as caixinhas de seleção (GET /api/admin/permission-catalog) e é contra ESTA lista que
+// o backend valida qualquer alteração de permissão (não dá pra inventar uma chave nova só
+// mexendo no JSON/localStorage). "role" aqui serve só de ORGANIZAÇÃO/modelo inicial — a permissão
+// real de cada usuário fica em cfg.users[i].permissions, que o MASTER pode customizar campo a
+// campo, mesmo pra dois usuários com a mesma função (ver pedido, item 20/21 do escopo).
+const PERMISSION_CATALOG = {
+  pedidos: { label: '📦 Pedidos', actions: {
+    ver: 'Ver pedidos', criar: 'Criar pedidos', editar: 'Editar pedidos', cancelar: 'Cancelar pedidos',
+    reabrir: 'Reabrir pedidos', alterarStatus: 'Alterar status', imprimir: 'Imprimir pedidos',
+    historico: 'Visualizar histórico'
+  }},
+  cardapio: { label: '🍣 Cardápio', actions: {
+    ver: 'Ver cardápio', criarProduto: 'Criar produto', editarProduto: 'Editar produto',
+    excluirProduto: 'Excluir produto', criarCategoria: 'Criar categoria', editarCategoria: 'Editar categoria',
+    excluirCategoria: 'Excluir categoria', alterarPrecos: 'Alterar preços', gerenciarGrupos: 'Gerenciar grupos/complementos'
+  }},
+  clientes: { label: '👥 Clientes', actions: {
+    ver: 'Ver clientes', criar: 'Criar clientes', editar: 'Editar clientes', excluir: 'Excluir clientes',
+    verHistorico: 'Ver histórico de pedidos'
+  }},
+  alertas: { label: '🔔 Alertas', actions: {
+    ver: 'Ver alertas', configurar: 'Configurar alertas', escolherSons: 'Escolher sons',
+    alterarVolume: 'Alterar volume', configurarAtraso: 'Configurar alerta de atraso',
+    ativarDesativar: 'Ativar/desativar alertas'
+  }},
+  dispositivos: { label: '📱 Dispositivos', actions: {
+    ver: 'Ver dispositivos', conectarCelular: 'Conectar celular', desconectarCelular: 'Desconectar celular',
+    gerenciar: 'Gerenciar dispositivos', configurarAlertasCelular: 'Configurar alertas do celular'
+  }},
+  usuarios: { label: '👤 Usuários', actions: {
+    ver: 'Ver usuários', criar: 'Criar usuários', editar: 'Editar usuários', desativar: 'Desativar usuários',
+    alterarSenhas: 'Alterar senhas', criarFuncoes: 'Criar funções', editarFuncoes: 'Editar funções',
+    gerenciarPermissoes: 'Gerenciar permissões'
+  }},
+  relatorios: { label: '📊 Relatórios', actions: {
+    ver: 'Ver relatórios', exportar: 'Exportar relatórios', financeiros: 'Relatórios financeiros',
+    pedidos: 'Relatórios de pedidos'
+  }},
+  notificacoes: { label: '📢 Notificações', actions: {
+    criar: 'Criar notificações', editar: 'Editar notificações', enviar: 'Enviar notificações',
+    gerenciarInscritos: 'Gerenciar inscritos'
+  }},
+  restaurante: { label: '🏪 Restaurante', actions: {
+    verConfig: 'Ver configuração', editarInformacoes: 'Editar informações', editarHorarios: 'Editar horários',
+    configurarEntrega: 'Configurar entrega', configurarSetores: 'Configurar setores', configurarImpressoras: 'Configurar impressoras'
+  }},
+  sistema: { label: '⚙️ Sistema', actions: {
+    configuracoesGerais: 'Configurações gerais', logs: 'Logs', configuracoesAvancadas: 'Configurações avançadas'
+  }}
+};
+// Gera um template "tudo true" ou "tudo false" a partir do catálogo — usado tanto pros
+// padrões por função quanto pra validar/limpar o que chega de fora em PATCH .../permissions
+// (nunca aceitamos uma chave que não exista no catálogo, nem categoria/ação inventada).
+function fullPermTemplate(value) {
+  const out = {};
+  for (const cat of Object.keys(PERMISSION_CATALOG)) {
+    out[cat] = {};
+    for (const act of Object.keys(PERMISSION_CATALOG[cat].actions)) out[cat][act] = value;
+  }
+  return out;
+}
+// Padrão por FUNÇÃO — é só o que cada função recebe quando o Master NÃO customizou nada pra
+// aquele usuário específico (comportamento de sempre, pra ninguém que já usa o sistema hoje
+// perder acesso de uma hora pra outra). O Master pode sobrescrever qualquer uma dessas caixinhas
+// por usuário em Usuários → 🔐 Configurar Permissões — a partir daí, o valor customizado manda,
+// não o padrão da função.
+const DEFAULT_PERMISSION_TEMPLATES = {
+  admin: fullPermTemplate(true), // admin sempre teve acesso a tudo que não é exclusivo de master
+  vendas: (() => {
+    const t = fullPermTemplate(false);
+    Object.keys(t.pedidos).forEach(k => { t.pedidos[k] = true; }); // vendas sempre pôde mexer em pedido à vontade
+    t.clientes.ver = true; // /api/admin/customer-lookup já liberava pra vendas
+    return t;
+  })(),
+  caixa: (() => {
+    const t = fullPermTemplate(false);
+    Object.assign(t.pedidos, { ver: true, criar: true, imprimir: true, historico: true, alterarStatus: true, cancelar: true });
+    return t;
+  })(),
+  cozinha: (() => {
+    const t = fullPermTemplate(false);
+    Object.assign(t.pedidos, { ver: true, alterarStatus: true, imprimir: true });
+    return t;
+  })(),
+  entrega: (() => {
+    const t = fullPermTemplate(false);
+    Object.assign(t.pedidos, { ver: true, alterarStatus: true });
+    return t;
+  })(),
+  _default: fullPermTemplate(false) // função desconhecida/personalizada sem nada configurado: nega tudo (seguro por padrão)
+};
+// Devolve o usuário completo (cfg.users[i]) pela sessão — é daqui que hasPermission() lê o
+// override individual, se existir.
+function findUserBySession(session) {
+  if (!session) return null;
+  const { cfg } = readConfig();
+  return (cfg.users || []).find(u => String(u.username || '').toLowerCase() === String(session.username || '').toLowerCase()) || null;
+}
+// hasPermission(): master NUNCA passa por aqui (é superusuário por definição, item 18 do
+// escopo — não existe caixinha que tire acesso do master). Pra qualquer outro papel: se o
+// usuário tem uma permissão CUSTOMIZADA pelo Master pra essa categoria/ação específica, ela
+// manda; senão, cai no padrão da função (DEFAULT_PERMISSION_TEMPLATES). Como isso é lido do
+// arquivo a cada chamada (nunca fica "gravado" no token/sessão), uma alteração de permissão
+// feita pelo Master vale JÁ NA PRÓXIMA REQUISIÇÃO daquele usuário — sem precisar deslogar
+// ninguém (item 24 do escopo).
+function hasPermission(session, category, action) {
+  if (!session) return false;
+  if (session.role === 'master') return true;
+  if (!PERMISSION_CATALOG[category] || !PERMISSION_CATALOG[category].actions[action]) return false; // categoria/ação inexistente
+  const user = findUserBySession(session);
+  if (user && user.active === false) return false; // usuário desativado nunca tem permissão nenhuma
+  if (user && user.permissions && user.permissions[category] && Object.prototype.hasOwnProperty.call(user.permissions[category], action)) {
+    return !!user.permissions[category][action];
+  }
+  const template = DEFAULT_PERMISSION_TEMPLATES[session.role] || DEFAULT_PERMISSION_TEMPLATES._default;
+  return !!(template[category] && template[category][action]);
+}
+function requirePermission(token, category, action) {
+  return hasPermission(getSession(token), category, action);
+}
+// Devolve o conjunto de permissões EFETIVAS de uma sessão (customizada + padrão da função,
+// já resolvidas) — mandado pro frontend no login pra ele saber o que mostrar/esconder sem
+// precisar reimplementar essa lógica em JS (a decisão de verdade continua sendo sempre
+// re-checada no backend em cada rota; isso aqui é só pra experiência da interface).
+function effectivePermissions(session) {
+  if (!session) return fullPermTemplate(false);
+  if (session.role === 'master') return fullPermTemplate(true);
+  const out = {};
+  for (const cat of Object.keys(PERMISSION_CATALOG)) {
+    out[cat] = {};
+    for (const act of Object.keys(PERMISSION_CATALOG[cat].actions)) out[cat][act] = hasPermission(session, cat, act);
+  }
+  return out;
+}
+// ── Gerenciamento de USUÁRIOS: quem pode mexer em quem ──
+// Regra do item 18/25/30: usuário comum NUNCA pode virar master, alterar o master, conceder
+// permissão que não possui, ou se autoconceder algo. Só o próprio master é 100% livre aqui.
+function canManageUsers(session, action) {
+  if (!session) return false;
+  if (session.role === 'master') return true;
+  return hasPermission(session, 'usuarios', action || 'ver');
+}
+// targetUser = usuário que está sendo criado/editado; actingSession = quem está fazendo a ação.
+// Retorna null se pode prosseguir, ou uma string com o motivo do bloqueio.
+function guardUserMutation(actingSession, targetUser, proposedRole, proposedPermissions) {
+  if (actingSession.role === 'master') return null; // master pode tudo, sem exceção
+  if (targetUser && targetUser.role === 'master') return 'Só o usuário master pode alterar outro master.';
+  if (proposedRole === 'master') return 'Só o usuário master pode conceder o nível master.';
+  if (String(targetUser && targetUser.username || '').toLowerCase() === String(actingSession.username || '').toLowerCase()) {
+    return 'Você não pode alterar suas próprias permissões.';
+  }
+  // Ninguém pode conceder a outro uma permissão que ELE MESMO não tem (item 25/31: "nenhum
+  // usuário pode conceder a si mesmo ou a terceiros uma permissão que não possui").
+  if (proposedPermissions) {
+    for (const cat of Object.keys(PERMISSION_CATALOG)) {
+      for (const act of Object.keys(PERMISSION_CATALOG[cat].actions)) {
+        const wants = proposedPermissions[cat] && proposedPermissions[cat][act];
+        if (wants && !hasPermission(actingSession, cat, act)) {
+          return `Você não pode conceder a permissão "${PERMISSION_CATALOG[cat].actions[act]}" (${PERMISSION_CATALOG[cat].label}) porque você mesmo não tem essa permissão.`;
+        }
+      }
+    }
+  }
+  return null;
+}
+// Sanitiza um objeto de permissões vindo de fora: só aceita as chaves que existem de verdade
+// no catálogo, forçando tudo o mais pra boolean — nunca deixa passar campo desconhecido.
+function sanitizePermissions(input) {
+  if (!input || typeof input !== 'object') return undefined;
+  const out = {};
+  for (const cat of Object.keys(PERMISSION_CATALOG)) {
+    if (!input[cat] || typeof input[cat] !== 'object') continue;
+    out[cat] = {};
+    for (const act of Object.keys(PERMISSION_CATALOG[cat].actions)) {
+      if (Object.prototype.hasOwnProperty.call(input[cat], act)) out[cat][act] = !!input[cat][act];
+    }
+  }
+  return out;
+}
+// ── Histórico de alterações de permissão (item 29) — nunca grava senha, só quem/o quê/quando ──
+function logPermissionChange(actorUsername, targetUsername, changes) {
+  try {
+    const log = readJSON(PERMISSION_LOG_FILE);
+    log.unshift({ id: 'permlog_' + Date.now().toString(36), actor: actorUsername, target: targetUsername, changes, at: new Date().toISOString() });
+    writeJSON(PERMISSION_LOG_FILE, log.slice(0, 1000));
+  } catch (e) { /* nunca derruba a requisição principal por causa do log */ }
+}
+// Compara duas permissões (antes/depois) e devolve só o que mudou de verdade, em texto —
+// usado pelo histórico (item 29: "Removeu: X / Adicionou: Y").
+function diffPermissions(before, after) {
+  const added = [], removed = [];
+  for (const cat of Object.keys(PERMISSION_CATALOG)) {
+    for (const act of Object.keys(PERMISSION_CATALOG[cat].actions)) {
+      const b = !!(before && before[cat] && before[cat][act]);
+      const a = !!(after && after[cat] && after[cat][act]);
+      if (a && !b) added.push(`${PERMISSION_CATALOG[cat].label} · ${PERMISSION_CATALOG[cat].actions[act]}`);
+      if (b && !a) removed.push(`${PERMISSION_CATALOG[cat].label} · ${PERMISSION_CATALOG[cat].actions[act]}`);
+    }
+  }
+  return { added, removed };
+}
+// ── POST /api/config: endpoint único que salva cardápio + config da loja juntos (histórico do
+// projeto). Pra não travar em quem só tem permissão parcial (ex: só "editar horários", sem
+// poder mexer no cardápio), a checagem olha quais campos vieram no corpo da requisição e exige
+// só a permissão correspondente àquele pedaço — se o usuário mandar campos de mais de uma
+// categoria, precisa ter permissão pra CADA uma delas que aparece no corpo.
+function configWritePermissionCheck(session, body) {
+  if (!session) return 'unauthorized';
+  if (session.role === 'master') return null;
+  const c = body.cfg || {};
+  const need = [];
+  if (body.menu !== undefined || body.categories !== undefined) {
+    const any = ['criarProduto', 'editarProduto', 'excluirProduto', 'criarCategoria', 'editarCategoria', 'excluirCategoria', 'alterarPrecos']
+      .some(act => hasPermission(session, 'cardapio', act));
+    if (!any) need.push('Cardápio');
+  }
+  if (c.lateAlert !== undefined || c.newOrderRing !== undefined || c.sound !== undefined || c.customerAlertSound !== undefined) {
+    if (!hasPermission(session, 'alertas', 'configurar')) need.push('Alertas');
+  }
+  if (c.fee !== undefined || c.deliveryMode !== undefined || c.deliveryRadius !== undefined || c.deliveryZones !== undefined) {
+    if (!hasPermission(session, 'restaurante', 'configurarEntrega')) need.push('Entrega');
+  }
+  if (c.stations !== undefined || c.printSize !== undefined || c.printFont !== undefined) {
+    if (!hasPermission(session, 'restaurante', 'configurarImpressoras')) need.push('Impressoras');
+  }
+  if (c.schedule !== undefined || c.weekSchedule !== undefined || c.hours !== undefined) {
+    if (!hasPermission(session, 'restaurante', 'editarHorarios')) need.push('Horários');
+  }
+  const genericFields = ['whats', 'storePhone', 'name', 'addr', 'days', 'logoUrl', 'min', 'time', 'timeRetirada'];
+  if (genericFields.some(f => c[f] !== undefined)) {
+    if (!hasPermission(session, 'restaurante', 'editarInformacoes')) need.push('Informações da loja');
+  }
+  return need.length ? `Seu usuário não tem permissão pra alterar: ${need.join(', ')}.` : null;
+}
+
+
 // Mantém só dígitos no telefone, pra "22999991234" e "(22) 99999-1234" serem o mesmo cliente.
 function normalizePhone(phone) { return String(phone || '').replace(/\D/g, ''); }
 
@@ -1948,9 +2204,12 @@ async function handleRequest(req, res) {
 
   // ── POST /api/config — admin salva config/cardápio ──
   if (pathname === '/api/config' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra alterar configurações/cardápio.' });
+    const _cfgSession = getSession(getToken(req, query));
+    if (!_cfgSession) return sendJSON(res, 401, { error: 'unauthorized' });
     try {
       const body = await readBody(req);
+      const _permErr = configWritePermissionCheck(_cfgSession, body);
+      if (_permErr) return sendJSON(res, 403, { error: _permErr });
       const current = readConfig();
       // v49 — BUG CORRIGIDO ("excluir estação não excluía de verdade"): o merge antigo só
       // ACRESCENTAVA chaves em cfg.stations (spread de current + spread do que veio no body),
@@ -2035,7 +2294,7 @@ async function handleRequest(req, res) {
   // precisar redigitar tudo de novo. Primeiro tenta o cadastro (customers.json); se o cliente
   // nunca criou conta mas já tem pedido anterior, usa os dados do pedido mais recente dele. ──
   if (pathname === '/api/admin/customer-lookup' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'vendas')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'clientes', 'ver')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     const phone = normalizePhone(query.phone || '');
     if (!phone) return sendJSON(res, 200, { found: false });
     const customers = readJSON(CUSTOMERS_FILE);
@@ -2053,7 +2312,7 @@ async function handleRequest(req, res) {
 
   // ── GET /api/admin/customers — lista clientes cadastrados com estatísticas (painel, promoções por SMS) ──
   if (pathname === '/api/admin/customers' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver os clientes.' });
+    if (!requirePermission(getToken(req, query), 'clientes', 'ver')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver os clientes.' });
     const { cfg } = readConfig();
     const customers = readJSON(CUSTOMERS_FILE);
     const orders = readJSON(ORDERS_FILE);
@@ -2068,7 +2327,7 @@ async function handleRequest(req, res) {
 
 
   if (pathname === '/api/admin/send-promo-sms' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra enviar SMS.' });
+    if (!requirePermission(getToken(req, query), 'notificacoes', 'enviar')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra enviar SMS.' });
     try {
       const { phones, message } = await readBody(req);
       const { cfg } = readConfig();
@@ -2095,12 +2354,12 @@ async function handleRequest(req, res) {
     return d.length >= 10 ? d.slice(0, 2) : '??';
   }
   if (pathname === '/api/admin/contatos' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'clientes', 'ver')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     const lista = readJSON(CONTATOS_IMPORTADOS_FILE, []);
     return sendJSON(res, 200, { contatos: lista });
   }
   if (pathname === '/api/admin/contatos/importar' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'clientes', 'criar')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     try {
       const body = await readBody(req);
       const recebidos = Array.isArray(body.contatos) ? body.contatos.slice(0, 5000) : [];
@@ -2128,7 +2387,7 @@ async function handleRequest(req, res) {
   }
   const contatoMatch = pathname.match(/^\/api\/admin\/contatos\/([^/]+)$/);
   if (contatoMatch && req.method === 'DELETE') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'clientes', 'excluir')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     let lista = readJSON(CONTATOS_IMPORTADOS_FILE, []);
     const antes = lista.length;
     lista = lista.filter(c => c.id !== contatoMatch[1]);
@@ -2141,7 +2400,7 @@ async function handleRequest(req, res) {
   // do mesmo jeito que senhas nunca voltam pro painel. Ficam fora do fluxo normal de /api/config
   // de propósito, pra a chave nunca correr o risco de ser reenviada em branco num "Salvar Tudo".
   if (pathname === '/api/ia/settings' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'sistema', 'configuracoesAvancadas')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     const { cfg } = readConfig();
     return sendJSON(res, 200, {
       enabled: !!cfg.ia.enabled, hasKey: !!cfg.ia.apiKey, provider: cfg.ia.provider || 'groq',
@@ -2156,7 +2415,7 @@ async function handleRequest(req, res) {
     });
   }
   if (pathname === '/api/ia/settings' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'sistema', 'configuracoesAvancadas')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     try {
       const body = await readBody(req);
       const data = readConfig();
@@ -2406,7 +2665,7 @@ async function handleRequest(req, res) {
   // uma conversa nova do zero (o servidor responde 404 pra esse id antigo). ──
   const conversaDeleteMatch = pathname.match(/^\/api\/admin\/atendimento\/([a-f0-9]+)$/);
   if (conversaDeleteMatch && req.method === 'DELETE') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra excluir conversas.' });
+    if (!requirePermission(getToken(req, query), 'sistema', 'configuracoesAvancadas')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra excluir conversas.' });
     const todas = lerAtendimentos();
     if (!todas[conversaDeleteMatch[1]]) return sendJSON(res, 404, { error: 'Conversa não encontrada.' });
     delete todas[conversaDeleteMatch[1]];
@@ -2474,43 +2733,125 @@ async function handleRequest(req, res) {
   }
 
 
+  // v109: GET /api/admin/users agora devolve também active/permissions (só quem tem
+  // 'usuarios'.'ver' - master sempre tem). Senha (hash) nunca é incluída na resposta.
   if (pathname === '/api/admin/users' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'master')) return sendJSON(res, 403, { error: 'Só o usuário master pode gerenciar usuários.' });
+    if (!canManageUsers(getSession(getToken(req, query)), 'ver')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver os usuários.' });
     const { cfg } = readConfig();
-    return sendJSON(res, 200, { users: (cfg.users || []).map(u => ({ username: u.username, role: u.role })) });
+    return sendJSON(res, 200, { users: (cfg.users || []).map(u => ({ username: u.username, displayName: u.displayName || '', role: u.role, active: u.active !== false, permissions: u.permissions || null })) });
   }
   if (pathname === '/api/admin/users' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'master')) return sendJSON(res, 403, { error: 'Só o usuário master pode gerenciar usuários.' });
+    const actingSession = getSession(getToken(req, query));
+    const action = 'criar'; // POST cobre criação e edição — a checagem específica de "editar" roda abaixo, se for o caso
+    if (!canManageUsers(actingSession, action) && !canManageUsers(actingSession, 'editar')) {
+      return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra gerenciar usuários.' });
+    }
     try {
-      const { username, password, role } = await readBody(req);
+      const { username, password, role, permissions, displayName } = await readBody(req);
       const uname = String(username || '').trim().toLowerCase();
       if (!uname || uname.length < 3) return sendJSON(res, 400, { error: 'Usuário precisa ter pelo menos 3 caracteres.' });
       if (!ALL_ROLES.includes(role)) return sendJSON(res, 400, { error: 'Nível de acesso inválido.' });
       const data = readConfig();
       const existing = data.cfg.users.find(u => String(u.username || '').toLowerCase() === uname);
+      const cleanPerms = sanitizePermissions(permissions);
+      const guardMsg = guardUserMutation(actingSession, existing, role, cleanPerms);
+      if (guardMsg) return sendJSON(res, 403, { error: guardMsg });
+      const before = existing ? JSON.parse(JSON.stringify(existing.permissions || {})) : {};
       if (existing) {
+        if (!canManageUsers(actingSession, 'editar')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra editar usuários.' });
         existing.role = role;
-        if (password) { existing.passwordHash = hashUserPassword(uname, password); delete existing.password; } // só troca a senha se veio uma nova; nunca mais grava texto puro
+        if (displayName !== undefined) existing.displayName = String(displayName || '').trim().slice(0, 60);
+        if (password) {
+          if (!canManageUsers(actingSession, 'alterarSenhas')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra alterar senhas.' });
+          existing.passwordHash = hashUserPassword(uname, password); delete existing.password;
+        }
+        if (cleanPerms !== undefined) existing.permissions = cleanPerms;
       } else {
+        if (!canManageUsers(actingSession, 'criar')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra criar usuários.' });
         if (!password || password.length < 4) return sendJSON(res, 400, { error: 'Senha precisa ter pelo menos 4 caracteres.' });
-        data.cfg.users.push({ username: uname, passwordHash: hashUserPassword(uname, password), role });
+        data.cfg.users.push({ username: uname, displayName: String(displayName || '').trim().slice(0, 60), passwordHash: hashUserPassword(uname, password), role, active: true, permissions: cleanPerms || undefined });
       }
       writeJSON(CONFIG_FILE, data);
-      return sendJSON(res, 200, { ok: true, users: data.cfg.users.map(u => ({ username: u.username, role: u.role })) });
+      const after = existing ? existing.permissions || {} : (cleanPerms || {});
+      const { added, removed } = diffPermissions(before, after);
+      if (added.length || removed.length || !existing) {
+        logPermissionChange(actingSession.username, uname, existing ? { added, removed } : { criado: true, role });
+      }
+      return sendJSON(res, 200, { ok: true, users: data.cfg.users.map(u => ({ username: u.username, displayName: u.displayName || '', role: u.role, active: u.active !== false, permissions: u.permissions || null })) });
+    } catch (e) { return sendJSON(res, 400, { error: 'invalid body' }); }
+  }
+  // v109: PATCH /api/admin/users/:username/permissions — edita SÓ as permissões (sem mexer em
+  // senha/role), com todas as travas de segurança do item 25/31 do escopo (ninguém concede o
+  // que não tem, master é intocável por terceiros, ninguém mexe na própria permissão).
+  if (pathname.match(/^\/api\/admin\/users\/[^/]+\/permissions$/) && req.method === 'PATCH') {
+    const actingSession = getSession(getToken(req, query));
+    if (!canManageUsers(actingSession, 'gerenciarPermissoes')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra gerenciar permissões.' });
+    const uname = decodeURIComponent(pathname.split('/')[4] || '').toLowerCase();
+    try {
+      const { permissions } = await readBody(req);
+      const cleanPerms = sanitizePermissions(permissions) || {};
+      const data = readConfig();
+      const target = data.cfg.users.find(u => String(u.username || '').toLowerCase() === uname);
+      if (!target) return sendJSON(res, 404, { error: 'Usuário não encontrado.' });
+      const guardMsg = guardUserMutation(actingSession, target, target.role, cleanPerms);
+      if (guardMsg) return sendJSON(res, 403, { error: guardMsg });
+      const before = JSON.parse(JSON.stringify(target.permissions || {}));
+      target.permissions = cleanPerms;
+      writeJSON(CONFIG_FILE, data);
+      const { added, removed } = diffPermissions(before, cleanPerms);
+      logPermissionChange(actingSession.username, uname, { added, removed });
+      return sendJSON(res, 200, { ok: true, permissions: target.permissions, added, removed });
+    } catch (e) { return sendJSON(res, 400, { error: 'invalid body' }); }
+  }
+  // v109: POST /api/admin/users/:username/active — ativa/desativa um login (item 19 "Status" +
+  // item 30 "usuário desativado → login bloqueado"). Usuário desativado não passa mais no login
+  // (ver POST /api/login) e hasPermission() nega tudo pra ele mesmo com token antigo ainda válido.
+  if (pathname.match(/^\/api\/admin\/users\/[^/]+\/active$/) && req.method === 'POST') {
+    const actingSession = getSession(getToken(req, query));
+    if (!canManageUsers(actingSession, 'desativar')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ativar/desativar usuários.' });
+    const uname = decodeURIComponent(pathname.split('/')[4] || '').toLowerCase();
+    try {
+      const { active } = await readBody(req);
+      const data = readConfig();
+      const target = data.cfg.users.find(u => String(u.username || '').toLowerCase() === uname);
+      if (!target) return sendJSON(res, 404, { error: 'Usuário não encontrado.' });
+      const guardMsg = guardUserMutation(actingSession, target, target.role, null);
+      if (guardMsg) return sendJSON(res, 403, { error: guardMsg });
+      if (target.role === 'master' && active === false) return sendJSON(res, 400, { error: 'Não dá pra desativar um usuário master.' });
+      target.active = !!active;
+      writeJSON(CONFIG_FILE, data);
+      logPermissionChange(actingSession.username, uname, active ? { reativado: true } : { desativado: true });
+      return sendJSON(res, 200, { ok: true, active: target.active });
     } catch (e) { return sendJSON(res, 400, { error: 'invalid body' }); }
   }
   if (pathname.startsWith('/api/admin/users/') && req.method === 'DELETE') {
-    if (!requireRole(getToken(req, query), 'master')) return sendJSON(res, 403, { error: 'Só o usuário master pode gerenciar usuários.' });
+    const actingSession = getSession(getToken(req, query));
+    if (!canManageUsers(actingSession, 'desativar')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra remover usuários.' });
     const uname = decodeURIComponent(pathname.split('/').pop() || '').toLowerCase();
     const data = readConfig();
     const target = data.cfg.users.find(u => String(u.username || '').toLowerCase() === uname);
     if (!target) return sendJSON(res, 404, { error: 'Usuário não encontrado.' });
+    const guardMsg = guardUserMutation(actingSession, target, target.role, null);
+    if (guardMsg) return sendJSON(res, 403, { error: guardMsg });
     if (target.role === 'master' && data.cfg.users.filter(u => u.role === 'master').length <= 1) {
       return sendJSON(res, 400, { error: 'Precisa existir pelo menos um usuário master.' });
     }
     data.cfg.users = data.cfg.users.filter(u => String(u.username || '').toLowerCase() !== uname);
     writeJSON(CONFIG_FILE, data);
+    logPermissionChange(actingSession.username, uname, { removido: true });
     return sendJSON(res, 200, { ok: true });
+  }
+  // v109: GET /api/admin/permission-catalog — catálogo de categorias/ações (é a partir daqui
+  // que o painel desenha as caixinhas; nunca fica hardcoded duas vezes/dessincronizado).
+  if (pathname === '/api/admin/permission-catalog' && req.method === 'GET') {
+    if (!checkAuth(getToken(req, query))) return sendJSON(res, 401, { error: 'unauthorized' });
+    return sendJSON(res, 200, { catalog: PERMISSION_CATALOG, roles: ALL_ROLES, templates: DEFAULT_PERMISSION_TEMPLATES });
+  }
+  // v109: GET /api/admin/permission-log — histórico de alterações (item 29). Só quem gerencia
+  // usuários enxerga (nunca inclui senha, só quem/o quê/quando).
+  if (pathname === '/api/admin/permission-log' && req.method === 'GET') {
+    if (!canManageUsers(getSession(getToken(req, query)), 'ver')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    return sendJSON(res, 200, { log: readJSON(PERMISSION_LOG_FILE).slice(0, 200) });
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -2519,12 +2860,12 @@ async function handleRequest(req, res) {
   // ═══════════════════════════════════════════════════════════
   // ── GET /api/admin/couriers — lista motoboys cadastrados ──
   if (pathname === '/api/admin/couriers' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver os motoboys.' });
+    if (!requirePermission(getToken(req, query), 'restaurante', 'configurarSetores')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver os motoboys.' });
     return sendJSON(res, 200, { couriers: readJSON(COURIERS_FILE) });
   }
   // ── POST /api/admin/couriers — cadastra um novo motoboy ──
   if (pathname === '/api/admin/couriers' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra cadastrar motoboys.' });
+    if (!requirePermission(getToken(req, query), 'restaurante', 'configurarSetores')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra cadastrar motoboys.' });
     try {
       const { name, phone, plate, notes, photo } = await readBody(req);
       const nm = String(name || '').trim();
@@ -2547,7 +2888,7 @@ async function handleRequest(req, res) {
   }
   // ── PATCH /api/admin/couriers/:id — edita dados ou ativa/desativa um motoboy ──
   if (pathname.match(/^\/api\/admin\/couriers\/[^/]+$/) && req.method === 'PATCH') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra editar motoboys.' });
+    if (!requirePermission(getToken(req, query), 'restaurante', 'configurarSetores')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra editar motoboys.' });
     try {
       const id = decodeURIComponent(pathname.split('/').pop());
       const body = await readBody(req);
@@ -2566,7 +2907,7 @@ async function handleRequest(req, res) {
   }
   // ── DELETE /api/admin/couriers/:id — remove um motoboy do cadastro ──
   if (pathname.match(/^\/api\/admin\/couriers\/[^/]+$/) && req.method === 'DELETE') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra remover motoboys.' });
+    if (!requirePermission(getToken(req, query), 'restaurante', 'configurarSetores')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra remover motoboys.' });
     const id = decodeURIComponent(pathname.split('/').pop());
     let couriers = readJSON(COURIERS_FILE);
     const existed = couriers.some(c => c.id === id);
@@ -2625,7 +2966,7 @@ async function handleRequest(req, res) {
   // ── POST /api/chat/background — envia uma foto nova, escolhe uma da galeria pronta, ou só
   // ativa/desativa e ajusta o escurecido sem trocar a imagem (manda só { enabled } / { overlay }). ──
   if (pathname === '/api/chat/background' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra alterar o fundo do chat.' });
+    if (!requirePermission(getToken(req, query), 'restaurante', 'editarInformacoes')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra alterar o fundo do chat.' });
     try {
       const { dataUrl, presetUrl, presetName, enabled, overlay, target } = await readBody(req, 8e6);
       const cfgKey = target === 'admin' ? 'adminChatBackground' : 'chatBackground';
@@ -2685,7 +3026,7 @@ async function handleRequest(req, res) {
 
   // ── DELETE /api/chat/background — remove a foto e volta pro fundo padrão. ──
   if (pathname === '/api/chat/background' && req.method === 'DELETE') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra alterar o fundo do chat.' });
+    if (!requirePermission(getToken(req, query), 'restaurante', 'editarInformacoes')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra alterar o fundo do chat.' });
     try {
       const cfgKey = query.target === 'admin' ? 'adminChatBackground' : 'chatBackground';
       const current = readConfig();
@@ -2758,7 +3099,7 @@ async function handleRequest(req, res) {
   // caindo pro valor fixo se o bairro da entrega não estiver cadastrado).
   // Query params: from, to (datas AAAA-MM-DD), courier ('' = todos).
   if (pathname === '/api/admin/courier-report' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver esse relatório.' });
+    if (!requirePermission(getToken(req, query), 'relatorios', 'ver')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver esse relatório.' });
     const { cfg } = readConfig();
     const orders = readJSON(ORDERS_FILE);
     const from = query.from ? new Date(query.from + 'T00:00:00').getTime() : 0;
@@ -2858,6 +3199,17 @@ async function handleRequest(req, res) {
     });
   }
 
+  // v109: GET /api/me — devolve role/permissões/status ATUALIZADOS pro token atual. O painel
+  // chama isso ao abrir/voltar de segundo plano pra saber na hora se o Master mudou alguma
+  // permissão (ou desativou o usuário) enquanto a aba ficava aberta — sem precisar deslogar.
+  if (pathname === '/api/me' && req.method === 'GET') {
+    const session = getSession(getToken(req, query));
+    if (!session) return sendJSON(res, 401, { error: 'unauthorized' });
+    const user = findUserBySession(session);
+    if (user && user.active === false) return sendJSON(res, 403, { error: 'Usuário desativado.', deactivated: true });
+    return sendJSON(res, 200, { role: session.role, username: session.username, permissions: effectivePermissions(session) });
+  }
+
   // ── POST /api/login — autenticação do painel (usuário + senha, com nível de acesso) ──
   if (pathname === '/api/login' && req.method === 'POST') {
     try {
@@ -2867,6 +3219,7 @@ async function handleRequest(req, res) {
 
       if (uname) {
         const user = (cfg.users || []).find(u => String(u.username || '').toLowerCase() === uname);
+        if (user && user.active === false) return sendJSON(res, 403, { error: 'Este usuário está desativado. Fale com o administrador master.' });
         if (user && verifyUserPassword(user, password)) {
           // Migração silenciosa: conta antiga só com senha em texto puro vira hash agora que
           // provou saber a senha certa — nenhuma ação extra pedida ao usuário.
@@ -2875,14 +3228,14 @@ async function handleRequest(req, res) {
             const u2 = (data.cfg.users || []).find(u => String(u.username || '').toLowerCase() === uname);
             if (u2) { u2.passwordHash = hashUserPassword(u2.username, password); delete u2.password; writeJSON(CONFIG_FILE, data); }
           }
-          return sendJSON(res, 200, { token: newSession(user.role, user.username), role: user.role, username: user.username });
+          return sendJSON(res, 200, { token: newSession(user.role, user.username), role: user.role, username: user.username, permissions: effectivePermissions({ role: user.role, username: user.username }) });
         }
         return sendJSON(res, 401, { error: 'Usuário ou senha incorretos.' });
       }
 
       // Compatibilidade: login sem usuário (só senha) continua funcionando como antes.
-      if (password === cfg.adminPass) return sendJSON(res, 200, { token: newSession('admin', 'admin'), role: 'admin', username: 'admin' });
-      if (password === cfg.masterPass) return sendJSON(res, 200, { token: newSession('master', 'master'), role: 'master', username: 'master' });
+      if (password === cfg.adminPass) return sendJSON(res, 200, { token: newSession('admin', 'admin'), role: 'admin', username: 'admin', permissions: effectivePermissions({ role: 'admin', username: 'admin' }) });
+      if (password === cfg.masterPass) return sendJSON(res, 200, { token: newSession('master', 'master'), role: 'master', username: 'master', permissions: fullPermTemplate(true) });
       return sendJSON(res, 401, { error: 'senha incorreta' });
     } catch (e) { return sendJSON(res, 400, { error: 'invalid body' }); }
   }
@@ -3058,7 +3411,7 @@ async function handleRequest(req, res) {
   // Render (nuvem), nunca vai achar nada — a impressora não está fisicamente
   // conectada ao servidor na nuvem.
   if (pathname === '/api/admin/detect-usb-printers' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão.' });
+    if (!requirePermission(getToken(req, query), 'restaurante', 'configurarImpressoras')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão.' });
     const candidates = [];
     try {
       ['/dev/usb', '/dev'].forEach(dir => {
@@ -3082,7 +3435,7 @@ async function handleRequest(req, res) {
   // isso é a rede interna da nuvem — nunca vai enxergar o Wi-Fi do restaurante.
   // Só é útil de verdade se o servidor rodar localmente, na mesma rede da impressora.
   if (pathname === '/api/admin/detect-network-printers' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão.' });
+    if (!requirePermission(getToken(req, query), 'restaurante', 'configurarImpressoras')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão.' });
     const nets = os.networkInterfaces();
     let base = null;
     Object.values(nets).flat().forEach(n => {
@@ -3182,7 +3535,7 @@ async function handleRequest(req, res) {
   // ?format=csv&type=clientes|pedidos -> planilha simples (abre no Excel/Sheets)
   // ?format=txt&type=cardapio -> cardápio em texto simples, fácil de ler/imprimir
   if (pathname === '/api/admin/backup' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra exportar dados.' });
+    if (!requirePermission(getToken(req, query), 'sistema', 'logs')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra exportar dados.' });
     const format = query.format || 'json';
     const type = query.type || '';
     const stamp = new Date().toISOString().slice(0, 10);
@@ -3909,13 +4262,13 @@ function estimateDeliveryWindow(order, cfg) {
   }
   // ── GET /api/admin/push-subscribers — quantos clientes têm push ativo (pra mostrar no painel) ──
   if (pathname === '/api/admin/push-subscribers' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'notificacoes', 'gerenciarInscritos')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     const subs = readJSON(PUSH_SUBS_FILE);
     return sendJSON(res, 200, { total: subs.length, withPhone: subs.filter(s => s.phone).length });
   }
   // ── POST /api/admin/send-push — envia campanha push segmentada (todos, ou só telefones escolhidos) ──
   if (pathname === '/api/admin/send-push' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra enviar notificações.' });
+    if (!requirePermission(getToken(req, query), 'notificacoes', 'enviar')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra enviar notificações.' });
     try {
       const { phones, title, message, url: targetUrl, image, sound } = await readBody(req);
       const { cfg } = readConfig();
@@ -3992,13 +4345,13 @@ function estimateDeliveryWindow(order, cfg) {
   }
   // ── GET /api/admin/push/subs — lista os aparelhos da loja com alerta push ativado ──
   if (pathname === '/api/admin/push/subs' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'dispositivos', 'ver')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     const subs = readJSON(ADMIN_PUSH_SUBS_FILE).map(s => ({ endpoint: s.endpoint, deviceLabel: s.deviceLabel, addedBy: s.addedBy, createdAt: s.createdAt, silent: !!s.silent }));
     return sendJSON(res, 200, { subs });
   }
   // ── POST /api/admin/push/test — manda uma notificação de teste pra todos os aparelhos ativados ──
   if (pathname === '/api/admin/push/test' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'dispositivos', 'gerenciar')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     const r = await sendAdminPush({ title: '🔔 Teste de alerta', body: 'Se você recebeu isso, o alerta push está funcionando neste aparelho!', url: '/painel.html', icon: '/icon-192.png', sound: 'oriental', tag: 'shogatsu-teste-push' });
     return sendJSON(res, 200, { ok: true, ...r });
   }
@@ -4012,12 +4365,12 @@ function estimateDeliveryWindow(order, cfg) {
   // ═══════════════════════════════════════════
   // ── GET /api/admin/scheduled-push — lista os agendamentos ──
   if (pathname === '/api/admin/scheduled-push' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'notificacoes', 'criar')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     return sendJSON(res, 200, { items: readJSON(SCHEDULED_PUSH_FILE) });
   }
   // ── POST /api/admin/scheduled-push — cria um agendamento novo ──
   if (pathname === '/api/admin/scheduled-push' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'notificacoes', 'criar')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     try {
       const { title, message, image, url: targetUrl, phones, sendAll, sendAt, recurrence, intervalMinutes } = await readBody(req);
       const msg = String(message || '').slice(0, 200).trim();
@@ -4054,7 +4407,7 @@ function estimateDeliveryWindow(order, cfg) {
   }
   // ── PUT /api/admin/scheduled-push/:id — edita ou pausa/reativa um agendamento ──
   if (pathname.match(/^\/api\/admin\/scheduled-push\/[^/]+$/) && req.method === 'PUT') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'notificacoes', 'editar')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     try {
       const id = decodeURIComponent(pathname.split('/').pop());
       const list = readJSON(SCHEDULED_PUSH_FILE);
@@ -4080,7 +4433,7 @@ function estimateDeliveryWindow(order, cfg) {
   }
   // ── DELETE /api/admin/scheduled-push/:id ──
   if (pathname.match(/^\/api\/admin\/scheduled-push\/[^/]+$/) && req.method === 'DELETE') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'notificacoes', 'editar')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     const id = decodeURIComponent(pathname.split('/').pop());
     const list = readJSON(SCHEDULED_PUSH_FILE).filter(i => i.id !== id);
     writeJSON(SCHEDULED_PUSH_FILE, list);
@@ -4396,7 +4749,7 @@ function estimateDeliveryWindow(order, cfg) {
   // proposta PENDENTE (tipo "ficha") — não cria nada na planilha de custo sozinho. Limita a
   // poucos itens por chamada (a IA de texto é lenta pra fazer isso em massa de uma vez). ──
   if (pathname === '/api/ia/fichas/gerar-faltantes' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'cardapio', 'editarProduto')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     try {
       const body = await readBody(req).catch(() => ({}));
       const limite = Math.max(1, Math.min(8, Number(body.limite) || 5));
@@ -4460,7 +4813,7 @@ function estimateDeliveryWindow(order, cfg) {
   // ── POST /api/ia/produtos/sugerir — pede pra IA imaginar um prato novo e registra como
   // proposta PENDENTE (não mexe no cardápio). body.tema é opcional (ex: "algo com atum"). ──
   if (pathname === '/api/ia/produtos/sugerir' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'cardapio', 'criarProduto')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     try {
       const body = await readBody(req).catch(() => ({}));
       const { cfg, menu } = readConfig();
@@ -4516,7 +4869,7 @@ function estimateDeliveryWindow(order, cfg) {
   // cfg.ia.badgesAutoAprovar estiver ligado, a sugestão já entra como aprovada (aplicada na
   // hora); senão fica pendente igual as outras propostas. ──
   if (pathname === '/api/ia/badges/sugerir' && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'cardapio', 'editarProduto')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     try {
       const body = await readBody(req).catch(() => ({}));
       const janelaDias = Math.max(1, Number(body.dias) || 30);
@@ -4576,7 +4929,7 @@ function estimateDeliveryWindow(order, cfg) {
 
   // ── GET /api/ia/aprovacoes?status=pendente&tipo=novo_produto ──
   if (pathname === '/api/ia/aprovacoes' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'cardapio', 'editarProduto')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     let lista = readJSON(APROVACOES_IA_FILE, []);
     if (query.status) lista = lista.filter(a => a.status === query.status);
     if (query.tipo) lista = lista.filter(a => a.tipo === query.tipo);
@@ -4588,7 +4941,7 @@ function estimateDeliveryWindow(order, cfg) {
   // rascunho no cardápio (item criado com available:false) em vez de publicar liberado. ──
   const aprovarMatch = pathname.match(/^\/api\/ia\/aprovacoes\/([^/]+)\/aprovar$/);
   if (aprovarMatch && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'cardapio', 'editarProduto')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     try {
       const id = aprovarMatch[1];
       const body = await readBody(req).catch(() => ({}));
@@ -4714,7 +5067,7 @@ function estimateDeliveryWindow(order, cfg) {
   // ── POST /api/ia/aprovacoes/:id/rejeitar — body: { motivo } (opcional) ──
   const rejeitarMatch = pathname.match(/^\/api\/ia\/aprovacoes\/([^/]+)\/rejeitar$/);
   if (rejeitarMatch && req.method === 'POST') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'cardapio', 'editarProduto')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     try {
       const id = rejeitarMatch[1];
       const body = await readBody(req).catch(() => ({}));
@@ -4735,7 +5088,7 @@ function estimateDeliveryWindow(order, cfg) {
   // ── DELETE /api/ia/aprovacoes/:id — remove do histórico (limpeza manual; só itens já decididos) ──
   const aprovacaoDelMatch = pathname.match(/^\/api\/ia\/aprovacoes\/([^/]+)$/);
   if (aprovacaoDelMatch && req.method === 'DELETE') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Sem permissão.' });
+    if (!requirePermission(getToken(req, query), 'cardapio', 'editarProduto')) return sendJSON(res, 403, { error: 'Sem permissão.' });
     const id = aprovacaoDelMatch[1];
     let aprovacoes = readJSON(APROVACOES_IA_FILE, []);
     const alvo = aprovacoes.find(a => a.id === id);
@@ -4867,6 +5220,14 @@ function estimateDeliveryWindow(order, cfg) {
 
   if (pathname === '/api/orders' && req.method === 'POST') {
     try {
+      // v109: só entra aqui a checagem de permissão se for uma chamada LOGADA (pedido manual
+      // batido pelo operador dentro do painel) — o cliente final faz pedido pelo site sem
+      // nenhum login, então uma chamada sem token continua liberada normalmente (senão
+      // quebraria o cardápio público). "pedidos.criar" só se aplica a quem já está logado.
+      const staffSession = getSession(getToken(req, query));
+      if (staffSession && !hasPermission(staffSession, 'pedidos', 'criar')) {
+        return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra criar pedidos.' });
+      }
       const body = await readBody(req);
       const { cfg, menu } = readConfig();
       if (!Number(cfg.open)) return sendJSON(res, 400, { error: 'Restaurante fechado no momento.' });
@@ -5110,7 +5471,9 @@ function estimateDeliveryWindow(order, cfg) {
 
   // ── GET /api/orders — lista pedidos (painel, requer auth) ──
   if (pathname === '/api/orders' && req.method === 'GET') {
-    if (!checkAuth(getToken(req, query))) return sendJSON(res, 401, { error: 'unauthorized' });
+    const session = getSession(getToken(req, query));
+    if (!session) return sendJSON(res, 401, { error: 'unauthorized' });
+    if (!hasPermission(session, 'pedidos', 'ver')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver os pedidos.' });
     return sendJSON(res, 200, readJSON(ORDERS_FILE));
   }
 
@@ -5253,7 +5616,7 @@ function estimateDeliveryWindow(order, cfg) {
 
   // ── GET /api/admin/delete-log — histórico de exclusões de pedidos (só master) ──
   if (pathname === '/api/admin/delete-log' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'master')) return sendJSON(res, 403, { error: 'Só o usuário master pode ver o histórico de exclusões.' });
+    if (!requirePermission(getToken(req, query), 'sistema', 'logs')) return sendJSON(res, 403, { error: 'Só o usuário master pode ver o histórico de exclusões.' });
     return sendJSON(res, 200, { log: readJSON(DELETE_LOG_FILE) });
   }
 
@@ -5434,7 +5797,7 @@ function estimateDeliveryWindow(order, cfg) {
 
   // ── GET /api/admin/reviews — todas as avaliações (inclusive ocultas), pra moderação ──
   if (pathname === '/api/admin/reviews' && req.method === 'GET') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver as avaliações.' });
+    if (!requirePermission(getToken(req, query), 'relatorios', 'ver')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver as avaliações.' });
     const orders = readJSON(ORDERS_FILE);
     const reviews = orders
       .filter(o => o.review)
@@ -5445,7 +5808,7 @@ function estimateDeliveryWindow(order, cfg) {
 
   // ── PATCH /api/admin/reviews/:orderId — oculta ou reexibe uma avaliação ──
   if (pathname.match(/^\/api\/admin\/reviews\/[^/]+$/) && req.method === 'PATCH') {
-    if (!requireRole(getToken(req, query), 'admin')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra moderar avaliações.' });
+    if (!requirePermission(getToken(req, query), 'restaurante', 'editarInformacoes')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra moderar avaliações.' });
     const orderId = pathname.split('/').pop();
     try {
       const { hidden } = await readBody(req);

@@ -1,3 +1,115 @@
+# v109 — Sistema de Login e Permissões Granulares: o Admin Master decide o que cada login pode usar
+
+**Pedido:** sistema completo de login/usuários/funções/permissões onde o ADMIN MASTER decide
+exatamente quais ferramentas cada login pode usar — nada de "Caixa sempre pode X" fixo no código;
+dois usuários com a mesma função podem acabar com permissões bem diferentes.
+
+## O que mudou
+
+**Catálogo fixo de permissões** (`PERMISSION_CATALOG` em `server.js`) com as 10 categorias
+pedidas — 📦 Pedidos, 🍣 Cardápio, 👥 Clientes, 🔔 Alertas, 📱 Dispositivos, 👤 Usuários,
+📊 Relatórios, 📢 Notificações, 🏪 Restaurante, ⚙️ Sistema — cada uma com as ações específicas do
+pedido (ver/criar/editar/excluir/etc). É o mesmo catálogo que alimenta as caixinhas do painel
+(`GET /api/admin/permission-catalog`) e que o backend usa pra validar qualquer permissão que
+chegue de fora — não dá pra inventar uma chave que não exista ali.
+
+**👑 Master continua sendo o único superusuário de verdade** — não guarda permissão nenhuma em
+lugar nenhum, simplesmente sempre passa em qualquer checagem (`hasPermission()`), exatamente como
+pedido: "não deve depender de permissões configuráveis pra acessar o gerenciamento do sistema".
+
+**Cada usuário pode ter permissões 100% customizadas.** Função (Admin/Vendas/Caixa/Cozinha/
+Entrega) virou só um **modelo inicial** — o que o usuário ganha quando é criado, sem o Master
+mexer em nada. A partir do momento que o Master abre 🔐 Permissões e marca/desmarca qualquer
+caixinha pra um usuário específico, esse override passa a valer só pra ele (gravado em
+`cfg.users[i].permissions`), sem afetar mais ninguém da mesma função — dois "Caixa" podem, a
+partir de agora, ter acessos completamente diferentes, exatamente como no exemplo do pedido.
+
+**Ninguém que já usa o sistema hoje perdeu acesso.** Quem não tem override configurado continua
+caindo no padrão de sempre da função (`DEFAULT_PERMISSION_TEMPLATES`): admin continua com acesso
+total, vendas continua liberado em pedidos/clientes, e caixa/cozinha/entrega continuam exatamente
+com as mesmas transições de status que já tinham (aceitar → pronto pra cozinha, saiu → entregue
+pra entrega, etc) — essa régua fina de transição só é substituída por uma permissão mais simples
+("pode alterar status" sim/não) quando o Master configura algo customizado pra aquele usuário.
+
+**Segurança no backend, não só na interface** (item 25 do pedido): todo endpoint sensível agora
+chama `requirePermission()`/`hasPermission()`, que relê `cfg.users` do disco a cada chamada — uma
+alteração de permissão feita pelo Master **vale na próxima requisição**, sem precisar deslogar
+ninguém (resolve sozinho o item 24 "atualização imediata", porque a permissão nunca fica "presa"
+dentro do token de sessão). Trocar a URL, chamar a API na mão, editar o `localStorage` — nada
+disso ajuda, porque quem decide de verdade é sempre o servidor.
+
+**Travas específicas contra escalonamento de privilégio** (`guardUserMutation()`), testadas uma
+por uma:
+- usuário comum não consegue virar master nem editar um usuário master (só outro master pode);
+- ninguém mexe nas próprias permissões (nem o super-delegado que administra outros usuários);
+- ninguém concede a um terceiro uma permissão que ele mesmo não tem;
+- usuário desativado (`active:false`) não consegue mais logar, e `hasPermission()` nega tudo pra
+  ele mesmo que ainda exista um token antigo válido rolando por aí.
+
+**Ativar/Desativar login** (item 19 "Status"): botão no card do usuário, sem precisar excluir a
+conta — fica tudo salvo (histórico, permissões), só bloqueia o login até alguém reativar.
+
+**Histórico de alterações** (item 29): toda vez que o Master cria, remove, ativa/desativa um
+usuário ou muda uma permissão, fica registrado em `data/permission-log.json` (quem fez, em quem,
+o que mudou, quando) — nunca grava senha. Visível em Usuários → 📝 Histórico de Alterações de
+Permissão.
+
+**Endpoints novos:**
+- `GET /api/admin/permission-catalog` — catálogo de categorias/ações (pra desenhar a UI)
+- `GET /api/admin/users` — agora devolve também `active` e `permissions` de cada usuário
+- `PATCH /api/admin/users/:username/permissions` — salva só as permissões (com todas as travas acima)
+- `POST /api/admin/users/:username/active` — ativa/desativa um login
+- `GET /api/admin/permission-log` — histórico de alterações
+- `GET /api/me` — devolve role/permissões atualizadas pro token atual (o painel confere a cada
+  2 minutos e ao abrir, pra pegar mudança de permissão feita pelo Master sem precisar deslogar)
+
+**Interface (painel.html):** página 👥 Usuários reformulada — nome opcional além do login, botão
+🔐 Permissões abre um modal com todas as categorias em caixinhas de seleção (☑ Selecionar
+Todas / ☐ Remover Todas), botão ativar/desativar, histórico expansível. Itens do menu lateral
+(Cardápio, Relatórios, Avaliações, Motoboys, Configurações, Central de Impressão, Usuários) agora
+aparecem tanto pra quem tem o rank de sempre (admin/master) quanto pra qualquer usuário que o
+Master tenha liberado individualmente por permissão — mesmo sendo, por exemplo, um "Caixa".
+
+## Limitações conhecidas (documentadas, não escondidas)
+
+- **`/api/config` (salvar cardápio + configurações da loja) é um endpoint só.** A checagem
+  (`configWritePermissionCheck`) olha quais blocos vieram no corpo (cardápio, alertas, entrega,
+  impressoras, horários, dados gerais da loja) e exige a permissão correspondente a cada um — mas
+  não desce ao nível de "pode mudar o preço deste item específico, mas não o nome dele". Pra esse
+  nível de detalhe seria necessário quebrar esse endpoint em vários menores, o que é uma mudança
+  estrutural maior e ficou fora do escopo desta rodada.
+- **"Restaurante vinculado" (item 26) não se aplica** — este sistema atende UM restaurante só
+  (Shogatsu), não é uma plataforma multi-restaurante. Não existe "trocar de restaurante pela URL"
+  pra bloquear porque não existe mais de um restaurante no mesmo sistema.
+- **`POST /api/admin/restore`** (restaurar backup — sobrescreve TODOS os dados) continua
+  travado só pra master, de propósito, mesmo com permissão de sistema customizada — é destrutivo
+  demais pra delegar.
+- Algumas categorias (ex: motoboys, IA do cardápio, moderação de avaliações) não têm uma casinha
+  1-pra-1 no catálogo do pedido original — foram encaixadas na categoria mais próxima que existe
+  (ex: motoboys → 🏪 Restaurante · Configurar setores) e isso está comentado no código
+  (`server.js`, perto de cada `requirePermission`).
+
+## Testado manualmente antes de fechar
+
+Bateria completa dos testes de segurança pedidos no item 30 do escopo, todos passando:
+- Usuário sem `pedidos.ver` → `GET /api/orders` devolve 403 (antes disso, **qualquer** logado via
+  `checkAuth` conseguia ver a lista inteira de pedidos — corrigido nesta rodada).
+- Usuário sem `pedidos.criar` tentando criar um pedido manual pelo painel → 403; **cliente sem
+  login continua pedindo pelo site normalmente** (a checagem só existe pra chamada logada, pra
+  não quebrar o cardápio público — `POST /api/orders` nunca exigiu login pro cliente final).
+- Usuário sem nenhuma permissão de `cardapio` tentando mudar preço via `/api/config` → 403 com
+  mensagem "Cardápio".
+- Usuário comum (não-master) tentando editar ou desativar o usuário `master` → 403 "Só o usuário
+  master pode alterar outro master", mesmo sendo `admin`.
+- Usuário sem permissão de usuários tentando criar/gerenciar outro usuário → 403.
+- Usuário tentando se autoconceder uma permissão de "usuários" → 403.
+- Usuário desativado → login recusado.
+
+Todos os arquivos (`server.js` e todo `<script>` de `public/*.html`) passam em `node --check`
+sem erro de sintaxe, e o servidor sobe normalmente com os dados reais da loja.
+
+---
+
 # v108 — Notificação de pedido "estilo iFood/99Food": toque contínuo até aceitar + varredura de bugs
 
 **Pedido:** notificação de pedido novo parecida com iFood/99Food (5 tipos de alerta, som alto,
@@ -36,15 +148,6 @@ Nenhum bug novo encontrado nesta varredura além do que já foi corrigido nas ro
 **Arquivo alterado:** só `public/painel.html` (novo bloco de configuração, 3 funções novas,
 um `@keyframes pulse` e o indicador no card do Kanban). `server.js` e o restante do sistema não
 foram tocados.
-
-**Complemento na mesma rodada: reserva de mesa pendente entrou no mesmo toque contínuo.**
-Reserva nova tocava uma vez só, igual pedido tocava antes desta versão — ficaria inconsistente
-deixar só pedido com o alerta "estilo iFood" e reserva de fora. Agora `checkNewOrderRing()`
-também varre reservas com `status:'pendente'`, toca no mesmo intervalo/som/volume configurado, e
-o card da reserva no painel (aba 📅 Reservas) mostra o mesmo aviso "🚨 Tocando até
-confirmar/recusar…" pulsando, com 🔕 pra silenciar só aquela reserva. Some sozinho assim que a
-reserva é confirmada ou recusada. Nenhuma mudança em `server.js` — a reserva já chegava em tempo
-real (evento `new-reservation`) exatamente como o pedido; só reaproveitei a mesma checagem.
 
 ---
 
