@@ -704,6 +704,16 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
 .wa-emoji-panel button{background:none;border:none;font-size:18px;padding:4px;border-radius:6px;line-height:1;cursor:pointer;}
 .wa-emoji-panel button:hover{background:var(--gold-bg,rgba(201,168,76,.15));}
 
+/* v113 — compactação adicional e controles locais */
+#page-pedidos .settings-card{margin-bottom:12px;}
+#page-pedidos .settings-card input{min-height:34px;}
+@media(max-width:760px){
+ #page-pedidos .field-row{grid-template-columns:1fr 1fr!important;}
+ #page-pedidos .field-row .field:last-child{grid-column:1/-1;}
+ #page-motoboys .settings-card{padding:12px!important;}
+ #page-motoboys .settings-card .field-row{grid-template-columns:1fr!important;}
+ #page-configuracoes .settings-card{padding:12px!important;}
+}
 /* v112 — interface mais moderna, simples e mobile-first */
 :root{--sidebar-w:228px;--radius-lg:18px;--radius-md:14px;}
 .sidebar{box-shadow:12px 0 40px rgba(0,0,0,.08);}
@@ -912,6 +922,31 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
 <button class="topbar-btn" data-reorder-id="ptab-kanban" id="ptab-kanban" onclick="setPedidosView('kanban')">📋 Kanban</button>
 </div>
 <button class="btn sm secondary reorder-toggle-btn" onclick="toggleReorderMode('pedidos-viewtabs','shog_btnorder_pedidos_viewtabs', this)" title="Arraste os botões acima pra reorganizar a posição deles">✏️ Editar posição</button>
+</div>
+<div class="settings-card" style="grid-column:1/-1;">
+<div class="settings-card-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span>⚙️ Aparência dos pedidos</span><span style="font-size:10px;color:var(--muted);font-weight:400;">Kanban + Lista</span></div>
+<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
+            Altere os nomes direto aqui. Sem modal e sem sair de Pedidos.
+          </div>
+<div class="field-row">
+<div class="field"><label style="font-size:10px;">Coluna "Novos"</label><input id="lb-colNovo"/></div>
+<div class="field"><label style="font-size:10px;">Botão de aceitar</label><input id="lb-actionNovo"/></div>
+</div>
+<div class="field-row">
+<div class="field"><label style="font-size:10px;">Coluna "Preparando"</label><input id="lb-colPrep"/></div>
+<div class="field"><label style="font-size:10px;">Botão de marcar pronto</label><input id="lb-actionPrep"/></div>
+</div>
+<div class="field-row">
+<div class="field"><label style="font-size:10px;">Coluna "Pronto"</label><input id="lb-colPronto"/></div>
+<div class="field"><label style="font-size:10px;">Botão de confirmar entrega</label><input id="lb-actionPronto"/></div>
+</div>
+<div class="field-row">
+<div class="field"><label style="font-size:10px;">Coluna "Entregue"</label><input id="lb-colEntregue"/></div>
+<div class="field"><label style="font-size:10px;">Botão de cancelar</label><input id="lb-btnCancel"/></div>
+</div>
+<div class="field-row">
+<div class="field"><label style="font-size:10px;">Botão de imprimir</label><input id="lb-btnPrint"/></div>
+</div>
 </div>
 <!-- ── Sub-aba: Visão Geral (ex-Dashboard) ── -->
 <div id="pedidos-view-visao">
@@ -1738,10 +1773,9 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
 <div class="settings-accordion-body" id="acc-body-restaurante">
 <div class="settings-grid">
 <div class="settings-card" style="grid-column:1/-1;">
-<div class="settings-card-title">🤖 Automações</div>
+<div class="settings-card-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span>🤖 Automações</span><span style="font-size:10px;color:var(--gold);font-weight:600;">👑 Master</span></div>
 <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">
-            Mesmos interruptores que aparecem no rodapé do menu lateral — só que aqui, em card,
-            fica mais fácil de ver o estado certinho (ligado/desligado) e o que cada um faz.
+            Abra, aceite pedidos e confirme reservas automaticamente. Tudo em um só lugar.
           </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
 <div class="store-toggle" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;">
@@ -1767,77 +1801,8 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
 </div>
 </div>
 </div>
-<div class="settings-card">
-<div class="settings-card-title">🏪 Dados e operação</div>
-<div class="field"><label>Nome do Restaurante</label><input id="cfg-name" placeholder="Shogatsu Culinária Oriental"/></div>
-<div class="field"><label>Endereço Completo</label><input id="cfg-addr" placeholder="Av. Gov. Roberto Silveira, 109"/></div>
-<div class="field-row">
-<div class="field"><label>Horário</label><input id="cfg-hours" placeholder="18h30–23h"/></div>
-<div class="field"><label>Dias</label><input id="cfg-days" placeholder="Ter–Dom"/></div>
-</div>
-<div class="field">
-<label>📅 Dias e horário de funcionamento (por dia da semana)</label>
-<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">
-              Usado pra avisar "fechado" e travar o relógio de agendamento/reserva dentro do horário certo de cada dia.
-            </div>
-<div id="week-schedule-editor" style="display:flex;flex-direction:column;gap:6px;"></div>
-</div>
-<div class="field"><label>Frase da avaliação (pedida ao cliente após receber o pedido)</label><input id="cfg-reviewPrompt" placeholder="O que você achou do seu pedido?"/></div>
-<div class="field">
-<label style="display:flex;align-items:center;justify-content:space-between;">
-<span>Frases prontas (o cliente toca pra adicionar à avaliação)</span>
-<button class="btn secondary sm" onclick="addReviewPhraseField()" type="button">+ Frase</button>
-</label>
-<div id="review-phrases-list" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div>
-</div>
 
 
-<div class="field"><label>WhatsApp (com DDI)</label><input id="cfg-whats" placeholder="5522988683755"/></div>
-<div class="field"><label>Telefone (ligar/SMS, com DDD)</label><input id="cfg-storePhone" placeholder="(22) 98868-3755"/></div>
-<div class="field-row">
-<div class="field"><label>Pedido Mínimo R$</label><input id="cfg-min" placeholder="60" type="number"/></div>
-<div class="field"><label>Tempo Estimado (Delivery)</label>
-<select onchange="if(this.value)document.getElementById('cfg-time').value=this.value;" style="margin-bottom:6px;">
-<option value="">Presets rápidos...</option>
-<option value="20–30 min">20–30 min</option>
-<option value="30–45 min">30–45 min</option>
-<option value="40–60 min">40–60 min</option>
-<option value="60–90 min">60–90 min</option>
-<option value="até 1h">até 1h</option>
-<option value="até 1h30">até 1h30</option>
-</select>
-<input id="cfg-time" placeholder="40–60 min"/>
-</div>
-</div>
-<div class="field">
-<label>Tempo Estimado (Retirada)</label>
-<div style="font-size:10px;color:var(--muted);margin-bottom:4px;">v34: retirada costuma ser bem mais rápida — agora tem sua própria estimativa, separada do delivery.</div>
-<select onchange="if(this.value)document.getElementById('cfg-timeretirada').value=this.value;" style="margin-bottom:6px;">
-<option value="">Presets rápidos...</option>
-<option value="10–15 min">10–15 min</option>
-<option value="15–20 min">15–20 min</option>
-<option value="20–30 min">20–30 min</option>
-<option value="30–45 min">30–45 min</option>
-</select>
-<input id="cfg-timeretirada" placeholder="20–30 min"/>
-</div>
-<div class="operation-subtitle">⏰ Horário automático</div>
-
-<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
-            Se ativado, o restaurante abre e fecha sozinho no horário configurado — o botão manual
-            "Restaurante Aberto/Fechado" no menu lateral deixa de valer enquanto isso estiver ligado.
-          </div>
-<div class="field">
-<label style="display:flex;align-items:center;gap:8px;">
-<input id="sched-enabled" type="checkbox"/> Ativar auto-programação
-            </label>
-</div>
-<div class="field-row">
-<div class="field"><label style="font-size:10px;">Abre às</label><input id="sched-open" type="time" value="18:00"/></div>
-<div class="field"><label style="font-size:10px;">Fecha às</label><input id="sched-close" type="time" value="23:00"/></div>
-</div>
-<div style="font-size:10px;color:var(--muted);">Exemplo: 18:00 até 23:00 — abre 18h, fecha 23h, todo dia. Funciona mesmo passando da meia-noite (ex: 18:00 até 02:00).</div>
-</div>
 
 
 </div>
@@ -1850,6 +1815,33 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
 </div>
 <div class="settings-accordion-body" id="acc-body-aparencia">
 <div class="settings-grid">
+<div class="settings-card">
+<div class="settings-card-title">🏪 Dados e operação</div>
+<div class="field-row" style="gap:8px;">
+<div class="field"><label>Restaurante</label><input id="cfg-name" placeholder="Shogatsu Culinária Oriental"/></div>
+<div class="field"><label>WhatsApp</label><input id="cfg-whats" placeholder="5522988683755"/></div>
+<div class="field"><label>Telefone</label><input id="cfg-storePhone" placeholder="(22) 98868-3755"/></div>
+</div>
+<div class="field"><label>Endereço</label><input id="cfg-addr" placeholder="Av. Gov. Roberto Silveira, 109"/></div>
+<div class="field-row" style="gap:8px;">
+<div class="field"><label>Horário</label><input id="cfg-hours" placeholder="18h30–23h"/></div>
+<div class="field"><label>Dias</label><input id="cfg-days" placeholder="Ter–Dom"/></div>
+<div class="field"><label>Pedido mínimo R$</label><input id="cfg-min" placeholder="60" type="number"/></div>
+</div>
+<div class="field"><label>Funcionamento por dia</label><div id="week-schedule-editor" style="display:flex;flex-direction:column;gap:6px;"></div></div>
+<div class="field-row" style="gap:8px;">
+<div class="field"><label>Delivery</label><input id="cfg-time" placeholder="40–60 min"/></div>
+<div class="field"><label>Retirada</label><input id="cfg-timeretirada" placeholder="20–30 min"/></div>
+</div>
+<div class="operation-subtitle">⏰ Auto-abertura / fechamento</div>
+<div class="field-row" style="gap:8px;">
+<div class="field"><label style="display:flex;align-items:center;gap:8px;"><input id="sched-enabled" type="checkbox"/> Ativar automático</label></div>
+<div class="field"><label>Abre</label><input id="sched-open" type="time" value="18:00"/></div>
+<div class="field"><label>Fecha</label><input id="sched-close" type="time" value="23:00"/></div>
+</div>
+<div class="field"><label>Avaliação</label><input id="cfg-reviewPrompt" placeholder="O que você achou do seu pedido?"/></div>
+<div class="field"><label style="display:flex;align-items:center;justify-content:space-between;"><span>Frases prontas</span><button class="btn secondary sm" onclick="addReviewPhraseField()" type="button">+ Frase</button></label><div id="review-phrases-list" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div></div>
+</div>
 <div class="settings-card">
 <div class="settings-card-title">🎨 Aparência do Cardápio</div>
 <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Ajusta como o cardápio aparece pro cliente — dá pra testar e ver o resultado ao vivo abrindo o site em outra aba.</div>
@@ -1965,34 +1957,8 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
 </div>
 <div class="settings-accordion-body" id="acc-body-delivery">
 <div class="settings-grid">
-<div class="settings-card" style="grid-column:1/-1;">
-<div class="settings-card-title">💰 Taxa de Entrega</div>
-<div class="field"><label>Como calcular a taxa de entrega?</label>
-<select id="fee-mode" onchange="renderFeeModeUI()">
-<option value="fixo">💰 Taxa fixa (mesmo valor pra todo mundo)</option>
-<option value="cep">📮 Por faixa de CEP</option>
-<option value="bairro">📍 Por bairro</option>
-<option value="distancia">📏 Por distância (km até o cliente)</option>
-</select>
-</div>
-<div class="field"><label>Taxa Fixa / Padrão R$ <span style="font-weight:400;color:var(--muted);">(usada no modo fixo, e como reserva nos outros modos)</span></label><input id="cfg-fee" placeholder="8" type="number"/></div>
-<div id="fee-mode-body"></div>
-</div>
-<div class="settings-card" style="grid-column:1/-1;">
-<div class="settings-card-title">🛵 Pagamento de Motoboy</div>
-<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
-            Valor que a loja paga pra cada entregador por entrega — usado no relatório <b>Relatórios → 🛵 Taxas de Motoboy</b>.
-            É separado da taxa de entrega cobrada do cliente logo acima.
-          </div>
-<div class="field"><label>Como calcular o valor pago ao motoboy?</label>
-<select id="cp-mode" onchange="renderCourierPayModeUI()">
-<option value="fixo">💰 Valor fixo (mesmo valor toda entrega)</option>
-<option value="bairro">📍 Por bairro</option>
-</select>
-</div>
-<div class="field"><label>Valor fixo por entrega (R$) <span style="font-weight:400;color:var(--muted);">(usado no modo fixo, e como reserva no modo por bairro)</span></label><input id="cp-fixedvalue" placeholder="6" step="0.01" type="number"/></div>
-<div id="cp-mode-body"></div>
-</div>
+
+
 <div class="settings-card" style="grid-column:1/-1;">
 <div class="settings-card-title">⭐ Fidelidade (Pontos)</div>
 <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
@@ -2053,129 +2019,34 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
 </div>
 <div class="settings-accordion-body" id="acc-body-sistema">
 <div class="settings-grid">
-<div class="settings-card" style="grid-column:1/-1;">
-<div class="settings-card-title">✏️ Textos de Status e Botões</div>
-<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
-            Personalize como os status e botões de ação aparecem no painel (Kanban e lista de pedidos).
-          </div>
-<div class="field-row">
-<div class="field"><label style="font-size:10px;">Coluna "Novos"</label><input id="lb-colNovo"/></div>
-<div class="field"><label style="font-size:10px;">Botão de aceitar</label><input id="lb-actionNovo"/></div>
-</div>
-<div class="field-row">
-<div class="field"><label style="font-size:10px;">Coluna "Preparando"</label><input id="lb-colPrep"/></div>
-<div class="field"><label style="font-size:10px;">Botão de marcar pronto</label><input id="lb-actionPrep"/></div>
-</div>
-<div class="field-row">
-<div class="field"><label style="font-size:10px;">Coluna "Pronto"</label><input id="lb-colPronto"/></div>
-<div class="field"><label style="font-size:10px;">Botão de confirmar entrega</label><input id="lb-actionPronto"/></div>
-</div>
-<div class="field-row">
-<div class="field"><label style="font-size:10px;">Coluna "Entregue"</label><input id="lb-colEntregue"/></div>
-<div class="field"><label style="font-size:10px;">Botão de cancelar</label><input id="lb-btnCancel"/></div>
-</div>
-<div class="field-row">
-<div class="field"><label style="font-size:10px;">Botão de imprimir</label><input id="lb-btnPrint"/></div>
-</div>
-</div>
+
 <div class="settings-card">
-<div class="settings-card-title">🔊 Alertas</div>
-<div class="field"><label>Alerta Sonoro (pedido novo)</label>
-<select id="cfg-sound"><option value="1">✅ Ativado</option><option value="0">❌ Desativado</option></select>
+<div class="settings-card-title">🔔 Alertas de pedidos</div>
+<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Som, pedido novo e atraso em um só lugar.</div>
+<div class="field-row" style="gap:8px;">
+<div class="field"><label>Som</label><select id="cfg-sound"><option value="1">Ativado</option><option value="0">Desativado</option></select></div>
+<div class="field"><label>Tipo</label><select id="cfg-sound-choice" onchange="onAlertSoundChoiceInput(this.value)"><option value="1">Curto</option><option value="2">Dois tons</option><option value="3">Urgente</option><option value="4">Três notas</option><option value="5">Duplo</option></select></div>
+<div class="field"><label>Volume <span id="cfg-alert-volume-val" style="color:var(--muted);">100%</span></label><input id="cfg-alert-volume" max="1" min="0" oninput="onAlertVolumeInput(this.value)" step="0.05" type="range" value="1"/></div>
 </div>
-<div class="field"><label>🎵 Som do alerta</label>
-<select id="cfg-sound-choice" onchange="onAlertSoundChoiceInput(this.value)">
-<option value="1">Som 1 — Curto e chamativo</option>
-<option value="2">Som 2 — Dois tons</option>
-<option value="3">Som 3 — Urgente</option>
-<option value="4">Som 4 — Três notas</option>
-<option value="5">Som 5 — Duplo/contínuo</option>
-</select>
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 10px;"><button class="btn secondary sm" onclick="testSelectedSound()" type="button">▶ Testar</button><button class="btn secondary sm" onclick="playBeep()" type="button">🔉 Volume</button></div>
+<div style="border-top:1px solid var(--border);padding-top:10px;"><div class="field-row" style="gap:8px;">
+<div class="field"><label>🔔 Pedido novo</label><select id="cfg-ring-enabled" onchange="onNewOrderRingInput()"><option value="1">Repetir</option><option value="0">Uma vez</option></select></div>
+<div class="field"><label>Intervalo</label><select id="cfg-ring-seconds" onchange="onNewOrderRingInput()"><option value="3">3s</option><option selected value="5">5s</option><option value="8">8s</option><option value="12">12s</option></select></div>
+<div class="field"><label>⏱️ Atrasado após</label><select id="cfg-late-minutes" onchange="onLateAlertInput()"><option value="0">Desativado</option><option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option><option value="30">30 min</option></select></div>
+<div class="field"><label>Repetir atraso</label><select id="cfg-late-repeat" onchange="onLateAlertInput()"><option value="1">1 min</option><option selected value="3">3 min</option><option value="5">5 min</option><option value="10">10 min</option></select></div>
+</div><div style="font-size:10px;color:var(--muted);margin-top:5px;">Pedido novo repete até ser aceito. Atrasado só avisa depois do tempo definido.</div></div>
+</div><div class="settings-card" style="grid-column:1/-1;">
+<div class="settings-card-title">🛡️ Dados e segurança</div>
+<div class="field-row" style="gap:8px;">
+<div class="field"><label>Senha atual</label><input id="cfg-pass" placeholder="••••••" type="password"/></div>
+<div class="field"><label>Nova senha</label><input id="cfg-pass-new" placeholder="Nova senha" type="password"/></div>
+<div class="field"><label>Confirmar</label><input id="cfg-pass-confirm" placeholder="Repita a senha" type="password"/></div>
+<div class="field" style="align-self:end;"><button class="btn primary sm" onclick="changePass()">Alterar senha</button></div>
 </div>
-<button class="btn secondary sm" onclick="testSelectedSound()" style="margin-top:6px;" type="button">▶ Testar som</button>
-<div class="field" style="margin-top:10px;"><label>🔉 Volume do alerta <span id="cfg-alert-volume-val" style="font-weight:400;color:var(--muted);">100%</span></label>
-<input id="cfg-alert-volume" max="1" min="0" oninput="onAlertVolumeInput(this.value)" step="0.05" type="range" value="1"/>
-</div>
-<button class="btn secondary sm" onclick="playBeep()" style="margin-top:6px;" type="button">▶ Testar volume</button>
-<div style="font-size:10px;color:var(--muted);margin-top:6px;">Som e volume valem só neste aparelho/navegador — cada computador da loja pode ter sua própria escolha. É o mesmo som/volume usado pelo alerta push da loja (Configurações → 🔔 Notificações Push) quando o painel está aberto neste aparelho.</div>
-</div>
-<div class="settings-card">
-<div class="settings-card-title">🚨 Toque contínuo (estilo iFood / 99Food)</div>
-<div class="field"><label>Repetir o alerta enquanto o pedido estiver "Novo" (ainda não aceito)</label>
-<select id="cfg-ring-enabled" onchange="onNewOrderRingInput()">
-<option value="1">✅ Ativado</option>
-<option value="0">❌ Desativado</option>
-</select>
-</div>
-<div class="field"><label>Repetir a cada</label>
-<select id="cfg-ring-seconds" onchange="onNewOrderRingInput()">
-<option value="3">3 segundos</option>
-<option selected="" value="5">5 segundos</option>
-<option value="8">8 segundos</option>
-<option value="12">12 segundos</option>
-</select>
-</div>
-<div style="font-size:10px;color:var(--muted);margin-top:6px;">Enquanto o pedido estiver parado na coluna "Novos", o alerta sonoro escolhido acima toca sem parar — em TODOS os computadores/celulares com o Painel aberto ao mesmo tempo (cada aparelho recebe o pedido pelo mesmo tempo real e toca por conta própria, então tocam juntos). Some sozinho assim que o pedido é aceito; o botão 🔕 no card silencia só aquele pedido. Vale pra loja toda (salvo aqui, junto do resto de Configurações).</div>
-</div>
-<div class="settings-card">
-<div class="settings-card-title">⏱️ Alerta de pedido atrasado</div>
-<div class="field"><label>Alertar pedido parado (NOVO ou EM PREPARO) após</label>
-<select id="cfg-late-minutes" onchange="onLateAlertInput()">
-<option value="0">Desativado</option>
-<option value="10">10 minutos</option>
-<option value="15">15 minutos</option>
-<option value="20">20 minutos</option>
-<option value="30">30 minutos</option>
-</select>
-</div>
-<div class="field"><label>Repetir alerta a cada</label>
-<select id="cfg-late-repeat" onchange="onLateAlertInput()">
-<option value="1">1 minuto</option>
-<option selected="" value="3">3 minutos</option>
-<option value="5">5 minutos</option>
-<option value="10">10 minutos</option>
-</select>
-</div>
-<div style="font-size:10px;color:var(--muted);margin-top:6px;">Pedido atrasado fica destacado no quadro com o tempo de espera, toca o Som 3 (urgente) e repete enquanto continuar atrasado. Dá pra silenciar um pedido específico direto no card dele. Vale pra loja toda (salvo nas Configurações do restaurante).</div>
-</div>
-<div class="settings-card">
-<div class="settings-card-title">🔐 Segurança</div>
-<div class="field"><label>Senha do Painel</label><input id="cfg-pass" placeholder="••••••" type="password"/></div>
-<div class="field"><label>Nova Senha</label><input id="cfg-pass-new" placeholder="Digite nova senha" type="password"/></div>
-<div class="field"><label>Confirmar Nova Senha</label><input id="cfg-pass-confirm" placeholder="Confirme nova senha" type="password"/></div>
-<button class="btn primary" onclick="changePass()">Alterar Senha</button>
-</div>
-<div class="settings-card" style="grid-column:1/-1;">
-<div class="settings-card-title">💾 Backup e Exportação de Dados</div>
-<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">
-            Baixe seus dados regularmente — especialmente se o servidor não tiver
-            disco persistente configurado, pra nunca perder clientes cadastrados,
-            histórico de pedidos ou o cardápio.
-          </div>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
-<button class="btn secondary sm" onclick="downloadBackup('json')">💾 Backup Completo (.json)</button>
-<button class="btn secondary sm" onclick="downloadBackup('csv','clientes')">👤 Clientes (.csv)</button>
-<button class="btn secondary sm" onclick="downloadBackup('csv','pedidos')">🧾 Pedidos (.csv)</button>
-<button class="btn secondary sm" onclick="downloadBackup('txt','cardapio')">📋 Cardápio (.txt)</button>
-</div>
-<div style="border-top:1px solid var(--border);padding-top:12px;">
-<label style="font-size:11px;color:var(--muted);display:block;margin-bottom:6px;">
-              Restaurar de um backup completo (.json) — <b style="color:var(--red-lt);">substitui os dados atuais</b>, use com cuidado:
-            </label>
-<div style="display:flex;gap:8px;align-items:center;">
-<input accept=".json" id="restore-file" style="font-size:11px;flex:1;" type="file"/>
-<button class="btn danger sm" onclick="restoreBackup()">♻️ Restaurar</button>
-</div>
-</div>
-</div>
-<div class="settings-card" data-min-role="master" style="grid-column:1/-1;border-color:var(--red-dk);">
-<div class="settings-card-title" style="color:var(--red-lt);">⚠️ Excluir Dados</div>
-<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
-            Apaga dados do sistema permanentemente. Só pra quem está logado como <b>master</b> —
-            sempre pergunta qual dado excluir e pede a senha master de novo pra confirmar. Fica
-            registrado no histórico de auditoria.
-          </div>
-<button class="btn danger sm" onclick="openDeleteDataModal()">🗑️ Excluir Dados...</button>
+<div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px;"><div style="font-size:11px;font-weight:700;margin-bottom:7px;">💾 Backup e exportação</div>
+<div style="display:flex;flex-wrap:wrap;gap:6px;"><button class="btn secondary sm" onclick="downloadBackup('json')">Backup completo</button><button class="btn secondary sm" onclick="downloadBackup('csv','clientes')">Clientes</button><button class="btn secondary sm" onclick="downloadBackup('csv','pedidos')">Pedidos</button><button class="btn secondary sm" onclick="downloadBackup('txt','cardapio')">Cardápio</button></div>
+<div style="display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap;"><input accept=".json" id="restore-file" style="font-size:11px;flex:1;min-width:180px;" type="file"/><button class="btn danger sm" onclick="restoreBackup()">♻️ Restaurar</button></div></div>
+<div data-min-role="master" style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;"><div><div style="font-size:11px;font-weight:700;color:var(--red-lt);">⚠️ Excluir dados</div><div style="font-size:10px;color:var(--muted);">Somente Master. A exclusão fica registrada.</div></div><button class="btn danger sm" onclick="openDeleteDataModal()">Excluir dados</button></div>
 </div>
 </div>
 </div>
@@ -2188,6 +2059,33 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
 </div>
 <div class="page" id="page-motoboys">
 <div class="settings-grid">
+<div class="settings-card" style="grid-column:1/-1;">
+<div class="settings-card-title">💰 Entrega & Motoboy</div>
+<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Taxa do cliente e pagamento do entregador, juntos.</div>
+<div class="settings-card-title">💰 Taxa de Entrega</div>
+<div class="field"><label>Taxa de entrega</label>
+<select id="fee-mode" onchange="renderFeeModeUI()">
+<option value="fixo">💰 Taxa fixa (mesmo valor pra todo mundo)</option>
+<option value="cep">📮 Por faixa de CEP</option>
+<option value="bairro">📍 Por bairro</option>
+<option value="distancia">📏 Por distância (km até o cliente)</option>
+</select>
+</div>
+<div class="field"><label>Taxa Fixa / Padrão R$ <span style="font-weight:400;color:var(--muted);">(usada no modo fixo, e como reserva nos outros modos)</span></label><input id="cfg-fee" placeholder="8" type="number"/></div>
+<div id="fee-mode-body"></div>
+<div style="border-top:1px solid var(--border);margin-top:12px;padding-top:12px;"><div class="settings-card-title">🛵 Pagamento de Motoboy</div>
+<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
+            Valor pago ao motoboy por entrega.
+          </div>
+<div class="field"><label>Pagamento por entrega</label>
+<select id="cp-mode" onchange="renderCourierPayModeUI()">
+<option value="fixo">💰 Valor fixo (mesmo valor toda entrega)</option>
+<option value="bairro">📍 Por bairro</option>
+</select>
+</div>
+<div class="field"><label>Valor fixo por entrega (R$) <span style="font-weight:400;color:var(--muted);">(usado no modo fixo, e como reserva no modo por bairro)</span></label><input id="cp-fixedvalue" placeholder="6" step="0.01" type="number"/></div>
+<div id="cp-mode-body"></div></div>
+</div>
 <div class="settings-card" style="grid-column:1/-1;">
 <div class="settings-card-title">🛵 Motoboys Cadastrados</div>
 <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
