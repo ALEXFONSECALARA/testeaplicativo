@@ -902,6 +902,58 @@ body{font-size:13px;letter-spacing:-.01em;}
 }
 @media(max-width:420px){.mi-grid{grid-template-columns:1fr!important;}.stats-grid{grid-template-columns:1fr 1fr!important;}.content{padding:10px;padding-bottom:76px;}}
 </style>
+
+/* v125 PARTE 4 — experiência mobile administrativa */
+@media(max-width:760px){
+  html{scroll-behavior:smooth;}
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom));}
+  .main{padding-bottom:0!important;}
+  .content{padding:10px 10px 24px!important;}
+  .page{width:100%;min-width:0;}
+  .panel,.settings-card,.stat-card{min-width:0;}
+  button,.btn,.topbar-btn,input,select,textarea{min-height:44px;}
+  .topbar{min-height:58px!important;}
+  .topbar-right{min-width:0;}
+  .topbar-btn{white-space:nowrap;}
+  .topbar-btn.primary{min-width:44px;}
+  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .settings-grid{grid-template-columns:1fr!important;}
+  .field-row,#page-pedidos .field-row{grid-template-columns:1fr!important;}
+  .field-row .field{grid-column:auto!important;min-width:0;}
+  .field input,.field select,.field textarea,input,select,textarea{font-size:16px!important;}
+  .mi-grid{grid-template-columns:1fr!important;gap:10px!important;}
+  .mi-card{display:grid;grid-template-columns:88px minmax(0,1fr);gap:10px;align-items:start;}
+  .mi-card-image{height:88px!important;width:88px!important;}
+  .mi-card-body{min-width:0;}
+  .mi-card-actions{grid-column:1/-1;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;}
+  .mi-card-actions button{width:100%;}
+  .menu-editor{display:flex!important;flex-direction:column!important;gap:10px!important;}
+  .menu-cats{scroll-snap-type:x proximity;padding-bottom:2px;}
+  .menu-cat-item{flex:0 0 150px!important;scroll-snap-align:start;min-height:48px;}
+  .menu-items-panel{min-height:0!important;}
+  .modal-overlay{padding:0!important;align-items:stretch!important;}
+  .modal-overlay .modal{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;border-radius:0!important;display:flex;flex-direction:column;}
+  .modal-overlay .modal-header{position:sticky;top:0;z-index:3;flex-shrink:0;}
+  .modal-overlay .modal-body{overflow-y:auto!important;flex:1;min-height:0;padding-bottom:90px;}
+  #item-modal .modal-footer,#order-modal .modal-footer,#cat-modal .modal-footer{position:sticky;bottom:0;z-index:4;flex-shrink:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--border);box-shadow:0 -8px 20px rgba(0,0,0,.08);}
+  #item-modal .modal-footer .btn,#order-modal .modal-footer .btn,#cat-modal .modal-footer .btn{flex:1;min-width:0;}
+  .table-wrap,table{max-width:100%;}
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #page-mensagens .wa-admin-wrap{height:calc(100dvh - 150px)!important;min-height:420px;}
+  #page-mensagens .wa-admin-chat{min-width:0;}
+  #page-mensagens .wa-bubble{max-width:86%;}
+  .settings-accordion-header{min-height:52px!important;}
+  #mobile-bottom-nav{bottom:max(8px,env(safe-area-inset-bottom));left:8px;right:8px;height:64px!important;padding:6px!important;border-radius:18px!important;}
+  #mobile-bottom-nav .mobile-nav-item{min-height:50px!important;touch-action:manipulation;}
+  #mobile-bottom-nav .mobile-nav-icon{font-size:19px;}
+  #mobile-bottom-nav .mobile-nav-label{font-size:10px;}
+}
+@media(max-width:420px){
+  .stats-grid{grid-template-columns:1fr!important;}
+  .mi-card{grid-template-columns:72px minmax(0,1fr);}
+  .mi-card-image{width:72px!important;height:72px!important;}
+}
+
 </head>
 <body>
 <!-- LOGIN -->
@@ -984,7 +1036,7 @@ body{font-size:13px;letter-spacing:-.01em;}
 </div>
 </div>
 <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebarCollapse()"></div>
-<nav aria-label="Navegação rápida" id="mobile-bottom-nav"><button class="mobile-nav-item" data-page="pedidos" onclick="goPage('pedidos')" type="button"><span class="mobile-nav-icon">📊</span><span class="mobile-nav-label">Pedidos</span></button><button class="mobile-nav-item" data-page="reservas" onclick="goPage('reservas')" type="button"><span class="mobile-nav-icon">📅</span><span class="mobile-nav-label">Reservas</span></button><button class="mobile-nav-item" data-page="mensagens" onclick="goPage('mensagens')" type="button"><span class="mobile-nav-icon">💬</span><span class="mobile-nav-label">Mensagens</span></button><button class="mobile-nav-item" data-page="cardapio" onclick="goPage('cardapio')" type="button"><span class="mobile-nav-icon">🍱</span><span class="mobile-nav-label">Cardápio</span></button><button class="mobile-nav-item" id="mobile-nav-menu" onclick="toggleSidebarCollapse()" type="button"><span class="mobile-nav-icon">☰</span><span class="mobile-nav-label">Menu</span></button></nav><div class="content">
+<nav aria-label="Navegação rápida" id="mobile-bottom-nav"><button class="mobile-nav-item" data-page="inicio" onclick="goPage('pedidos')" type="button"><span class="mobile-nav-icon">⌂</span><span class="mobile-nav-label">Início</span></button><button class="mobile-nav-item" data-page="pedidos" onclick="goPage('pedidos');setTimeout(()=>typeof setPedidosView==='function'&&setPedidosView('lista'),0)" type="button"><span class="mobile-nav-icon">🧾</span><span class="mobile-nav-label">Pedidos</span></button><button class="mobile-nav-item" data-page="cardapio" onclick="goPage('cardapio')" type="button"><span class="mobile-nav-icon">🍱</span><span class="mobile-nav-label">Cardápio</span></button><button class="mobile-nav-item" data-page="mensagens" onclick="goPage('mensagens')" type="button"><span class="mobile-nav-icon">💬</span><span class="mobile-nav-label">Mensagens</span></button><button class="mobile-nav-item" id="mobile-nav-menu" data-page="mais" onclick="toggleSidebarCollapse()" type="button"><span class="mobile-nav-icon">☰</span><span class="mobile-nav-label">Mais</span></button></nav><div class="content">
 <!-- ── DASHBOARD ── -->
 <div class="page active" id="page-pedidos">
 <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
@@ -2303,7 +2355,7 @@ body{font-size:13px;letter-spacing:-.01em;}
 </div>
 <div class="item-editor-card item-editor-section v120-local-badge-card">
 <div class="item-editor-section-title"><span>🏷 Destaque no cardápio</span><span class="v120-local-badge-label">Rápido</span></div>
-<div class="item-editor-section-sub">Escolha um selo pronto ou escreva o seu. O selo fica acima do preço no cardápio do cliente, sem cobrir a foto.</div>
+<div class="item-editor-section-sub">Escolha um selo pronto ou escreva o seu. O selo fica abaixo da descrição e antes do preço, dentro do card do cliente, sem cobrir a foto.</div>
 <div class="v120-badge-presets" role="group" aria-label="Selos prontos">
 <button type="button" class="v120-badge-preset" data-badge="🔥 Mais vendido" onclick="setLocalBadgePreset('🔥 Mais vendido')">🔥 Mais vendido</button>
 <button type="button" class="v120-badge-preset" data-badge="⭐ Novidade" onclick="setLocalBadgePreset('⭐ Novidade')">⭐ Novidade</button>
@@ -3564,24 +3616,38 @@ async function loadOrders(){
 // tempo real é (re)estabelecida, busca a lista completa do servidor e dispara o alerta de
 // "novo pedido" pra qualquer pedido "novo" que o painel ainda não conhecia — cobre exatamente
 // a reconexão depois de queda de internet, F5 do navegador, ou reinício do servidor.
+let resyncInFlight = false;
+const alertedOrderIds = new Map();
+
 async function resyncOrders(){
+  if(resyncInFlight) return;
+  if(!token || (navigator && navigator.onLine === false)) return;
+  resyncInFlight = true;
   try {
     const fresh = await apiGet('/api/orders');
     const knownIds = new Set(orders.map(o => o.id));
+    const now = Date.now();
+    // Limpa memória de alertas antigos para não crescer indefinidamente.
+    for(const [id, ts] of alertedOrderIds){ if(now-ts > 10*60*1000) alertedOrderIds.delete(id); }
     const missing = fresh.filter(o => !knownIds.has(o.id) && o.status === 'novo');
     orders = fresh;
     updateNewBadge();
     refreshCurrentPage();
     missing.forEach(o => {
-      if (Number(cfg.sound) !== 0) playBeep();
+      // SSE + sincronização podem enxergar o mesmo pedido quase ao mesmo tempo.
+      if(alertedOrderIds.has(o.id)) return;
+      alertedOrderIds.set(o.id, now);
+      if(Number(cfg.sound) !== 0) playBeep();
       showToast('🔔 Novo Pedido!', `${o.id} — ${o.name} — R$ ${Number(o.total).toFixed(2).replace('.', ',')}`, 6000);
     });
-  } catch (e) { /* sem internet agora — tenta de novo na próxima reconexão/poll */ }
+  } catch (e) {
+    // Sem internet/servidor: não altera a lista atual. A próxima reconexão tenta novamente.
+  } finally {
+    resyncInFlight = false;
+  }
 }
-// Rede de segurança independente do SSE: nunca depender só de evento em tempo real — se o
-// SSE ficar "conectado" mas silenciosamente travado (proxy/celular que mata streams ociosos),
-// essa rechecagem periódica ainda pega qualquer pedido perdido.
-setInterval(resyncOrders, 45000);
+// Rede de segurança independente do SSE.
+setInterval(resyncOrders, 30000);
 
 function setConnStatus(state){
   const el = document.getElementById('conn-status');
@@ -3593,69 +3659,75 @@ function setConnStatus(state){
 }
 
 let sseErrorSince = null;
+let sseReconnectTimer = null;
+let sseReconnectDelay = 1000;
+let sseConnecting = false;
+
+function scheduleSSEReconnect(){
+  if(sseReconnectTimer || !token || (navigator && navigator.onLine === false)) return;
+  const delay = Math.min(sseReconnectDelay, 30000);
+  sseReconnectDelay = Math.min(sseReconnectDelay * 2, 30000);
+  sseReconnectTimer = setTimeout(()=>{
+    sseReconnectTimer = null;
+    connectSSE();
+  }, delay);
+}
+
 function connectSSE(){
-  if(evtSource) evtSource.close();
+  if(!token) return;
+  if(sseReconnectTimer){ clearTimeout(sseReconnectTimer); sseReconnectTimer=null; }
+  if(sseConnecting) return;
+  if(navigator && navigator.onLine === false){ setConnStatus('lost'); return; }
+  if(evtSource){ try{ evtSource.close(); }catch(e){} evtSource=null; }
+  sseConnecting = true;
   setConnStatus('connecting');
-  evtSource = new EventSource('/api/stream?token='+encodeURIComponent(token));
+  const source = new EventSource('/api/stream?token='+encodeURIComponent(token));
+  evtSource = source;
 
-  evtSource.onopen = () => { sseErrorSince = null; setConnStatus('connected'); resyncOrders(); };
-
-  // C2 (relatório de auditoria): antes, uma conexão perdida (reinício do servidor, sessão
-  // expirada, queda de internet) falhava em silêncio — o navegador tentava reconectar sozinho
-  // pra sempre, sem avisar ninguém, e o painel parecia "normal" mesmo sem receber pedido novo
-  // nenhum. Agora qualquer erro atualiza o indicador visual; e se o motivo for a sessão ter
-  // expirado (token inválido), detecta isso rapidamente e manda fazer login de novo, em vez de
-  // ficar num loop mudo de tentativas fadadas a falhar.
-  evtSource.onerror = async () => {
-    setConnStatus('lost');
-    if (!sseErrorSince) sseErrorSince = Date.now();
-    try {
-      const check = await fetch('/api/orders?token=' + encodeURIComponent(token));
-      if (check.status === 401 || check.status === 403) {
-        evtSource.close();
-        alert('Sua sessão expirou. Faça login de novo pra continuar recebendo pedidos em tempo real.');
-        doLogout();
-      }
-    } catch (e) { /* sem internet no momento — o EventSource nativo continua tentando sozinho */ }
+  source.onopen = () => {
+    sseConnecting = false;
+    sseErrorSince = null;
+    sseReconnectDelay = 1000;
+    setConnStatus('connected');
+    resyncOrders();
   };
 
-  evtSource.addEventListener('new-order', e=>{
-    const o = JSON.parse(e.data);
-    // Corrige bug de duplicação: se esse pedido já está na lista (ex: criado
-    // manualmente pelo próprio painel, que já o adiciona na hora), só atualiza
-    // em vez de adicionar de novo.
-    const existingIdx = orders.findIndex(x=>x.id===o.id);
-    if(existingIdx>-1) orders[existingIdx]=o; else orders.unshift(o);
-    updateNewBadge();
-    if(Number(cfg.sound)!==0) playBeep();
-    showToast('🔔 Novo Pedido!', `${o.id} — ${o.name} — R$ ${Number(o.total).toFixed(2).replace('.',',')}`, 6000);
-    refreshCurrentPage();
-    // v84 — BUG CORRIGIDO ("impressora não imprime em todas as estações, principalmente em
-    // pedido real"): faltava passar isAuto=true aqui. Sem isso, quando um pedido novo chegava
-    // com "imprimir automaticamente" ligado, este painel chamava /api/print pra cada via com
-    // auto:false — e o servidor (ver POST /api/print, "v55") entendia isso como um clique
-    // MANUAL de reimpressão e mandava um SEGUNDO aviso "print-order" pro Agente Local, que já
-    // tinha imprimido esse mesmo pedido sozinho pelo evento "new-order" direto. Duas
-    // impressões quase simultâneas na MESMA impressora física (uma pelo caminho automático,
-    // outra por esse disparo duplicado) podiam colidir e derrubar/corromper uma das vias —
-    // por isso pedidos de teste (uma única chamada) sempre funcionavam, mas pedidos reais
-    // vindos de cliente (que passam por aqui) às vezes perdiam via. Passando isAuto=true, o
-    // servidor pula o aviso duplicado, exatamente como já era a intenção original.
-    // v95 — BUG CORRIGIDO ("impressão automática disparava mesmo com o pedido NÃO
-    // automático"): esse gatilho (evento "new-order" recebido pelo Painel no navegador)
-    // só olhava pra cfg.print ("imprimir automaticamente" ligado) e ignorava por completo
-    // se o pedido nasceu ACEITO sozinho (aceite automático) ou PENDENTE aguardando alguém
-    // aceitar manualmente. O Agente Local (print-agent.js) já tinha essa mesma trava desde a
-    // v92 — aqui no Painel (usada pelas vias com método "Navegador"/"Automática" com a
-    // Extensão) ela nunca tinha sido replicada, então um pedido pendente (aceite automático
-    // desligado) podia sair impresso sozinho pelo navegador mesmo assim, gastando papel de
-    // pedido que ainda nem foi aceito/pode ser recusado. o._autoAcceptOn vem do servidor (ver
-    // broadcast('new-order', ...) em server.js) refletindo cfg.autoAcceptOrders no instante
-    // exato da criação do pedido. Impressão MANUAL (botão "🖨 Imprimir" clicado por alguém)
-    // continua funcionando sempre, com ou sem aceite automático — só o disparo AUTOMÁTICO
-    // daqui é que passa a respeitar essa condição.
-    if(Number(cfg.print) && o._autoAcceptOn) printOrder(o.id, null, null, true);
+  source.onerror = async () => {
+    sseConnecting = false;
+    setConnStatus('lost');
+    if(!sseErrorSince) sseErrorSince = Date.now();
+    // Fecha esta conexão para evitar ficar com EventSource preso em um estado
+    // aparentemente conectado. O reconector usa backoff e não cria várias conexões.
+    try{ source.close(); }catch(e){}
+    if(evtSource === source) evtSource = null;
+    try {
+      const check = await fetch('/api/orders?token=' + encodeURIComponent(token), {cache:'no-store'});
+      if(check.status === 401 || check.status === 403){
+        alert('Sua sessão expirou. Faça login de novo pra continuar recebendo pedidos em tempo real.');
+        doLogout();
+        return;
+      }
+    } catch(e) {}
+    scheduleSSEReconnect();
+  };
+
+  source.addEventListener('new-order', e=>{
+    try{
+      const o = JSON.parse(e.data);
+      const existingIdx = orders.findIndex(x=>x.id===o.id);
+      if(existingIdx>-1) orders[existingIdx]=o; else orders.unshift(o);
+      updateNewBadge();
+      // O mesmo pedido pode chegar por SSE e pelo resync; alerta uma única vez.
+      if(!alertedOrderIds.has(o.id)){
+        alertedOrderIds.set(o.id, Date.now());
+        if(Number(cfg.sound)!==0) playBeep();
+        showToast('🔔 Novo Pedido!', `${o.id} — ${o.name} — R$ ${Number(o.total).toFixed(2).replace('.',',')}`, 6000);
+      }
+      refreshCurrentPage();
+      if(Number(cfg.print) && o._autoAcceptOn) printOrder(o.id, null, null, true);
+    }catch(err){ console.warn('[SSE new-order] payload inválido', err); }
   });
+
   // v39: alerta de nova reserva (novidade pedida) — mesmo som + toast do pedido novo, e
   // atualiza o contador da aba Reservas na hora, mesmo se o operador estiver em outra aba.
   evtSource.addEventListener('new-reservation', e=>{
@@ -3724,7 +3796,47 @@ function connectSSE(){
     // abrir o Painel), deixa passar pra não perder a primeira impressão à toa.
     if(activeStationInfo.active === false) return;
     let win = window.open('', '_blank', 'width=380,height=600');
-    if(win) win.document.write('<body style="font-family:sans-serif;padding:24px;color:#666;">Carregando pedido...</body>');
+    if(win) win.document.write('<body style="font-family:sans-serif;padding:24px;color:#666;">Carregando pedido...
+<script>
+/* v125 PARTE 4 — navegação e ergonomia mobile, sem alterar o modo cliente */
+(function(){
+  'use strict';
+  function isMobile(){ return window.matchMedia && window.matchMedia('(max-width:760px)').matches; }
+  function syncMobileNav(){
+    if(!isMobile()) return;
+    const active=document.querySelector('.page.active');
+    const id=active && active.id ? active.id.replace('page-','') : 'pedidos';
+    document.querySelectorAll('#mobile-bottom-nav .mobile-nav-item').forEach(b=>b.classList.remove('active'));
+    let key=id;
+    if(id==='pedidos') key='inicio';
+    const btn=document.querySelector('#mobile-bottom-nav .mobile-nav-item[data-page="'+key+'"]');
+    if(btn) btn.classList.add('active');
+  }
+  function closeMobileSidebar(){
+    if(!isMobile()) return;
+    const side=document.querySelector('.sidebar');
+    if(side && !side.classList.contains('collapsed')){ try{ toggleSidebarCollapse(); }catch(e){} }
+  }
+  window.addEventListener('resize',syncMobileNav,{passive:true});
+  document.addEventListener('click',function(e){
+    const nav=e.target.closest && e.target.closest('#mobile-bottom-nav .mobile-nav-item');
+    if(nav){ setTimeout(function(){ syncMobileNav(); closeMobileSidebar(); },40); }
+  });
+  document.addEventListener('DOMContentLoaded',function(){
+    setTimeout(syncMobileNav,250);
+    const observer=new MutationObserver(function(){ syncMobileNav(); });
+    document.querySelectorAll('.page').forEach(function(p){ observer.observe(p,{attributes:true,attributeFilter:['class']}); });
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape' && isMobile()){
+        const open=document.querySelector('.modal-overlay.show,.modal-overlay[style*="display: flex"],.modal-overlay[style*="display:flex"]');
+        if(open) return;
+        closeMobileSidebar();
+      }
+    });
+  });
+})();
+</script>
+</body>');
     openBrowserTicket(r.order, r.station, r.deliveryWindow, win).catch(()=>{});
   });
   // v90: outro Painel abriu (ou assumiu por failover) a Estação Ativa de Impressão — atualiza
@@ -10556,6 +10668,145 @@ if(token){
     document.querySelectorAll('.v120-badge-preset').forEach(b=>b.classList.toggle('is-selected',b.dataset.badge===value));
     if(typeof updateItemLivePreview==='function') updateItemLivePreview();
   };
+})();
+</script>
+<script id="v125-part2-connection-resilience">
+(function(){
+  function updateNetworkState(){
+    if(navigator.onLine === false){ setConnStatus('lost'); return; }
+    if(token && (!evtSource || evtSource.readyState === 2)) connectSSE();
+    else if(token) resyncOrders();
+  }
+  window.addEventListener('offline', ()=>setConnStatus('lost'));
+  window.addEventListener('online', updateNetworkState);
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'visible' && token){
+      if(!evtSource || evtSource.readyState === 2) connectSSE();
+      resyncOrders();
+    }
+  });
+})();
+</script>
+<style id="v125-part3-cardapio">
+/* Parte 3 — Cardápio rápido: elimina controles técnicos duplicados do badge sem remover dados legados. */
+#item-modal .v122-badge-tools{display:none!important}
+#item-modal .v120-local-badge-card .item-editor-section-sub{font-size:10px;color:var(--muted);margin-bottom:8px}
+#item-modal .v120-badge-presets{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important}
+#item-modal .v120-badge-preset{min-height:42px!important;border:1px solid var(--border)!important;background:var(--bg)!important;color:var(--white)!important;border-radius:10px!important;padding:8px 10px!important;text-align:left!important;font-size:12px!important;font-weight:700!important}
+#item-modal .v120-badge-preset.is-selected{border-color:var(--red)!important;background:var(--red-bg)!important;color:var(--red-lt)!important}
+#item-modal .v120-badge-preset.is-off{color:var(--muted)!important;font-weight:600!important}
+#item-modal .v120-badge-custom{margin-top:8px!important}
+#item-modal .v120-badge-custom label{font-size:10px!important}
+#item-modal .v120-badge-custom input{min-height:42px!important}
+#item-modal .v122-portion-chips{gap:6px!important}
+#item-modal .v122-portion-chips button{min-height:36px!important;padding:6px 10px!important;font-size:11px!important;background:var(--bg)!important}
+@media(max-width:520px){#item-modal .v120-badge-presets{grid-template-columns:1fr 1fr!important}#item-modal .v120-badge-preset{font-size:11px!important}}
+</style>
+<script id="v125-part3-cardapio-js">
+(function(){
+  const $=id=>document.getElementById(id);
+  /* O badge agora é exclusivamente local. O legado global continua nos dados para compatibilidade. */
+  window.itemHasBadge = function(item){ return !!(item && item.badgeMode !== 'off' && item.badge); };
+  function cleanLeadingIcon(text){
+    return String(text||'').replace(/^(🔥|⭐|💎|♥|❤|🍣|✨|🏆)\s*/,'').trim();
+  }
+  const presetMap={
+    '🔥 Mais vendido':['🔥','Mais vendido','#C62828'],
+    '⭐ Novidade':['⭐','Novidade','#9A7B2F'],
+    '💎 Premium':['💎','Premium','#55759B'],
+    '♥ Recomendado':['♥','Recomendado','#A83D62'],
+    '':['','','#C62828']
+  };
+  window.setLocalBadgePreset=function(value){
+    const d=presetMap[value]||['✨',cleanLeadingIcon(value),'#C62828'];
+    if($('item-badge')) $('item-badge').value=d[1];
+    if($('item-badge-icon')) $('item-badge-icon').value=d[0];
+    if($('item-badge-color')) $('item-badge-color').value=d[2];
+    const mode=$(value?'item-badgemode-manual':'item-badgemode-off'); if(mode) mode.checked=true;
+    document.querySelectorAll('.v120-badge-preset').forEach(b=>b.classList.toggle('is-selected',b.dataset.badge===value));
+    if(typeof updateItemLivePreview==='function') updateItemLivePreview();
+  };
+  window.setLocalBadgeCustom=function(value){
+    const clean=cleanLeadingIcon(value);
+    if($('item-badge')) $('item-badge').value=clean;
+    if($('item-badge-icon') && !clean) $('item-badge-icon').value='';
+    const mode=$(clean?'item-badgemode-manual':'item-badgemode-off'); if(mode) mode.checked=true;
+    document.querySelectorAll('.v120-badge-preset').forEach(b=>b.classList.toggle('is-selected',b.dataset.badge===value));
+    if(typeof updateItemLivePreview==='function') updateItemLivePreview();
+  };
+  function normalizeOpen(){
+    const input=$('item-badge'); if(!input) return;
+    input.value=cleanLeadingIcon(input.value);
+    const icon=$('item-badge-icon');
+    if(icon && input.value && !icon.value){
+      const text=input.value.toLowerCase();
+      if(text.includes('mais vendido')) icon.value='🔥';
+      else if(text.includes('novidade')) icon.value='⭐';
+      else if(text.includes('premium')) icon.value='💎';
+      else if(text.includes('recomend')) icon.value='♥';
+    }
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(normalizeOpen,250));
+  const oldEdit=window.openEditItem;
+  if(oldEdit) window.openEditItem=function(){const r=oldEdit.apply(this,arguments);setTimeout(normalizeOpen,80);return r;};
+})();
+</script>
+
+
+<style id="v125-part5-simplify">
+/* Parte 5 — mensagens, avaliações e configurações: menos ruído, mesma funcionalidade. */
+#page-mensagens > div:first-child{position:sticky;top:0;z-index:18;background:var(--bg);padding:8px 0 10px!important}
+#page-mensagens > div:first-child .btn{min-height:40px}
+.v125-savebar{position:sticky;bottom:10px;z-index:15;display:flex;justify-content:flex-end;gap:8px;padding:8px;margin-top:10px;background:color-mix(in srgb,var(--panel) 94%,transparent);border:1px solid var(--border);border-radius:12px;backdrop-filter:blur(10px)}
+.v125-review-tools{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 10px}
+.v125-review-hint{font-size:10px;color:var(--muted)}
+#page-configuracoes .settings-accordion-header{transition:background .15s ease}
+#page-configuracoes .settings-accordion-header:active{background:rgba(198,40,40,.08)}
+@media(max-width:760px){
+  #page-mensagens > div:first-child{margin:0 -2px}
+  #page-mensagens > div:first-child{display:grid!important;grid-template-columns:1fr 1fr;gap:6px!important}
+  #page-mensagens > div:first-child .btn{width:100%;font-size:12px}
+  #page-mensagens .wa-admin-wrap{height:calc(100dvh - 175px)!important;min-height:0!important;border-radius:12px!important}
+  #page-mensagens .wa-admin-list{width:100%!important;max-width:100%!important}
+  #page-mensagens .wa-admin-chat{position:relative!important;width:100%!important}
+  #page-mensagens .wa-admin-chat-active{height:100%!important}
+  #page-mensagens .wa-admin-chat-empty{min-height:180px}
+  #page-mensagens #msg-tab-central .settings-card{padding:12px!important}
+  #page-mensagens #msg-tab-central .field-row{grid-template-columns:1fr!important}
+  #page-avaliacoes .settings-card{padding:12px!important}
+  .v125-savebar{bottom:calc(62px + env(safe-area-inset-bottom));justify-content:stretch}
+  .v125-savebar .btn{flex:1;min-height:44px}
+}
+</style>
+<script id="v125-part5-simplify-js">
+(function(){
+  const $=id=>document.getElementById(id);
+  function addSaveBar(){
+    const central=$('msg-tab-central');
+    if(central && !central.querySelector('.v125-savebar')){
+      const bar=document.createElement('div');bar.className='v125-savebar';
+      bar.innerHTML='<button class="btn primary" type="button" onclick="saveMensagensCentral()">💾 Salvar alterações</button>';
+      central.appendChild(bar);
+    }
+  }
+  function addReviewTools(){
+    const list=$('admin-reviews-list'); if(!list || list.previousElementSibling?.classList.contains('v125-review-tools')) return;
+    const tools=document.createElement('div');tools.className='v125-review-tools';
+    tools.innerHTML='<span class="v125-review-hint">Responda com uma frase pronta ou personalize a mensagem antes de enviar.</span><button class="btn secondary sm" type="button" onclick="renderV122ReviewPhrases()">↻ Atualizar frases</button>';
+    list.parentNode.insertBefore(tools,list);
+  }
+  function polishSettings(){
+    document.querySelectorAll('#page-configuracoes .settings-accordion-header').forEach(h=>{
+      const title=h.querySelector('.acc-title'); if(!title) return;
+      if(!h.querySelector('.v125-acc-note')){
+        const note=document.createElement('span');note.className='v125-acc-note';note.style.cssText='font-size:10px;color:var(--muted);font-weight:500;margin-left:auto;margin-right:10px';
+        const body=h.nextElementSibling; const n=body?.querySelectorAll('.settings-card').length||0; note.textContent=n?(n+' seção'+(n===1?'':'ões')):''; h.insertBefore(note,h.querySelector('.acc-chevron'));
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{addSaveBar();addReviewTools();polishSettings()},180));
+  const oldGo=window.goPage;
+  if(oldGo) window.goPage=function(id){const r=oldGo.apply(this,arguments);if(id==='mensagens'){setTimeout(addSaveBar,100)}if(id==='avaliacoes'){setTimeout(addReviewTools,100)}if(id==='configuracoes'){setTimeout(polishSettings,100)}return r;};
 })();
 </script>
 </body>

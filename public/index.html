@@ -681,6 +681,14 @@ button:active, .btn:active, [role="button"]:active, .pay-opt:active, .cat-tab:ac
 .item-card .item-badge-price{font-family:inherit;text-transform:none;}
 @media(max-width:520px){.item-footer .item-badge-price{font-size:8.5px;padding:4px 8px;margin-bottom:5px;}}
 </style>
+<style id="v125-part3-client-badge">
+/* Badge único: abaixo da descrição; não altera posição do preço. */
+.item-badge-wrap-below-desc{display:block!important;margin:8px 0 2px!important;position:relative!important;z-index:1!important}
+.item-badge-wrap-below-desc .item-badge{display:inline-flex!important;position:static!important;float:none!important;margin:0!important;max-width:100%!important;box-sizing:border-box!important}
+.item-footer .item-badge-price,.item-card .item-badge-price{display:none!important}
+.item-badge-icon{flex:0 0 auto!important}
+.item-badge-text{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important}
+</style>
 </head>
 <body>
 
