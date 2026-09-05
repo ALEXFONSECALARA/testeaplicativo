@@ -987,6 +987,67 @@ body{font-size:13px;letter-spacing:-.01em;}
   .mi-card-image{width:72px!important;height:72px!important;}
 }
 </style>
+<style id="v125-mobile-simple-kanban">
+/* v125.2 — SOM + KANBAN MOBILE SIMPLES (somente painel administrativo) */
+@media(max-width:760px){
+  /* Kanban é a tela principal no celular */
+  #pedidos-viewtabs{display:flex!important;gap:6px!important;position:sticky;top:58px;z-index:20;padding:6px 0;background:var(--bg);}
+  #pedidos-viewtabs .reorder-toggle-btn{display:none!important;}
+  #pedidos-viewtabs .topbar-btn{flex:1;min-height:42px!important;padding:8px 6px!important;font-size:12px!important;}
+  #pedidos-viewtabs #ptab-visao{display:none!important;}
+  #pedidos-viewtabs #ptab-lista{display:none!important;}
+  #pedidos-viewtabs #ptab-kanban{display:block!important;}
+  #pedidos-view-visao{display:none!important;}
+  #pedidos-view-lista{display:none!important;}
+  #pedidos-view-kanban{display:block!important;}
+  #page-pedidos .kanban{margin:0!important;}
+  #page-pedidos .kanban-board,#page-pedidos .kanban-board-wrap,[id^="kanban"]{scrollbar-width:none;}
+  #page-pedidos .kanban-board::-webkit-scrollbar{display:none;}
+  #page-pedidos .kanban-col{flex-basis:min(84vw,320px)!important;width:min(84vw,320px)!important;max-width:min(84vw,320px)!important;}
+  #page-pedidos .kanban-header{position:sticky;top:0;z-index:2;padding:9px 10px!important;}
+  #page-pedidos .k-card{padding:10px!important;border-radius:12px!important;}
+  #page-pedidos .k-card-name{font-size:13px!important;font-weight:700;}
+  #page-pedidos .k-card-items{font-size:11px!important;line-height:1.35!important;max-height:34px;overflow:hidden;}
+  #page-pedidos .k-card-footer{margin-top:8px!important;}
+  #page-pedidos .k-btn{min-height:44px!important;font-size:12px!important;border-radius:10px!important;}
+  #page-pedidos .k-card-footer button{min-width:44px!important;min-height:40px!important;}
+
+  /* Visão geral: mantém só o essencial quando alguém entra nela por link/estado antigo. */
+  #pedidos-view-visao .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  #pedidos-view-visao .stats-grid .stat-card:nth-child(n+3){display:none!important;}
+  #pedidos-view-visao .panels>div:nth-child(2){display:none!important;}
+  #pedidos-view-visao .panel-header .btn{font-size:11px!important;}
+
+  /* Lista: compacta, sem excesso de informação no telefone. */
+  #pedidos-view-lista>div:first-child{gap:6px!important;margin-bottom:10px!important;}
+  #pedidos-filterbar{gap:5px!important;flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:3px;}
+  #pedidos-filterbar .topbar-btn{flex:0 0 auto!important;min-height:40px!important;padding:7px 10px!important;font-size:11px!important;}
+  #pedidos-view-lista .reorder-toggle-btn{display:none!important;}
+  #order-search{width:100%!important;min-height:44px!important;}
+  #orders-list-full .order-card{padding:10px!important;border-radius:12px!important;}
+  #orders-list-full .order-card .order-items{max-height:38px;overflow:hidden;}
+  #orders-list-full .order-card .order-header>div{gap:4px!important;}
+  #orders-list-full .order-card .order-header .status-badge{font-size:10px!important;padding:3px 6px!important;}
+  #orders-list-full .order-card .order-footer{font-size:11px!important;}
+  #orders-list-full .order-card .order-actions .oa-btn.whatsapp,
+  #orders-list-full .order-card .order-actions .oa-btn.paid,
+  #orders-list-full .order-card .order-actions .oa-btn.cancel{font-size:11px!important;}
+
+  /* Um único modal de impressão, reaproveitado entre todas as etapas. */
+  #mobile-print-flow-modal .modal{background:var(--panel)!important;}
+  #mobile-print-flow-modal .mobile-print-flow-icon{font-size:48px;line-height:1;margin:8px 0 14px;}
+  #mobile-print-flow-modal .mobile-print-flow-title{font-size:20px;font-weight:800;text-align:center;}
+  #mobile-print-flow-modal .mobile-print-flow-sub{font-size:12px;color:var(--muted);text-align:center;margin-top:6px;line-height:1.45;}
+  #mobile-print-flow-modal .mobile-print-flow-order{margin:16px 0;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--elevated,var(--panel));}
+  #mobile-print-flow-modal .mobile-print-flow-item{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);}
+  #mobile-print-flow-modal .mobile-print-flow-item:last-child{border-bottom:0;}
+  #mobile-print-flow-modal .mobile-print-flow-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px;}
+  #mobile-print-flow-modal .mobile-print-flow-actions .btn{width:100%;min-height:48px!important;font-weight:800;}
+  #mobile-print-flow-modal .mobile-print-flow-progress{height:6px;border-radius:99px;background:var(--border);overflow:hidden;margin:16px 0 4px;}
+  #mobile-print-flow-modal .mobile-print-flow-progress>i{display:block;height:100%;width:45%;background:var(--green-lt,var(--green));border-radius:99px;animation:mobilePrintProgress 1.2s ease-in-out infinite alternate;}
+  @keyframes mobilePrintProgress{from{width:28%;}to{width:82%;}}
+}
+</style>
 </head>
 <body>
 <!-- LOGIN -->
@@ -1069,7 +1130,7 @@ body{font-size:13px;letter-spacing:-.01em;}
 </div>
 </div>
 <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebarCollapse()"></div>
-<nav aria-label="Navegação rápida" id="mobile-bottom-nav"><button class="mobile-nav-item" data-page="inicio" onclick="goPage('pedidos')" type="button"><span class="mobile-nav-icon">⌂</span><span class="mobile-nav-label">Início</span></button><button class="mobile-nav-item" data-page="pedidos" onclick="goPage('pedidos');setTimeout(()=>typeof setPedidosView==='function'&&setPedidosView('lista'),0)" type="button"><span class="mobile-nav-icon">🧾</span><span class="mobile-nav-label">Pedidos</span></button><button class="mobile-nav-item" data-page="cardapio" onclick="goPage('cardapio')" type="button"><span class="mobile-nav-icon">🍱</span><span class="mobile-nav-label">Cardápio</span></button><button class="mobile-nav-item" data-page="mensagens" onclick="goPage('mensagens')" type="button"><span class="mobile-nav-icon">💬</span><span class="mobile-nav-label">Mensagens</span></button><button class="mobile-nav-item" id="mobile-nav-menu" data-page="mais" onclick="toggleSidebarCollapse()" type="button"><span class="mobile-nav-icon">☰</span><span class="mobile-nav-label">Mais</span></button></nav><div class="content">
+<nav aria-label="Navegação rápida" id="mobile-bottom-nav"><button class="mobile-nav-item" data-page="inicio" onclick="goPage('pedidos')" type="button"><span class="mobile-nav-icon">⌂</span><span class="mobile-nav-label">Início</span></button><button class="mobile-nav-item" data-page="pedidos" onclick="goPage('pedidos');setTimeout(()=>typeof setPedidosView==='function'&&setPedidosView('kanban'),0)" type="button"><span class="mobile-nav-icon">🧾</span><span class="mobile-nav-label">Pedidos</span></button><button class="mobile-nav-item" data-page="cardapio" onclick="goPage('cardapio')" type="button"><span class="mobile-nav-icon">🍱</span><span class="mobile-nav-label">Cardápio</span></button><button class="mobile-nav-item" data-page="mensagens" onclick="goPage('mensagens')" type="button"><span class="mobile-nav-icon">💬</span><span class="mobile-nav-label">Mensagens</span></button><button class="mobile-nav-item" id="mobile-nav-menu" data-page="mais" onclick="toggleSidebarCollapse()" type="button"><span class="mobile-nav-icon">☰</span><span class="mobile-nav-label">Mais</span></button></nav><div class="content">
 <!-- ── DASHBOARD ── -->
 <div class="page active" id="page-pedidos">
 <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
@@ -3884,7 +3945,7 @@ function goPage(id, silent){
   document.querySelectorAll('.mobile-nav-item[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
   if(window.innerWidth<=760 && !silent){ const sb=document.getElementById('sidebar'); const bd=document.getElementById('sidebar-backdrop'); if(sb && !sb.classList.contains('collapsed')){sb.classList.add('collapsed'); localStorage.setItem('shog_sidebar_collapsed','1');} if(bd)bd.classList.remove('show'); }
   document.getElementById('topbar-title').textContent=pageTitles[id]||id;
-  if(id==='pedidos')setPedidosView(pedidosView);
+  if(id==='pedidos'){ if(window.innerWidth<=760 && pedidosView==='visao') pedidosView='kanban'; setPedidosView(pedidosView); }
   if(id==='reservas')renderReservationsList();
   if(id==='cardapio')renderMenuEditor();
   if(id==='custos')renderCustosPage();
@@ -4037,7 +4098,28 @@ function playAlertSound(soundId, ctxOverride){
     }
   }catch(e){}
 }
-function playBeep(){ playAlertSound(alertSoundChoice()); }
+let mobileAlertAudioCtx=null;
+let mobileAlertAudioUnlocked=false;
+function unlockMobileAlertAudio(){
+  if(!isAdminMobile()) return;
+  try{
+    const Ctx=window.AudioContext||window.webkitAudioContext; if(!Ctx) return;
+    if(!mobileAlertAudioCtx) mobileAlertAudioCtx=new Ctx();
+    if(mobileAlertAudioCtx.state==='suspended') mobileAlertAudioCtx.resume();
+    mobileAlertAudioUnlocked=true;
+  }catch(e){}
+}
+function playBeep(){
+  try{
+    if(isAdminMobile()){
+      unlockMobileAlertAudio();
+      if(navigator.vibrate) navigator.vibrate([120,70,120]);
+      if(mobileAlertAudioCtx && mobileAlertAudioUnlocked){ playAlertSound(alertSoundChoice(),mobileAlertAudioCtx); return; }
+    }
+  }catch(e){}
+  playAlertSound(alertSoundChoice());
+}
+
 function testSelectedSound(){
   const el = document.getElementById('cfg-sound-choice');
   playAlertSound(el ? el.value : alertSoundChoice());
@@ -5525,7 +5607,7 @@ function registerPendingPrintAck(orderId, station){
   }, 15000);
   pendingPrintAcks.set(key, { timeout });
 }
-async function printOrder(id, ev, stations, isAuto){
+async function printOrderCore(id, ev, stations, isAuto){
   const targetStations = (Array.isArray(stations) && stations.length) ? stations : getPrintStations();
   const btn = (ev||window.event)?.currentTarget;
   if(btn) btn.classList.add('printing');
@@ -5636,6 +5718,101 @@ async function printOrder(id, ev, stations, isAuto){
     if(fellBackAny) showToast('ℹ️ Impressora compartilhada', 'Uma ou mais vias sem impressora própria saíram na mesma impressora do Caixa.', 5000);
   }
   if(btn) btn.classList.remove('printing');
+}
+
+
+// v125.2 — fluxo de impressão mobile: um único modal, uma etapa por vez, sem sobreposição.
+let mobilePrintFlowBusy=false;
+let mobilePrintFlowOrderId=null;
+function isAdminMobile(){ return window.matchMedia && window.matchMedia('(max-width:760px)').matches; }
+function mobilePrintOrderSummary(order){
+  const items=(order?.items||[]).slice(0,5);
+  const extra=(order?.items||[]).length-items.length;
+  return `<div class="mobile-print-flow-order">
+    <div style="display:flex;justify-content:space-between;gap:8px;font-weight:800;margin-bottom:8px;">
+      <span>Pedido ${esc(order.ticketNumber?'#'+order.ticketNumber:'#'+order.id)}</span>
+      <span>${order.mode==='delivery'?'🛵 Delivery':'🏪 Retirada'}</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${esc(order.name||'Cliente')} · ${orderTime(order.createdAt)}</div>
+    ${items.map(i=>`<div class="mobile-print-flow-item"><span>${Number(i.qty)||1}x ${esc(i.name||'Item')}</span><b>R$ ${(Number(i.price||0)*(Number(i.qty)||1)).toFixed(2).replace('.',',')}</b></div>`).join('')}
+    ${extra>0?`<div style="font-size:11px;color:var(--muted);padding-top:7px;">+ ${extra} item(ns)</div>`:''}
+    <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:14px;font-weight:900;"><span>Total</span><span>R$ ${Number(order.total||0).toFixed(2).replace('.',',')}</span></div>
+  </div>`;
+}
+function ensureMobilePrintModal(){
+  let el=document.getElementById('mobile-print-flow-modal');
+  if(el) return el;
+  el=document.createElement('div');
+  el.className='modal-overlay'; el.id='mobile-print-flow-modal';
+  el.innerHTML=`<div class="modal">
+    <div class="modal-header"><span class="modal-title" id="mobile-print-flow-header">Impressão</span><button class="modal-close" id="mobile-print-flow-close" type="button">✕</button></div>
+    <div class="modal-body" id="mobile-print-flow-body"></div>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{ if(e.target===el) mobilePrintFlowClose(); });
+  el.querySelector('#mobile-print-flow-close').addEventListener('click',mobilePrintFlowClose);
+  return el;
+}
+function mobilePrintFlowClose(){
+  const el=document.getElementById('mobile-print-flow-modal');
+  if(el) el.classList.remove('open');
+  mobilePrintFlowBusy=false; mobilePrintFlowOrderId=null;
+}
+function mobilePrintFlowStep(step,order,extra){
+  const el=ensureMobilePrintModal();
+  const body=el.querySelector('#mobile-print-flow-body');
+  const header=el.querySelector('#mobile-print-flow-header');
+  const common=`<div style="max-width:520px;margin:0 auto;padding:8px 2px 18px;">`;
+  if(step==='review'){
+    header.textContent='Imprimir pedido';
+    body.innerHTML=common+`<div class="mobile-print-flow-icon">🖨️</div><div class="mobile-print-flow-title">Pedido pronto para imprimir</div><div class="mobile-print-flow-sub">Uma única ação envia todas as vias configuradas.</div>${mobilePrintOrderSummary(order)}<div class="mobile-print-flow-actions"><button class="btn primary" id="mobile-print-now">🖨 Imprimir agora</button><button class="btn secondary" id="mobile-print-cancel">Cancelar</button></div></div>`;
+    body.querySelector('#mobile-print-now').onclick=()=>mobilePrintFlowRun(order);
+    body.querySelector('#mobile-print-cancel').onclick=mobilePrintFlowClose;
+  }else if(step==='printing'){
+    header.textContent='Imprimindo';
+    body.innerHTML=common+`<div class="mobile-print-flow-icon">🖨️</div><div class="mobile-print-flow-title">Enviando para a impressora…</div><div class="mobile-print-flow-sub">Aguarde. Esta tela continua aberta até terminar.</div><div class="mobile-print-flow-progress"><i></i></div><div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;">${esc(order.id||'Pedido')}</div><div class="mobile-print-flow-actions"><button class="btn secondary" id="mobile-print-stop">Cancelar</button></div></div>`;
+    body.querySelector('#mobile-print-stop').onclick=mobilePrintFlowClose;
+  }else if(step==='success'){
+    header.textContent='Concluído';
+    body.innerHTML=common+`<div class="mobile-print-flow-icon">✅</div><div class="mobile-print-flow-title">Impressão concluída</div><div class="mobile-print-flow-sub">Pedido ${esc(order.ticketNumber?'#'+order.ticketNumber:'#'+order.id)} enviado com sucesso.</div>${extra?.message?`<div style="margin-top:12px;text-align:center;font-size:12px;color:var(--muted);">${esc(extra.message)}</div>`:''}<div class="mobile-print-flow-actions"><button class="btn primary" id="mobile-print-next">Próximo pedido →</button><button class="btn secondary" id="mobile-print-done">Fechar</button></div></div>`;
+    body.querySelector('#mobile-print-next').onclick=()=>mobilePrintFlowNext(order.id);
+    body.querySelector('#mobile-print-done').onclick=mobilePrintFlowClose;
+  }else if(step==='empty'){
+    header.textContent='Impressão';
+    body.innerHTML=common+`<div class="mobile-print-flow-icon">✓</div><div class="mobile-print-flow-title">Tudo impresso</div><div class="mobile-print-flow-sub">Não há outro pedido novo aguardando impressão.</div><div class="mobile-print-flow-actions"><button class="btn primary" id="mobile-print-close-empty">Fechar</button></div></div>`;
+    body.querySelector('#mobile-print-close-empty').onclick=mobilePrintFlowClose;
+  }
+  el.classList.add('open');
+}
+async function mobilePrintFlowRun(order){
+  if(mobilePrintFlowBusy) return;
+  mobilePrintFlowBusy=true;
+  mobilePrintFlowStep('printing',order);
+  try{
+    await printOrderCore(order.id,null,null,false);
+    mobilePrintFlowStep('success',order,{message:'O próximo pedido será aberto automaticamente.'});
+    setTimeout(()=>{ if(document.getElementById('mobile-print-flow-modal')?.classList.contains('open') && mobilePrintFlowOrderId===order.id) mobilePrintFlowNext(order.id); },1100);
+  }catch(e){
+    mobilePrintFlowBusy=false;
+    mobilePrintFlowStep('review',order);
+    showToast('⚠️ Não foi possível imprimir',e.message||'Tente novamente.',6000);
+  }
+}
+function mobilePrintFlowNext(currentId){
+  const next=orders.filter(o=>STATUS_FROM_SERVER[o.status]==='novo' && o.id!==currentId).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt))[0];
+  if(!next){ mobilePrintFlowBusy=false; mobilePrintFlowOrderId=null; mobilePrintFlowStep('empty',orders.find(o=>o.id===currentId)||{}); return; }
+  mobilePrintFlowBusy=false; mobilePrintFlowOrderId=next.id; mobilePrintFlowStep('review',next);
+}
+async function printOrder(id, ev, stations, isAuto){
+  if(isAdminMobile() && !isAuto){
+    const order=orders.find(o=>o.id===id);
+    if(!order) return;
+    mobilePrintFlowOrderId=id;
+    mobilePrintFlowBusy=false;
+    mobilePrintFlowStep('review',order);
+    return;
+  }
+  return printOrderCore(id,ev,stations,isAuto);
 }
 
 // v51: o modal "Escolher Impressora" (🖨▾) foi removido a pedido — imprimir agora sempre manda
@@ -10110,6 +10287,10 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('clic
 document.addEventListener('keydown', e=>{
   if(e.key==='Escape'){ const open=document.querySelector('.modal-overlay.open'); if(open) open.classList.remove('open'); }
 });
+
+// Em celulares, libera o Web Audio no primeiro toque para que o próximo pedido toque na hora.
+document.addEventListener('pointerdown', unlockMobileAlertAudio, {passive:true, once:false});
+document.addEventListener('touchstart', unlockMobileAlertAudio, {passive:true, once:false});
 
 // ═══════════════════════════════════════════
 // INIT
