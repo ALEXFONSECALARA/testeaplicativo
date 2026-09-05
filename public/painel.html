@@ -1050,76 +1050,71 @@ body{font-size:13px;letter-spacing:-.01em;}
 </style>
 
 <style id="v125-mobile-kanban-responsive-animated">
-/* v125.3 — KANBAN MOBILE: responsivo, animado e com avanço por toque — somente painel administrativo */
+/* v125.4 — KANBAN MOBILE seguro: uma coluna por vez, rolagem suave sem pular a página */
 @media(max-width:760px){
+  html,body{max-width:100%;overflow-x:hidden!important;}
   #page-pedidos .kanban-board{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:flex-start!important;
+    gap:10px!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
     scroll-snap-type:x mandatory!important;
     scroll-behavior:smooth!important;
     overscroll-behavior-x:contain!important;
-    touch-action:pan-x pan-y!important;
-    padding-left:2px!important;
-    padding-right:2px!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-x!important;
+    padding:2px 2px 10px!important;
+    box-sizing:border-box!important;
   }
   #page-pedidos .kanban-col{
+    flex:0 0 calc(100vw - 34px)!important;
+    width:calc(100vw - 34px)!important;
+    max-width:calc(100vw - 34px)!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
     scroll-snap-align:start!important;
     scroll-snap-stop:always!important;
-    transition:transform .28s ease,opacity .28s ease,box-shadow .28s ease!important;
-    will-change:transform,opacity;
+    overflow:hidden!important;
+    transition:transform .22s ease,opacity .22s ease!important;
+    will-change:transform;
   }
-  #page-pedidos .kanban-col.is-current{
-    transform:translateY(-2px)!important;
+  #page-pedidos .kanban-col.is-current{transform:translateY(-1px)!important;}
+  #page-pedidos .kanban-body{
+    min-height:120px!important;
+    max-height:none!important;
+    overflow:visible!important;
   }
   #page-pedidos .k-card{
-    animation:shogKanbanCardIn .32s ease both;
-    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important;
-  }
-  #page-pedidos .k-card:active{
-    transform:scale(.985)!important;
-  }
-  #page-pedidos .k-card + .k-card{animation-delay:.035s;}
-  #page-pedidos .kanban-mobile-next{
     width:100%!important;
-    min-height:42px!important;
-    margin:0 0 8px!important;
-    border:1px solid var(--border)!important;
-    background:var(--bg)!important;
-    color:var(--muted)!important;
-    border-radius:10px!important;
-    font-size:11px!important;
-    font-weight:800!important;
-    letter-spacing:.01em;
-    transition:transform .18s ease,background .18s ease,border-color .18s ease!important;
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    animation:shogKanbanCardIn .22s ease both;
+    transition:transform .16s ease,box-shadow .16s ease!important;
   }
-  #page-pedidos .kanban-mobile-next:active{
-    transform:scale(.98)!important;
-    background:var(--red-bg)!important;
-    border-color:var(--red)!important;
-    color:var(--red-lt)!important;
+  #page-pedidos .k-card:active{transform:scale(.99)!important;}
+  #page-pedidos .k-card-items{overflow:hidden!important;text-overflow:ellipsis!important;}
+  #page-pedidos .kanban-mobile-next{
+    width:100%!important;min-height:44px!important;margin:4px 0 2px!important;
+    box-sizing:border-box!important;border:1px solid var(--border)!important;
+    background:var(--bg)!important;color:var(--muted)!important;border-radius:10px!important;
+    font-size:11px!important;font-weight:800!important;transition:transform .16s ease!important;
   }
-  #page-pedidos .kanban-mobile-hint{
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    gap:6px!important;
-    font-size:10px!important;
-    color:var(--muted)!important;
-    padding:4px 0 8px!important;
-  }
-  #page-pedidos .kanban-mobile-dotbar{
-    display:flex!important;
-    justify-content:center!important;
-    gap:5px!important;
-    padding:2px 0 8px!important;
-  }
-  #page-pedidos .kanban-mobile-dotbar i{
-    width:6px;height:6px;border-radius:50%;background:var(--border2);display:block;transition:transform .2s ease,background .2s ease;
-  }
+  #page-pedidos .kanban-mobile-next:active{transform:scale(.98)!important;}
+  #page-pedidos .kanban-mobile-hint{display:flex!important;justify-content:center!important;gap:6px!important;font-size:10px!important;color:var(--muted)!important;padding:4px 0 7px!important;}
+  #page-pedidos .kanban-mobile-dotbar{display:flex!important;justify-content:center!important;gap:5px!important;padding:2px 0 7px!important;}
+  #page-pedidos .kanban-mobile-dotbar i{width:6px;height:6px;border-radius:50%;background:var(--border2);display:block;transition:transform .2s ease,background .2s ease;}
   #page-pedidos .kanban-mobile-dotbar i.active{background:var(--red-lt);transform:scale(1.35);}
+  #page-pedidos .kanban{width:100%!important;min-width:0!important;}
 }
-@media(min-width:761px){
-  .kanban-mobile-next,.kanban-mobile-hint,.kanban-mobile-dotbar{display:none!important;}
-}
-@keyframes shogKanbanCardIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+@media(min-width:761px){.kanban-mobile-next,.kanban-mobile-hint,.kanban-mobile-dotbar{display:none!important;}}
+@keyframes shogKanbanCardIn{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:translateX(0)}}
 </style>
 </head>
 <body>
@@ -11086,29 +11081,26 @@ if(token){
   function mobile(){ return window.matchMedia && window.matchMedia('(max-width:760px)').matches; }
   function board(){ return document.getElementById('kanban-board'); }
   function cols(){ var b=board(); return b ? Array.prototype.slice.call(b.querySelectorAll('.kanban-col')) : []; }
-  function goToCol(index,behavior){
+  function updateDots(index){ var b=board(); if(!b) return; b.querySelectorAll('.kanban-mobile-dotbar i').forEach(function(d,i){d.classList.toggle('active',i===index);}); }
+  function goToCol(index){
     if(!mobile()) return;
-    var b=board(), list=cols();
-    if(!b || !list.length) return;
+    var b=board(), list=cols(); if(!b||!list.length) return;
     index=Math.max(0,Math.min(index,list.length-1));
-    list.forEach(function(c,i){ c.classList.toggle('is-current',i===index); });
-    list[index].scrollIntoView({behavior:behavior||'smooth',block:'nearest',inline:'start'});
+    list.forEach(function(c,i){c.classList.toggle('is-current',i===index);});
+    var target=list[index];
+    var left=Math.max(0,target.offsetLeft-b.offsetLeft-2);
+    b.scrollTo({left:left,behavior:'smooth'});
     updateDots(index);
-  }
-  function updateDots(index){
-    var b=board(); if(!b) return;
-    b.querySelectorAll('.kanban-mobile-dotbar i').forEach(function(dot,i){dot.classList.toggle('active',i===index);});
   }
   function decorate(){
     if(!mobile()) return;
-    var b=board(), list=cols();
-    if(!b || !list.length) return;
-    if(!b.querySelector('.kanban-mobile-dotbar')){
+    var b=board(), list=cols(); if(!b||!list.length) return;
+    if(!b.parentNode.querySelector('.kanban-mobile-dotbar')){
       var dots=document.createElement('div'); dots.className='kanban-mobile-dotbar';
       dots.innerHTML=list.map(function(){return '<i aria-hidden="true"></i>';}).join('');
       b.parentNode.insertBefore(dots,b);
     }
-    if(!b.querySelector('.kanban-mobile-hint')){
+    if(!b.parentNode.querySelector('.kanban-mobile-hint')){
       var hint=document.createElement('div'); hint.className='kanban-mobile-hint';
       hint.innerHTML='<span>← deslize</span><b>•</b><span>toque para avançar</span><b>•</b><span>deslize →</span>';
       b.parentNode.insertBefore(hint,b.nextSibling);
@@ -11117,43 +11109,36 @@ if(token){
       col.dataset.kanbanIndex=String(i);
       var body=col.querySelector('.kanban-body');
       if(body && i<list.length-1 && !body.querySelector('.kanban-mobile-next')){
-        var btn=document.createElement('button');
-        btn.type='button'; btn.className='kanban-mobile-next';
-        btn.textContent='Próxima etapa →';
-        btn.addEventListener('click',function(e){e.stopPropagation();goToCol(i+1);});
-        body.appendChild(btn);
+        var btn=document.createElement('button'); btn.type='button'; btn.className='kanban-mobile-next'; btn.textContent='Próxima etapa →';
+        btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();goToCol(i+1);}); body.appendChild(btn);
       }
     });
-    updateDots(0);
-    list[0].classList.add('is-current');
+    updateDots(0); list[0].classList.add('is-current');
   }
   function bind(){
-    var b=board(); if(!b || b.dataset.mobileKanbanBound==='1') return;
+    var b=board(); if(!b||b.dataset.mobileKanbanBound==='1') return;
     b.dataset.mobileKanbanBound='1';
     b.addEventListener('click',function(e){
       if(!mobile()) return;
       if(e.target.closest && e.target.closest('button,a,input,select,textarea,[onclick*="silence"],.kanban-mobile-next')) return;
-      var card=e.target.closest && e.target.closest('.k-card');
-      if(!card) return;
-      var col=card.closest('.kanban-col'), list=cols();
-      var i=list.indexOf(col);
-      if(i>=0 && i<list.length-1){
-        e.preventDefault();
-        goToCol(i+1);
-      }
+      var card=e.target.closest && e.target.closest('.k-card'); if(!card) return;
+      var col=card.closest('.kanban-col'), list=cols(), i=list.indexOf(col);
+      if(i>=0 && i<list.length-1){ e.preventDefault(); goToCol(i+1); }
     });
+    b.addEventListener('scroll',function(){
+      if(!mobile()) return;
+      clearTimeout(b._kanbanScrollTimer);
+      b._kanbanScrollTimer=setTimeout(function(){
+        var list=cols(), best=0, dist=Infinity;
+        list.forEach(function(c,i){var d=Math.abs((c.offsetLeft-b.offsetLeft)-b.scrollLeft);if(d<dist){dist=d;best=i;}});
+        list.forEach(function(c,i){c.classList.toggle('is-current',i===best);}); updateDots(best);
+      },80);
+    },{passive:true});
   }
-  function refresh(){
-    if(!mobile()) return;
-    setTimeout(function(){decorate();bind();},40);
-  }
+  function refresh(){ if(!mobile()) return; setTimeout(function(){decorate();bind();},60); }
   document.addEventListener('DOMContentLoaded',function(){setTimeout(refresh,300);});
   window.addEventListener('resize',refresh,{passive:true});
-  var observer=new MutationObserver(function(){ if(mobile()) refresh(); });
-  document.addEventListener('DOMContentLoaded',function(){
-    var target=document.getElementById('kanban-board');
-    if(target) observer.observe(target,{childList:true,subtree:true});
-  });
+  document.addEventListener('click',function(e){ if(e.target.closest && e.target.closest('[onclick*="setPedidosView"],#ptab-kanban')) setTimeout(refresh,150); });
 })();
 </script>
 </body>
