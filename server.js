@@ -425,7 +425,12 @@ ensureVapidKeys();
 
 function readJSON(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
 function writeJSON(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+  // v125 final: gravação atômica — evita deixar JSON pela metade se o processo cair durante a escrita.
+  const dir = path.dirname(file);
+  const tmp = path.join(dir, `.${path.basename(file)}.${process.pid}.tmp`);
+  const payload = JSON.stringify(data, null, 2);
+  fs.writeFileSync(tmp, payload, 'utf8');
+  fs.renameSync(tmp, file);
   syncToSupabase(file, data); // fire-and-forget — nunca trava nem quebra a resposta ao usuário
 }
 
@@ -1080,7 +1085,7 @@ function broadcast(event, data) {
 // quando os arquivos do sistema são atualizados; precisa de REINICIAR-AGENTE.bat. Atualizar esse
 // valor sempre que print-agent.js mudar de verdade (não precisa mudar em toda alteração de
 // server.js — só quando o AGENT_BUILD de lá também mudar).
-const CURRENT_AGENT_BUILD = 'v95';
+const CURRENT_AGENT_BUILD = 'v125-part2';
 const printAgents = new Map(); // agentId -> { label, stations, printers, build, lastSeen }
 const PRINT_AGENT_TTL_MS = 90 * 1000; // sem novo aviso em 90s, considera o agente offline
 function getOnlinePrintAgents() {
@@ -3770,6 +3775,16 @@ function estimateDeliveryWindow(order, cfg) {
     } catch (e) { return sendJSON(res, 400, { error: 'invalid body' }); }
   }
 
+  // ── GET /api/health — diagnóstico leve para monitoramento/deploy. Não expõe dados do restaurante.
+  if (pathname === '/api/health' && req.method === 'GET') {
+    const checks = {};
+    for (const [name, file] of Object.entries({config: CONFIG_FILE, orders: ORDERS_FILE, customers: CUSTOMERS_FILE})) {
+      try { fs.accessSync(file, fs.constants.R_OK | fs.constants.W_OK); checks[name] = true; } catch (_) { checks[name] = false; }
+    }
+    const ok = Object.values(checks).every(Boolean);
+    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.125', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
+  }
+
   // ── GET /api/print-agent/status — o painel consulta pra mostrar se tem algum Agente Local
   // conectado agora, e quais vias cada um cobre (v82); agora também informa quantos
   // Terminais de Impressão (modo Navegador) estão de fato ativos agora (v85) ──
@@ -3778,6 +3793,35 @@ function estimateDeliveryWindow(order, cfg) {
     const agents = getOnlinePrintAgents();
     const coveredStations = [...new Set(agents.flatMap(a => a.printers.flatMap(p => p.stations)))];
     return sendJSON(res, 200, { online: agents.length > 0, agents, coveredStations, terminalsOnline: getOnlinePrintTerminalsCount(), currentAgentBuild: CURRENT_AGENT_BUILD });
+  }
+
+  // ── GET /api/print-agent/pending — v125-part1: recuperação de impressão após queda de SSE/rede.
+  // O Agente Local consulta esta fila periodicamente. Assim, se ele estava offline quando o
+  // evento 'new-order' aconteceu, o pedido não fica perdido: ele reaparece aqui até cada via
+  // ser concluída. A trava por pedido+via continua sendo feita em /api/print-agent/claim, então
+  // dois agentes consultando a mesma fila não imprimem a mesma via duas vezes.
+  if (pathname === '/api/print-agent/pending' && req.method === 'GET') {
+    if (!checkAuth(getToken(req, query))) return sendJSON(res, 401, { error: 'unauthorized' });
+    try {
+      const now = Date.now();
+      const maxAgeMs = 48 * 60 * 60 * 1000;
+      const orders = readJSON(ORDERS_FILE)
+        .filter(o => o && o.autoPrintEligible === true && !['cancelado','entregue'].includes(o.status))
+        .filter(o => now - new Date(o.createdAt || 0).getTime() <= maxAgeMs)
+        .filter(o => {
+          const states = o.autoPrintState || {};
+          return !o.autoPrinted || Object.keys(states).some(st => states[st]?.status !== 'done') || Object.keys(states).length === 0;
+        })
+        .slice(0, 100);
+      const reservations = readJSON(RESERVATIONS_FILE)
+        .filter(r => r && r.autoPrintEligible === true)
+        .filter(r => now - new Date(r.createdAt || 0).getTime() <= maxAgeMs)
+        .filter(r => !r.autoPrinted && r.autoPrintState?.status !== 'done')
+        .slice(0, 100);
+      return sendJSON(res, 200, { ok: true, orders, reservations, serverTime: new Date().toISOString() });
+    } catch (e) {
+      return sendJSON(res, 500, { error: 'Não foi possível consultar a fila de impressão.', retryable: true });
+    }
   }
 
   // ── POST /api/print-station/register — o Painel avisa que abriu/está ativo AGORA e assume
@@ -5150,6 +5194,8 @@ function estimateDeliveryWindow(order, cfg) {
         // (Configurações → 🏪 Restaurante → 🤖 Automações). Quando ligado, a reserva já nasce
         // confirmada, sem precisar ninguém clicar em "Confirmar" no painel.
         status: cfg.autoAcceptReservations ? 'confirmada' : 'pendente',
+        // v125-part1: permite recuperar a impressão automática de reserva após queda de conexão.
+        autoPrintEligible: !!cfg.print,
         name, phone, people, date, time,
         notes: String(body.notes || '').slice(0, 200),
         storeReply: '' // v33: mensagem da loja pro cliente (aparece na tela de acompanhamento)
@@ -5357,6 +5403,10 @@ function estimateDeliveryWindow(order, cfg) {
         ticketNumber: null, // só é atribuído quando a loja ACEITA o pedido (veja PATCH /api/orders/:id)
         createdAt: new Date().toISOString(),
         status: 'novo',
+        // v125-part1: marca no próprio pedido se ele nasceu elegível para impressão automática.
+        // Isso permite recuperar pedidos perdidos durante uma queda de SSE/rede sem imprimir
+        // pedidos que só foram aceitos manualmente depois.
+        autoPrintEligible: !!cfg.autoAcceptOrders,
         autoPrinted: {}, // v86: ver POST /api/print — evita a mesma via imprimir 2-3x com vários painéis abertos
         mode: body.mode === 'retirada' ? 'retirada' : 'delivery',
         name: String(body.name || '').slice(0, 80),
