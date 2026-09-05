@@ -2182,6 +2182,16 @@ async function handleRequest(req, res) {
   const pathname = parsed.pathname;
   const query = Object.fromEntries(parsed.searchParams);
 
+  // v123 — admin-cardapio.html foi removido por ser apenas um atalho duplicado.
+  // Mantemos a URL antiga funcionando para não quebrar favoritos/links antigos.
+  if (pathname === '/admin-cardapio.html' && (req.method === 'GET' || req.method === 'HEAD')) {
+    res.writeHead(301, {
+      'Location': '/painel.html#cardapio',
+      'Cache-Control': 'no-store'
+    });
+    return res.end();
+  }
+
   if (req.method === 'OPTIONS') { return sendJSON(res, 204, {}); }
 
   // ── GET /api/version — usado pelo front-end (public/version-check.js) pra saber se existe
@@ -3653,11 +3663,20 @@ function estimateDeliveryWindow(order, cfg) {
     try {
       const { orderId, station, ok, error } = await readBody(req);
       if (!orderId || !station) return sendJSON(res, 400, { error: 'orderId e station são obrigatórios.' });
+      // v122: fecha o ciclo da trava automática. Sucesso vira DONE; falha libera a via para retry.
+      try {
+        const orders = readJSON(ORDERS_FILE); const oi = orders.findIndex(o=>o.id===orderId);
+        if(oi>-1){ const o=orders[oi]; if(!o.autoPrintState)o.autoPrintState={};
+          if(ok){ o.autoPrintState[station]={status:'done',finishedAt:new Date().toISOString()}; o.autoPrinted=o.autoPrinted||{}; o.autoPrinted[station]=true; }
+          else { delete o.autoPrintState[station]; if(o.autoPrinted) delete o.autoPrinted[station]; }
+          orders[oi]=o; writeJSON(ORDERS_FILE,orders);
+        }
+      } catch(e) { console.error('⚠️ Não consegui atualizar estado da impressão:',e.message); }
       if (!ok) {
         try {
           const log = readJSON(PRINT_LOG_FILE);
-          log.unshift({ orderId, station, error: String(error || 'Falha desconhecida').slice(0, 500), ts: new Date().toISOString() });
-          fs.writeFileSync(PRINT_LOG_FILE, JSON.stringify(log.slice(0, 500), null, 2)); // guarda só os 500 mais recentes
+          log.unshift({ orderId, station, error: String(error || 'Falha desconhecida').slice(0, 500), ts: new Date().toISOString(), retryable:true });
+          fs.writeFileSync(PRINT_LOG_FILE, JSON.stringify(log.slice(0, 500), null, 2));
         } catch (e) { console.error('⚠️  Não consegui gravar print-log.json:', e.message); }
       }
       broadcast('print-result', { orderId, station, ok: !!ok, error: error || null });
@@ -3691,26 +3710,30 @@ function estimateDeliveryWindow(order, cfg) {
     if (!checkAuth(getToken(req, query))) return sendJSON(res, 401, { error: 'unauthorized' });
     try {
       const { kind, id, station } = await readBody(req);
+      const now=Date.now(), leaseMs=90000;
       if (kind === 'reservation') {
-        const list = readJSON(RESERVATIONS_FILE);
-        const idx = list.findIndex(r => r.id === id);
-        if (idx === -1) return sendJSON(res, 404, { error: 'Reserva não encontrada.', claimed: false });
-        if (list[idx].autoPrinted) return sendJSON(res, 200, { claimed: false, alreadyClaimed: true });
-        list[idx].autoPrinted = true;
-        writeJSON(RESERVATIONS_FILE, list);
-        return sendJSON(res, 200, { claimed: true });
+        const list=readJSON(RESERVATIONS_FILE); const idx=list.findIndex(r=>r.id===id); if(idx===-1)return sendJSON(res,404,{error:'Reserva não encontrada.',claimed:false});
+        const r=list[idx]; const state=r.autoPrintState; if(r.autoPrinted||state?.status==='done')return sendJSON(res,200,{claimed:false,alreadyClaimed:true});
+        if(state?.status==='printing' && now-Number(state.claimedAt||0)<leaseMs)return sendJSON(res,200,{claimed:false,alreadyPrinting:true});
+        r.autoPrintState={status:'printing',claimedAt:now}; list[idx]=r; writeJSON(RESERVATIONS_FILE,list); return sendJSON(res,200,{claimed:true});
       }
-      // kind === 'order' (padrão)
-      if (!station) return sendJSON(res, 400, { error: 'station obrigatório.', claimed: false });
-      const orders = readJSON(ORDERS_FILE);
-      const idx = orders.findIndex(o => o.id === id);
-      if (idx === -1) return sendJSON(res, 404, { error: 'Pedido não encontrado.', claimed: false });
-      if (!orders[idx].autoPrinted) orders[idx].autoPrinted = {};
-      if (orders[idx].autoPrinted[station]) return sendJSON(res, 200, { claimed: false, alreadyClaimed: true });
-      orders[idx].autoPrinted[station] = true;
-      writeJSON(ORDERS_FILE, orders);
-      return sendJSON(res, 200, { claimed: true });
-    } catch (e) { return sendJSON(res, 400, { error: 'invalid body', claimed: false }); }
+      if(!station)return sendJSON(res,400,{error:'station obrigatório.',claimed:false});
+      const orders=readJSON(ORDERS_FILE); const idx=orders.findIndex(o=>o.id===id); if(idx===-1)return sendJSON(res,404,{error:'Pedido não encontrado.',claimed:false});
+      const o=orders[idx]; o.autoPrintState=o.autoPrintState||{}; const state=o.autoPrintState[station];
+      if(o.autoPrinted?.[station] || state?.status==='done')return sendJSON(res,200,{claimed:false,alreadyClaimed:true});
+      if(state?.status==='printing' && now-Number(state.claimedAt||0)<leaseMs)return sendJSON(res,200,{claimed:false,alreadyPrinting:true});
+      o.autoPrintState[station]={status:'printing',claimedAt:now}; orders[idx]=o; writeJSON(ORDERS_FILE,orders); return sendJSON(res,200,{claimed:true});
+    } catch(e){return sendJSON(res,400,{error:'invalid body',claimed:false});}
+  }
+
+  // v122 — libera/fecha reservas de impressão quando o agente termina ou falha.
+  if (pathname === '/api/print-agent/release' && req.method === 'POST') {
+    if (!checkAuth(getToken(req, query))) return sendJSON(res,401,{error:'unauthorized'});
+    try{ const {kind,id,station}=await readBody(req); if(kind==='reservation'){const list=readJSON(RESERVATIONS_FILE);const i=list.findIndex(r=>r.id===id);if(i>-1){delete list[i].autoPrintState;writeJSON(RESERVATIONS_FILE,list);}} else {const orders=readJSON(ORDERS_FILE);const i=orders.findIndex(o=>o.id===id);if(i>-1){delete (orders[i].autoPrintState||{})[station];if(orders[i].autoPrinted)delete orders[i].autoPrinted[station];writeJSON(ORDERS_FILE,orders);}} return sendJSON(res,200,{ok:true}); }catch(e){return sendJSON(res,400,{error:'invalid body'});}
+  }
+  if (pathname === '/api/print-agent/complete' && req.method === 'POST') {
+    if (!checkAuth(getToken(req, query))) return sendJSON(res,401,{error:'unauthorized'});
+    try{ const {kind,id,station}=await readBody(req); if(kind==='reservation'){const list=readJSON(RESERVATIONS_FILE);const i=list.findIndex(r=>r.id===id);if(i>-1){list[i].autoPrinted=true;delete list[i].autoPrintState;writeJSON(RESERVATIONS_FILE,list);}} else {const orders=readJSON(ORDERS_FILE);const i=orders.findIndex(o=>o.id===id);if(i>-1){orders[i].autoPrinted=orders[i].autoPrinted||{};orders[i].autoPrinted[station]=true;orders[i].autoPrintState=orders[i].autoPrintState||{};orders[i].autoPrintState[station]={status:'done',finishedAt:new Date().toISOString()};writeJSON(ORDERS_FILE,orders);}} return sendJSON(res,200,{ok:true}); }catch(e){return sendJSON(res,400,{error:'invalid body'});}
   }
 
   // ── POST /api/print-agent/announce — o Agente Local avisa "estou vivo" (v82) ──
@@ -3865,14 +3888,13 @@ function estimateDeliveryWindow(order, cfg) {
       // auto-print; qualquer segunda chamada automática pra essa MESMA via desse MESMO pedido
       // é ignorada, não importa de quantos painéis abertos ela venha.
       if (auto) {
-        if (!order.autoPrinted) order.autoPrinted = {};
-        if (order.autoPrinted[st]) {
-          return sendJSON(res, 200, { ok: true, printed: false, skipped: true, alreadyAutoPrinted: true, order, station: st });
-        }
-        order.autoPrinted[st] = true;
-        const idx = orders.findIndex(o => o.id === order.id);
-        if (idx > -1) orders[idx] = order;
-        writeJSON(ORDERS_FILE, orders);
+        const now=Date.now(); const leaseMs=90000;
+        if(!order.autoPrintState) order.autoPrintState={};
+        const state=order.autoPrintState[st];
+        if(order.autoPrinted?.[st] || state?.status==='done') return sendJSON(res,200,{ok:true,printed:false,skipped:true,alreadyAutoPrinted:true,order,station:st});
+        if(state?.status==='printing' && now-Number(state.claimedAt||0)<leaseMs) return sendJSON(res,200,{ok:true,printed:false,skipped:true,alreadyAutoPrinting:true,order,station:st});
+        order.autoPrintState[st]={status:'printing',claimedAt:now,owner:String(stationId||originId||'panel').slice(0,120)};
+        const idx = orders.findIndex(o => o.id === order.id); if(idx>-1) orders[idx]=order; writeJSON(ORDERS_FILE,orders);
       }
 
       const deliveryWindow = estimateDeliveryWindow(order, cfg);
@@ -4029,15 +4051,18 @@ function estimateDeliveryWindow(order, cfg) {
 
       try {
         if (printerCfg.method === 'rede') {
-          if (!printerCfg.ip) return sendJSON(res, 400, { error: `Impressora de rede da via "${st}" sem IP configurado.` });
+          if (!printerCfg.ip) { if(auto){try{const fresh=readJSON(ORDERS_FILE);const oi=fresh.findIndex(o=>o.id===order.id);if(oi>-1){delete (fresh[oi].autoPrintState||{})[st];writeJSON(ORDERS_FILE,fresh);}}catch(e){}} return sendJSON(res, 400, { error: `Impressora de rede da via "${st}" sem IP configurado.`, retryable:true }); }
           await sendNetworkPrint(printerCfg.ip, printerCfg.port, ticketText);
         } else if (printerCfg.method === 'usb') {
-          if (!printerCfg.device) return sendJSON(res, 400, { error: `Caminho do dispositivo USB da via "${st}" não configurado.` });
+          if (!printerCfg.device) { if(auto){try{const fresh=readJSON(ORDERS_FILE);const oi=fresh.findIndex(o=>o.id===order.id);if(oi>-1){delete (fresh[oi].autoPrintState||{})[st];writeJSON(ORDERS_FILE,fresh);}}catch(e){}} return sendJSON(res, 400, { error: `Caminho do dispositivo USB da via "${st}" não configurado.`, retryable:true }); }
           await sendUSBPrint(printerCfg.device, ticketText);
         }
+        if(auto){ const fresh=readJSON(ORDERS_FILE); const oi=fresh.findIndex(o=>o.id===order.id); if(oi>-1){fresh[oi].autoPrintState=fresh[oi].autoPrintState||{};fresh[oi].autoPrintState[st]={status:'done',finishedAt:new Date().toISOString()};fresh[oi].autoPrinted=fresh[oi].autoPrinted||{};fresh[oi].autoPrinted[st]=true;writeJSON(ORDERS_FILE,fresh);} }
         return sendJSON(res, 200, { ok: true, printed: true, order, station: st, method: printerCfg.method, usedCaixaFallback });
       } catch (printErr) {
-        return sendJSON(res, 502, { error: `Falha ao imprimir na via "${st}": ${printErr.message}` });
+        if(auto){ try{const fresh=readJSON(ORDERS_FILE);const oi=fresh.findIndex(o=>o.id===order.id);if(oi>-1){fresh[oi].autoPrintState=fresh[oi].autoPrintState||{};delete fresh[oi].autoPrintState[st];if(fresh[oi].autoPrinted)delete fresh[oi].autoPrinted[st];writeJSON(ORDERS_FILE,fresh);}}catch(e){} }
+        try{const log=readJSON(PRINT_LOG_FILE);log.unshift({orderId,station,error:String(printErr.message||printErr).slice(0,500),ts:new Date().toISOString(),retryable:true,method:printerCfg.method});fs.writeFileSync(PRINT_LOG_FILE,JSON.stringify(log.slice(0,500),null,2));}catch(e){}
+        return sendJSON(res, 502, { error: `Falha ao imprimir na via "${st}": ${printErr.message}`, retryable:true });
       }
     } catch (e) { return sendJSON(res, 400, { error: 'invalid body' }); }
   }
