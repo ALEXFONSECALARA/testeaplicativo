@@ -10,6 +10,7 @@
 <meta content="Painel Shogatsu" name="apple-mobile-web-app-title"/>
 <link href="manifest-painel.json" rel="manifest"/>
 <link href="apple-touch-icon.png" rel="apple-touch-icon"/>
+<link rel="icon" type="image/png" href="/favicon.png">
 <link href="favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
 <title>Shogatsu — Painel do Restaurante</title>
@@ -1911,7 +1912,7 @@ body{font-size:13px;letter-spacing:-.01em;}
 <div class="field"><label>Fecha</label><input id="sched-close" type="time" value="23:00"/></div>
 </div>
 <div class="field"><label>Avaliação</label><input id="cfg-reviewPrompt" placeholder="O que você achou do seu pedido?"/></div>
-<div class="field"><label style="display:flex;align-items:center;justify-content:space-between;"><span>Frases prontas</span><button class="btn secondary sm" onclick="addReviewPhraseField()" type="button">+ Frase</button></label><div id="review-phrases-list" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div></div>
+<div class="field v122-review-phrases-source" style="display:none"><label>Frases prontas</label><div id="review-phrases-list" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div></div>
 </div>
 <div class="settings-card">
 <div class="settings-card-title">🎨 Aparência do Cardápio</div>
@@ -2245,6 +2246,7 @@ body{font-size:13px;letter-spacing:-.01em;}
             Aparecem no site pra todo mundo ver, exceto as que você ocultar. Ocultar não apaga —
             você pode reexibir quando quiser.
           </div>
+<div class="v122-review-phrases-card"><div class="v122-review-phrases-head"><div><strong>💬 Frases prontas</strong><span>Use respostas rápidas ao moderar ou responder avaliações.</span></div><button class="btn secondary sm" type="button" onclick="addReviewPhraseField();renderV122ReviewPhrases();">+ Frase</button></div><div id="v122-review-phrases-list"></div></div>
 <div id="admin-reviews-list" style="display:flex;flex-direction:column;gap:10px;"></div>
 </div>
 </div>
@@ -2295,7 +2297,9 @@ body{font-size:13px;letter-spacing:-.01em;}
 <div class="field"><label>Preço *</label><input id="item-price" oninput="updateItemLivePreview()" placeholder="0,00" step="0.01" type="number"/></div>
 </div>
 <div class="field"><label>Descrição</label><textarea id="item-desc" oninput="updateItemLivePreview()" placeholder="Explique o que vem no prato, ingredientes e diferenciais..."></textarea></div>
-<div class="field-row"><div class="field"><label>Porção</label><input id="item-qty" placeholder="Ex.: 8 peças"/></div></div>
+<div class="field-row"><div class="field"><label>Porção / tamanho</label><input id="item-qty" list="item-qty-presets" placeholder="Ex.: 8 peças ou 500 ml"/></div></div>
+<datalist id="item-qty-presets"><option value="4 peças"></option><option value="6 peças"></option><option value="8 peças"></option><option value="10 peças"></option><option value="12 peças"></option><option value="16 peças"></option><option value="20 peças"></option><option value="250 ml"></option><option value="300 ml"></option><option value="350 ml"></option><option value="400 ml"></option><option value="500 ml"></option><option value="600 ml"></option><option value="700 ml"></option><option value="1 L"></option></datalist>
+<div class="v122-portion-chips" id="item-qty-chips"><button type="button" onclick="setItemQtyPreset('4 peças')">4</button><button type="button" onclick="setItemQtyPreset('6 peças')">6</button><button type="button" onclick="setItemQtyPreset('8 peças')">8</button><button type="button" onclick="setItemQtyPreset('10 peças')">10</button><button type="button" onclick="setItemQtyPreset('12 peças')">12</button><button type="button" onclick="setItemQtyPreset('250 ml')">250 ml</button><button type="button" onclick="setItemQtyPreset('350 ml')">350 ml</button><button type="button" onclick="setItemQtyPreset('500 ml')">500 ml</button><button type="button" onclick="setItemQtyPreset('1 L')">1 L</button></div>
 </div>
 <div class="item-editor-card item-editor-section v120-local-badge-card">
 <div class="item-editor-section-title"><span>🏷 Destaque no cardápio</span><span class="v120-local-badge-label">Rápido</span></div>
@@ -2307,7 +2311,13 @@ body{font-size:13px;letter-spacing:-.01em;}
 <button type="button" class="v120-badge-preset" data-badge="♥ Recomendado" onclick="setLocalBadgePreset('♥ Recomendado')">♥ Recomendado</button>
 <button type="button" class="v120-badge-preset is-off" data-badge="" onclick="setLocalBadgePreset('')">Sem selo</button>
 </div>
-<div class="field v120-badge-custom"><label>Personalizar selo <span>opcional</span></label><input id="item-badge" maxlength="28" placeholder="Ex.: 🍣 Chef recomenda" oninput="setLocalBadgeCustom(this.value)"/></div>
+<div class="field v120-badge-custom"><label>Texto do selo <span>opcional</span></label><input id="item-badge" maxlength="28" placeholder="Ex.: Chef recomenda" oninput="setLocalBadgeCustom(this.value)"/></div>
+<div class="v122-badge-tools">
+  <div class="field"><label>Ícone</label><select id="item-badge-icon"><option value="🔥">🔥 Fogo</option><option value="⭐">⭐ Estrela</option><option value="💎">💎 Diamante</option><option value="♥">♥ Coração</option><option value="🍣">🍣 Sushi</option><option value="✨">✨ Brilho</option><option value="🏆">🏆 Troféu</option><option value="">Sem ícone</option></select></div>
+  <div class="field"><label>Tamanho</label><select id="item-badge-size"><option value="11">Compacto</option><option value="13">Padrão</option><option value="15">Destaque</option><option value="17">Premium</option></select></div>
+  <div class="field"><label>Cor</label><select id="item-badge-color"><option value="#C62828">🔴 Shogatsu</option><option value="#9A7B2F">🟡 Dourado</option><option value="#222222">⚫ Grafite</option><option value="#2E7D32">🟢 Verde</option></select></div>
+  <div class="field"><label>Texto</label><select id="item-badge-text-color"><option value="#FFFFFF">⚪ Branco</option><option value="#171717">⚫ Preto</option><option value="#FFF3CD">🟡 Creme</option></select></div>
+</div>
 <div style="display:none"><input id="item-badgemode-global" name="item-badgemode" type="radio" value="global"/><input id="item-badgemode-manual" name="item-badgemode" type="radio" value="manual"/><input id="item-badgemode-off" name="item-badgemode" type="radio" value="off"/></div>
 </div>
 <div class="item-editor-card">
@@ -7342,6 +7352,10 @@ function openAddItem(){
   ['item-name','item-desc','item-qty','item-badge'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('item-price').value='';
   document.getElementById('item-badgemode-global').checked=true;
+  if(document.getElementById('item-badge-icon'))document.getElementById('item-badge-icon').value='🔥';
+  if(document.getElementById('item-badge-size'))document.getElementById('item-badge-size').value='13';
+  if(document.getElementById('item-badge-color'))document.getElementById('item-badge-color').value='#C62828';
+  if(document.getElementById('item-badge-text-color'))document.getElementById('item-badge-text-color').value='#FFFFFF';
   resetItemPhotoPreview('', {x:50,y:50});
   editingVariants=[];
   renderVariantGroups();
@@ -7358,6 +7372,10 @@ function openEditItem(si,ii){
   document.getElementById('item-price').value=item.price;
   document.getElementById('item-qty').value=item.qty||'';
   document.getElementById('item-badge').value=item.badge||'';
+  if(document.getElementById('item-badge-icon'))document.getElementById('item-badge-icon').value=item.badgeIcon||'🔥';
+  if(document.getElementById('item-badge-size'))document.getElementById('item-badge-size').value=String(item.badgeSize||13);
+  if(document.getElementById('item-badge-color'))document.getElementById('item-badge-color').value=item.badgeColor||'#C62828';
+  if(document.getElementById('item-badge-text-color'))document.getElementById('item-badge-text-color').value=item.badgeTextColor||'#FFFFFF';
   document.getElementById('item-badgemode-'+(item.badgeMode||'global')).checked=true;
   resetItemPhotoPreview(item.image||'', item.imagePos||{x:50,y:50});
   editingVariants=JSON.parse(JSON.stringify(item.variants||[]));
@@ -7456,6 +7474,10 @@ async function saveItem(){
     price:parseFloat(document.getElementById('item-price').value)||0,
     qty:document.getElementById('item-qty').value.trim(),
     badge:document.getElementById('item-badge').value.trim(),
+    badgeIcon:document.getElementById('item-badge-icon')?.value||'🔥',
+    badgeSize:parseInt(document.getElementById('item-badge-size')?.value)||13,
+    badgeColor:document.getElementById('item-badge-color')?.value||'#C62828',
+    badgeTextColor:document.getElementById('item-badge-text-color')?.value||'#FFFFFF',
     badgeMode:(document.querySelector('input[name="item-badgemode"]:checked')||{}).value||'global',
     image:document.getElementById('item-image').value.trim(),
     imagePos:{x:posX,y:posY},
@@ -10423,5 +10445,44 @@ if(token){
 })();
 </script>
 
+
+<style id="shog-v122-final-mobile">
+/* v122 FINAL — UX mobile-first, impressão resiliente, badges locais e comunicação unificada. */
+.v122-badge-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+.v122-badge-tools .field label{font-size:9px}.v122-badge-tools select{font-size:12px;padding:8px}
+.v122-portion-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.v122-portion-chips button{border:1px solid var(--border2);background:var(--bg);color:var(--muted);border-radius:999px;padding:5px 9px;font-size:10px;cursor:pointer}.v122-portion-chips button:hover{border-color:var(--red);color:var(--red-lt)}
+.v122-review-phrases-card{border:1px solid var(--border);background:var(--card);border-radius:12px;padding:12px;margin:0 0 10px}.v122-review-phrases-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.v122-review-phrases-head strong{display:block;font-size:13px}.v122-review-phrases-head span{display:block;font-size:10px;color:var(--muted);margin-top:3px}.v122-review-phrase-row{display:flex;gap:6px;margin-top:7px}.v122-review-phrase-row input{flex:1}.v122-review-phrase-row button{width:34px;border:1px solid var(--border);background:var(--bg);color:var(--red-lt);border-radius:7px}
+/* Impressão: compacto, sem excesso de explicações. Mantém todos os controles funcionais. */
+#page-impressao .panel-body{padding:12px!important}.v122-print-help{display:none}.v122-print-compact{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr);gap:10px}.v122-print-status{font-size:10px!important;line-height:1.35!important;padding:7px 9px!important}
+#page-impressao .settings-card{padding:12px!important;border-radius:12px!important}.v122-hide-print-copy{display:none!important}
+/* Mensagens: uma única central, abas viram dois blocos sem navegação duplicada. */
+#page-mensagens>div:first-child{display:none!important}#page-mensagens #msg-tab-inbox,#page-mensagens #msg-tab-central{display:block!important}.v122-msg-title{margin:0 0 8px;font-size:13px;font-weight:800;color:var(--white)}#page-mensagens #msg-tab-inbox{margin-bottom:10px}
+/* Modal de item: mais limpo em mobile. */
+#item-modal>.modal{max-width:900px!important;width:min(900px,96vw)!important;border-radius:18px!important;margin:2vh auto!important;height:min(96vh,980px)!important}
+@media(max-width:760px){
+ .v122-badge-tools{grid-template-columns:1fr 1fr}.v122-review-phrases-head{align-items:flex-start}.v122-print-compact{grid-template-columns:1fr}.v122-portion-chips button{flex:1 0 auto}.modal-body{padding:12px!important}.item-editor-grid{grid-template-columns:1fr!important}.item-preview-card{position:static!important}.field input,.field select,.field textarea{min-height:44px;font-size:15px}.btn{min-height:42px}.settings-card-title{font-size:13px}.wa-admin-wrap{height:calc(100vh - 210px)!important;min-height:420px!important}.wa-footer textarea{font-size:16px!important}.wa-icon-btn,.wa-send-btn{width:40px!important;height:40px!important}
+ #page-impressao .settings-grid{grid-template-columns:1fr!important}.v122-hide-mobile-copy{display:none!important}
+}
+@media(max-width:420px){.v122-badge-tools{grid-template-columns:1fr}.v122-portion-chips button{font-size:9px;padding:5px 7px}.v122-review-phrase-row input{font-size:14px}}
+</style>
+<script id="shog-v122-final-js">
+(function(){
+  const $=id=>document.getElementById(id);
+  window.setItemQtyPreset=function(v){const el=$('item-qty');if(el){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));el.focus();}};
+  function badgeDefaults(){return {icon:'🔥',size:'13',color:'#C62828',textColor:'#FFFFFF'};}
+  function syncBadgeControls(item){const d=badgeDefaults(), x=item||{}; if($('item-badge-icon'))$('item-badge-icon').value=x.badgeIcon||d.icon; if($('item-badge-size'))$('item-badge-size').value=String(x.badgeSize||d.size); if($('item-badge-color'))$('item-badge-color').value=x.badgeColor||d.color; if($('item-badge-text-color'))$('item-badge-text-color').value=x.badgeTextColor||d.textColor;}
+  window.syncV122BadgeControls=syncBadgeControls;
+  window.renderV122ReviewPhrases=function(){const src=$('review-phrases-list'),dst=$('v122-review-phrases-list');if(!src||!dst)return;const vals=[...src.querySelectorAll('input')].map(x=>x.value);dst.innerHTML=vals.length?vals.map((v,i)=>`<div class="v122-review-phrase-row"><input value="${String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}" oninput="reviewPhrasesState[${i}]=this.value"><button type="button" onclick="reviewPhrasesState.splice(${i},1);renderReviewPhrasesList();renderV122ReviewPhrases();">🗑</button></div>`).join(''):'<div style="font-size:11px;color:var(--muted);padding:8px 0">Nenhuma frase. Adicione respostas rápidas para facilitar a rotina.</div>';};
+  const oldAdd=window.addReviewPhraseField; if(oldAdd){window.addReviewPhraseField=function(){oldAdd.apply(this,arguments);setTimeout(renderV122ReviewPhrases,0);};}
+  const oldRender=window.renderReviewPhrasesList; if(oldRender){window.renderReviewPhrasesList=function(){oldRender.apply(this,arguments);setTimeout(renderV122ReviewPhrases,0);};}
+  const oldOpenNew=window.openAddItem; if(oldOpenNew){window.openAddItem=function(){const r=oldOpenNew.apply(this,arguments);setTimeout(()=>syncBadgeControls({}),30);return r;};}
+  const oldOpenEdit=window.openEditItem; if(oldOpenEdit){window.openEditItem=function(si,ii){const r=oldOpenEdit.apply(this,arguments);setTimeout(()=>syncBadgeControls((window.menu&&menu[si]&&menu[si].items&&menu[si].items[ii])||{}),30);return r;};}
+  function compactPrinting(){const page=$('page-impressao');if(!page||page.dataset.v122==='1')return;page.dataset.v122='1';const cards=[...page.querySelectorAll('.settings-card')];cards.forEach(c=>{const title=c.querySelector('.settings-card-title')?.textContent||'';if(/Fonte de Impressão/.test(title)){c.style.padding='10px';} if(/Impressão Automática/.test(title)){c.querySelectorAll('div').forEach(d=>{const t=d.textContent||'';if(t.includes('Só marca isso no computador')||t.includes('Já colocou um nome escolhido'))d.style.display='none';});}});}
+  function unifyMessages(){const p=$('page-mensagens');if(!p||p.dataset.v122==='1')return;p.dataset.v122='1';const central=$('msg-tab-central'),inbox=$('msg-tab-inbox');if(central&&inbox){central.style.display='block';inbox.style.display='block';const h=document.createElement('div');h.className='v122-msg-title';h.textContent='💬 Central de Mensagens';p.insertBefore(h,p.children[1]||null);}}
+  function markPrintStatus(){const box=$('print-agent-status-box');if(box)box.classList.add('v122-print-status');}
+  document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{compactPrinting();unifyMessages();markPrintStatus();renderV122ReviewPhrases();syncBadgeControls({});},150);});
+  const oldGo=window.goPage;if(oldGo){window.goPage=function(id){const r=oldGo.apply(this,arguments);if(id==='impressao')setTimeout(compactPrinting,100);if(id==='mensagens')setTimeout(unifyMessages,100);if(id==='avaliacoes')setTimeout(renderV122ReviewPhrases,100);return r;};}
+})();
+</script>
 </body>
 </html>

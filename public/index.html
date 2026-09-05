@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Shogatsu">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <title>Shogatsu · Peça Agora</title>
@@ -2820,15 +2821,18 @@ function itemPlaceholderHtml(icon){
 // v73: resolve o badge de um item — respeita item.badgeMode ('global' herda o Badge Global,
 // 'manual' usa o texto próprio do item, 'off' não mostra nenhum badge.
 function itemBadgeHtml(item){
-  const mode = item.badgeMode || 'global';
-  if (mode === 'off') return '';
-  if (mode === 'manual') return item.badge ? `<div class="item-badge">${item.badge}</div>` : '';
-  const gb = cfg.globalBadge;
-  if (gb && gb.enabled) {
-    const style = `background:${gb.bgColor};color:${gb.textColor};font-size:${gb.fontSize}px;font-weight:${gb.fontWeight};opacity:${(gb.opacity==null?100:gb.opacity)/100};border-radius:${gb.borderRadius}px;padding:${gb.padding}px ${Number(gb.padding)+4}px;${gb.borderEnabled?`border:1px solid ${gb.borderColor};`:''}${gb.shadow?'box-shadow:0 2px 6px rgba(0,0,0,.35);':''}`;
-    return `<div class="item-badge" style="${style}">${gb.icon ? gb.icon+' ' : ''}${gb.text}</div>`;
-  }
-  return item.badge ? `<div class="item-badge">${item.badge}</div>` : '';
+  const mode=item.badgeMode||'global';
+  if(mode==='off') return '';
+  const raw=String(item.badge||'').trim();
+  if(mode!=='manual' && !raw && !(item.badgeText)) return '';
+  let icon=String(item.badgeIcon||'');
+  let text=String(item.badgeText||raw||'').trim();
+  if(!item.badgeIcon && raw){ const mm=raw.match(/^((?:🔥|⭐|💎|♥|🍣|✨|🏆)\s*)(.*)$/); if(mm){icon=mm[1].trim();text=mm[2].trim();} }
+  if(!text) return '';
+  const size=Math.max(11,Math.min(18,Number(item.badgeSize)||13));
+  const bg=item.badgeColor||'#C62828';
+  const fg=item.badgeTextColor||'#FFFFFF';
+  return `<div class="item-badge" style="background:${bg};color:${fg};font-size:${size}px;font-weight:700;border-radius:999px;padding:${size<13?4:5}px ${size<13?9:11}px;box-shadow:0 2px 8px rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.16);line-height:1;display:inline-flex;align-items:center;gap:4px;">${icon?icon+' ':''}${esc(text)}</div>`;
 }
 function renderMenu() {
   document.getElementById('hero-address').textContent = cfg.addr;
@@ -2959,7 +2963,7 @@ function renderMenu() {
             ${badgeAboveName ? badgeHtml : ''}
             <div class="item-name">${item.name}</div>
             ${badgeBelowName ? badgeHtml : ''}
-            <div class="item-desc${item.desc ? ' clamped' : ''}" id="desc-${key}">${item.desc}${item.qty ? ` <span style="color:var(--muted);font-size:10px">(${item.qty})</span>` : ''}</div>
+            <div class="item-desc${item.desc ? ' clamped' : ''}" id="desc-${key}">${item.desc}${item.qty ? ` <span class="item-portion-inline">· ${esc(item.qty)}</span>` : ''}</div>
             ${item.desc ? `<button type="button" class="item-desc-toggle" id="desc-toggle-${key}" onclick="toggleItemDesc('${key}', event)">⌄ Ver mais</button>` : ''}
             ${cartQty > 0 ? `<div class="mi-in-cart-tag">🛒 ${cartQty} no carrinho</div>` : ''}
             <div class="item-footer">
@@ -3528,6 +3532,9 @@ function setPlaceBtnState(state, customLabel) {
   label.textContent = customLabel || (state === 'loading' ? 'Enviando pedido...' : state === 'blocked' ? 'Indisponível no momento' : '🛒 Finalizar Pedido');
 }
 
+function showPendingOrderRetry(){let b=document.getElementById('shog-pending-order');if(!b){b=document.createElement('div');b.id='shog-pending-order';b.style='position:fixed;left:12px;right:12px;bottom:84px;z-index:9999;background:#171717;color:#fff;border:1px solid #C62828;border-radius:12px;padding:12px;box-shadow:0 8px 30px rgba(0,0,0,.35);font:13px sans-serif;';document.body.appendChild(b);}b.innerHTML='<b>⚠️ Pedido aguardando conexão</b><div style="font-size:11px;margin-top:4px;opacity:.8">Sua tentativa foi guardada. Quando a internet voltar, toque em Tentar novamente.</div><div style="display:flex;gap:6px;margin-top:8px"><button type="button" style="flex:1;padding:9px;border:0;border-radius:8px;background:#C62828;color:#fff;font-weight:700" onclick="retryPendingOrder()">↻ Tentar novamente</button><button type="button" style="padding:9px 12px;border:1px solid #444;border-radius:8px;background:#222;color:#fff" onclick="this.closest(\"#shog-pending-order\").remove()">Fechar</button></div>';}
+async function retryPendingOrder(){try{const raw=localStorage.getItem('shogatsu_pending_order');if(!raw)return;const p=JSON.parse(raw);const r=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...p.payload,idempotencyKey:p.idempotencyKey})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Não foi possível reenviar.');localStorage.removeItem('shogatsu_pending_order');document.getElementById('shog-pending-order')?.remove();window._placeOrderIdemKey=null;alert('✅ Pedido confirmado!');}catch(e){alert('Ainda sem conexão. Tente novamente em alguns segundos.');}}
+function initPendingOrderRetry(){try{const raw=localStorage.getItem('shogatsu_pending_order');if(raw&&Date.now()-Number(JSON.parse(raw).savedAt||0)<86400000)showPendingOrderRetry();else localStorage.removeItem('shogatsu_pending_order');}catch(e){}}
 async function placeOrder() {
   if (!Number(cfg.open)) { alert('O restaurante está fechado no momento. Tente novamente durante o horário de funcionamento: ' + cfg.hours); return; }
 
@@ -3596,10 +3603,10 @@ async function placeOrder() {
     // Pedido confirmado (novo ou recuperado via idempotência) — libera a chave pra próxima compra.
     window._placeOrderIdemKey = null;
   } catch (e) {
-    // Erro de rede: NÃO libera a chave. Se o cliente tentar de novo (ou o app tentar sozinho),
-    // a mesma chave é reenviada — se o pedido já tinha sido salvo no servidor antes da conexão
-    // cair, o backend reconhece a chave e devolve o pedido existente em vez de duplicar.
-    alert('Erro de conexão. Verifique sua internet e tente novamente. Se o pedido já tiver sido registrado, ele não será duplicado.');
+    // v122: guarda a tentativa localmente. O cliente pode recuperar o pedido sem perder o carrinho
+    // e sem criar duplicidade, porque a mesma idempotencyKey continua sendo reutilizada.
+    try{ localStorage.setItem('shogatsu_pending_order', JSON.stringify({savedAt:Date.now(),idempotencyKey,payload:{mode,name,phone,address,hood,items,obs,payMethod,troco,subtotal,fee,total,couponCode:appliedCoupon?appliedCoupon.code:'',redeemPoints:pointsDiscountValue().points,scheduledFor}})); }catch(err){}
+    showPendingOrderRetry();
     setPlaceBtnState('idle');
     return;
   }
@@ -4340,6 +4347,7 @@ if (typeof ResizeObserver !== 'undefined') {
 loadCustomerSession();
 loadConfig();
 connectPublicSSE();
+initPendingOrderRetry();
 attachCheckoutDraftListeners(); // v52: liga a gravação automática do rascunho do formulário de entrega
 loadCheckoutDraft(); // v52: já preenche os campos com o último rascunho salvo, mesmo antes de abrir o checkout
 loadReviews();
@@ -4558,5 +4566,8 @@ updatePushButtonState();
 <link rel="stylesheet" href="/install-prompt.css">
 <script src="/install-prompt.js" defer></script>
 <script src="/version-check.js"></script>
+<style id="shog-v122-client-badge">
+.item-badge-price{display:inline-flex!important;align-items:center!important;justify-content:flex-end!important;max-width:100%;white-space:nowrap}.item-portion-inline{color:var(--muted);font-size:10px;white-space:nowrap}.item-footer{align-items:flex-end!important;gap:8px!important}.item-footer .item-badge-price{margin:0 0 5px auto!important}.item-badge{letter-spacing:.15px!important;text-transform:none!important}@media(max-width:520px){.item-footer .item-badge-price{font-size:inherit!important}.item-portion-inline{font-size:9.5px}}
+</style>
 </body>
 </html>
