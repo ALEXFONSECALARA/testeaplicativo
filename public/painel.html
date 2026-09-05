@@ -768,6 +768,38 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
   .stat-card:nth-child(n+3){display:none;}
   .mobile-nav-label{font-size:8.5px;}
 }
+
+/* v125.1 — correção mobile: Kanban e impressão de pedidos sem corte */
+@media(max-width:760px){
+  #page-pedidos .kanban-board,#page-pedidos .kanban-board-wrap,[id^="kanban"]{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    overflow-x:auto!important;overflow-y:visible!important;
+    -webkit-overflow-scrolling:touch;padding-bottom:8px;
+  }
+  #page-pedidos .kanban-board{
+    display:flex!important;gap:10px!important;align-items:flex-start!important;
+  }
+  #page-pedidos .kanban-col{
+    flex:0 0 min(82vw,330px)!important;width:min(82vw,330px)!important;
+    max-width:min(82vw,330px)!important;min-width:0!important;
+  }
+  #page-pedidos .k-card{min-width:0!important;max-width:100%!important;overflow:hidden;}
+  #page-pedidos .order-card{min-width:0!important;max-width:100%!important;overflow:hidden;}
+  #page-pedidos .order-header,#page-pedidos .order-footer{min-width:0;}
+  #page-pedidos .order-header>*{min-width:0;max-width:100%;}
+  #page-pedidos .order-id,#page-pedidos .order-name,#page-pedidos .order-items{overflow-wrap:anywhere;word-break:break-word;}
+  #page-pedidos .order-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important;width:100%;}
+  #page-pedidos .order-actions .oa-btn,#page-pedidos .order-actions .oa-print-group{min-width:0!important;width:100%!important;box-sizing:border-box;}
+  #page-pedidos .oa-btn{font-size:12px!important;padding:10px 6px!important;white-space:normal!important;line-height:1.2;}
+  #page-pedidos .oa-print-group{display:flex!important;}
+  #page-pedidos .oa-print-group .oa-btn.print{min-width:0!important;flex:1 1 auto;}
+  #page-pedidos .oa-print-group .oa-btn.print-more{flex:0 0 38px!important;}
+}
+
+/* Impressão do pedido: conteúdo sempre cabe na largura disponível da tela e da folha. */
+@media screen and (max-width:520px){
+  html,body{max-width:100%!important;overflow-x:hidden!important;}
+}
 </style>
 <style id="shog-modern-v1">
 /* Shogatsu — interface enxuta/moderna v1 */
@@ -5741,7 +5773,7 @@ function openBrowserReservationTicket(reservation){
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Reserva ${reservation.id}</title>
   <style>
     @page{ margin:0; }
-    body{font-family:${pf};width:100%;max-width:302px;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;}
+    body{font-family:${pf};width:100%;max-width:302px;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word;} @media screen and (max-width:520px){body{width:100vw;max-width:100vw;padding:10px 8px;overflow-x:hidden;} .t-item{align-items:flex-start;gap:6px;} .t-item span:first-child{min-width:0;overflow-wrap:anywhere;word-break:break-word;} .t-item span:last-child{flex:0 0 auto;} .t-row,.t-bullet-item{overflow-wrap:anywhere;word-break:break-word;}} @media print{body{width:100%;max-width:100%;padding:4px;overflow:visible;}}
     .t-center{text-align:center;}
     .t-title{font-size:${Math.round(17*scale)}px;font-weight:800;letter-spacing:2px;}
     .t-sub{font-size:${Math.round(11*scale)}px;letter-spacing:1.5px;margin-top:2px;color:#555;}
