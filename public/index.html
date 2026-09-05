@@ -241,7 +241,8 @@ button{cursor:pointer;font-family:'Jost',sans-serif;}
 .item-desc-toggle:active{opacity:.7;}
 .item-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .item-price{font-family:'Cormorant Garamond',serif;font-size:calc(21px * var(--menu-fs-scale,1));font-weight:700;color:var(--red-lt);letter-spacing:.2px;}
-.item-badge{font-size:10px;font-weight:700;letter-spacing:.5px;color:#3a2a00;background:linear-gradient(90deg,#FFD54A,#FFB300);padding:3px 10px;border-radius:20px;margin-bottom:6px;display:inline-block;}
+.item-badge{font-size:10px;font-weight:750;letter-spacing:.25px;color:#fff;background:linear-gradient(135deg,#c62828,#9e1f1f);padding:5px 10px;border-radius:7px;margin-bottom:7px;display:inline-flex;align-items:center;gap:4px;line-height:1;box-shadow:0 5px 14px rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.16);}
+.item-img .item-badge{margin:0;}
 .item-promo-tag{margin-top:6px;font-size:11px;font-weight:700;color:#3a2a00;background:linear-gradient(90deg,#FFD54A,#FFB300);padding:4px 10px;border-radius:6px;display:inline-block;letter-spacing:.3px;}
 
 .add-btn{background:var(--red);border:none;border-radius:50%;width:36px;height:36px;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s,transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease;-webkit-tap-highlight-color:transparent;}
@@ -2925,7 +2926,7 @@ function renderMenu() {
         // mudava a pré-visualização no painel, nunca o cardápio de verdade pro cliente (o badge
         // ficava sempre "grudado" no mesmo lugar, por isso parecia "travado"). Agora a posição
         // escolhida é aplicada aqui de verdade.
-        const badgePos = !isAvail ? 'abaixo-foto' : ((cfg.globalBadge && cfg.globalBadge.position) || 'abaixo-foto');
+        const badgePos = !isAvail ? 'abaixo-foto' : (item.badgeMode==='manual' && item.badge ? 'sobre-foto' : ((cfg.globalBadge && cfg.globalBadge.enabled && cfg.globalBadge.position) || 'abaixo-foto'));
         const badgeCornerStyle = badgePos==='sobre-foto' ? 'position:absolute;top:6px;left:6px;z-index:2;'
           : badgePos==='canto-superior-esquerdo' ? 'position:absolute;top:6px;left:6px;z-index:2;'
           : badgePos==='canto-superior-direito' ? 'position:absolute;top:6px;right:38px;z-index:2;'
