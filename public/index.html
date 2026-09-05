@@ -2824,15 +2824,21 @@ function itemBadgeHtml(item){
   const mode=item.badgeMode||'global';
   if(mode==='off') return '';
   const raw=String(item.badge||'').trim();
-  if(mode!=='manual' && !raw && !(item.badgeText)) return '';
-  let icon=String(item.badgeIcon||'');
+  let icon=String(item.badgeIcon||'').trim();
   let text=String(item.badgeText||raw||'').trim();
-  if(!item.badgeIcon && raw){ const mm=raw.match(/^((?:🔥|⭐|💎|♥|🍣|✨|🏆)\s*)(.*)$/); if(mm){icon=mm[1].trim();text=mm[2].trim();} }
-  if(!text) return '';
+  const known={'🔥':'Mais vendido','⭐':'Novidade','💎':'Premium','♥':'Recomendado','❤':'Recomendado'};
+  const lead=/^(🔥|⭐|💎|♥|❤|🍣|✨|🏆)\s*/;
+  const m=text.match(lead);
+  if(m){ if(!icon) icon=m[1]; text=text.slice(m[0].length).trim(); }
+  if(!icon && raw){ const rm=raw.match(lead); if(rm){ icon=rm[1]; text=raw.slice(rm[0].length).trim(); } }
+  if(!text && icon && known[icon]) text=known[icon];
+  if(!icon && known[raw]) { icon=raw; text=known[raw]; }
+  if(mode!=='manual' && !text && !icon) return '';
+  if(!text) text='Destaque';
   const size=Math.max(11,Math.min(18,Number(item.badgeSize)||13));
   const bg=item.badgeColor||'#C62828';
   const fg=item.badgeTextColor||'#FFFFFF';
-  return `<div class="item-badge" style="background:${bg};color:${fg};font-size:${size}px;font-weight:700;border-radius:999px;padding:${size<13?4:5}px ${size<13?9:11}px;box-shadow:0 2px 8px rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.16);line-height:1;display:inline-flex;align-items:center;gap:4px;">${icon?icon+' ':''}${esc(text)}</div>`;
+  return `<span class="item-badge" style="--badge-bg:${bg};--badge-fg:${fg};--badge-size:${size}px;">${icon?`<span class="item-badge-icon" aria-hidden="true">${esc(icon)}</span>`:''}<span class="item-badge-text">${esc(text)}</span></span>`;
 }
 function renderMenu() {
   document.getElementById('hero-address').textContent = cfg.addr;
@@ -2942,14 +2948,14 @@ function renderMenu() {
         // escolhida é aplicada aqui de verdade.
         // v121: posição fixa premium — opção 6, badge acima do preço.
         // Mantém o modelo original do card e altera somente o ponto visual do selo.
-        const badgePos = 'acima-preco';
-        const badgeCornerStyle = '';
+        // v124: posição única e fixa — abaixo da descrição, dentro do card.
+        // O preço e a estrutura do card permanecem exatamente no lugar original.
         const badgeInsideImg = false;
         const badgeAboveImg = false;
         const badgeBelowImg = false;
         const badgeAboveName = false;
         const badgeBelowName = false;
-        const badgeAbovePrice = !!badgeHtml;
+        const badgeAbovePrice = false;
         return `
         <div class="item-card" id="card-${key}" style="${isAvail ? '' : 'opacity:.55;'}">
           ${badgeAboveImg ? badgeHtml : ''}
@@ -2965,9 +2971,9 @@ function renderMenu() {
             ${badgeBelowName ? badgeHtml : ''}
             <div class="item-desc${item.desc ? ' clamped' : ''}" id="desc-${key}">${item.desc}${item.qty ? ` <span class="item-portion-inline">· ${esc(item.qty)}</span>` : ''}</div>
             ${item.desc ? `<button type="button" class="item-desc-toggle" id="desc-toggle-${key}" onclick="toggleItemDesc('${key}', event)">⌄ Ver mais</button>` : ''}
+            ${badgeHtml ? `<div class="item-badge-wrap-below-desc">${badgeHtml}</div>` : ''}
             ${cartQty > 0 ? `<div class="mi-in-cart-tag">🛒 ${cartQty} no carrinho</div>` : ''}
             <div class="item-footer">
-              ${badgeAbovePrice ? `<div class="item-badge item-badge-price">${badgeHtml.replace(/^<div class="item-badge"[^>]*>/,'').replace(/<\/div>$/,'')}</div>` : ''}
               ${(() => {
                 if (hasVariants) return `<span class="item-price">a partir de R$ ${item.price.toFixed(2).replace('.', ',')}</span>`;
                 const disc = getActiveItemDiscount(key);
@@ -4568,6 +4574,16 @@ updatePushButtonState();
 <script src="/version-check.js"></script>
 <style id="shog-v122-client-badge">
 .item-badge-price{display:inline-flex!important;align-items:center!important;justify-content:flex-end!important;max-width:100%;white-space:nowrap}.item-portion-inline{color:var(--muted);font-size:10px;white-space:nowrap}.item-footer{align-items:flex-end!important;gap:8px!important}.item-footer .item-badge-price{margin:0 0 5px auto!important}.item-badge{letter-spacing:.15px!important;text-transform:none!important}@media(max-width:520px){.item-footer .item-badge-price{font-size:inherit!important}.item-portion-inline{font-size:9.5px}}
+</style>
+
+<style id="shog-v124-badge-final">
+/* v124 FINAL — badge único, abaixo da descrição; preço permanece intocado. */
+.item-badge-wrap-below-desc{display:block;margin:8px 0 2px;min-height:0;}
+.item-badge-wrap-below-desc .item-badge{display:inline-flex!important;align-items:center!important;gap:6px!important;width:max-content!important;max-width:100%!important;box-sizing:border-box!important;margin:0!important;padding:6px 10px!important;border-radius:999px!important;border:1px solid color-mix(in srgb,var(--badge-bg,#C62828) 72%,#fff 28%)!important;background:color-mix(in srgb,var(--badge-bg,#C62828) 12%,transparent)!important;color:var(--badge-fg,#fff)!important;font-size:var(--badge-size,13px)!important;font-weight:750!important;line-height:1!important;letter-spacing:.2px!important;text-transform:none!important;box-shadow:none!important;}
+.item-badge-wrap-below-desc .item-badge-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;font-size:1em!important;line-height:1!important;}
+.item-badge-wrap-below-desc .item-badge-text{display:inline-block!important;line-height:1.05!important;}
+.item-footer .item-badge-price{display:none!important;}
+@media(max-width:520px){.item-badge-wrap-below-desc{margin-top:7px}.item-badge-wrap-below-desc .item-badge{font-size:min(var(--badge-size,13px),13px)!important;padding:5px 9px!important;gap:5px!important;}}
 </style>
 </body>
 </html>

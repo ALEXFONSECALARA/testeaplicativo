@@ -10484,5 +10484,79 @@ if(token){
   const oldGo=window.goPage;if(oldGo){window.goPage=function(id){const r=oldGo.apply(this,arguments);if(id==='impressao')setTimeout(compactPrinting,100);if(id==='mensagens')setTimeout(unifyMessages,100);if(id==='avaliacoes')setTimeout(renderV122ReviewPhrases,100);return r;};}
 })();
 </script>
+
+<style id="shog-v124-panel-badge">
+/* v124 — editor do badge: um único local para escolher selo; controles antigos ficam compatíveis, mas ocultos. */
+#item-modal .v122-badge-tools .field:nth-child(1),#item-modal .v122-badge-tools .field:nth-child(4){display:none!important;}
+#item-modal .v122-badge-tools{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-width:430px!important;}
+#item-modal .v120-badge-presets{display:flex!important;flex-wrap:wrap!important;gap:7px!important;}
+#item-modal .v120-badge-preset{min-height:38px!important;padding:8px 12px!important;border-radius:10px!important;font-size:11px!important;}
+#item-modal .v120-badge-custom input{min-height:44px!important;}
+#item-modal .v120-local-badge-card .item-editor-section-sub{max-width:650px!important;}
+</style>
+<script id="shog-v124-panel-badge-js">
+(function(){
+  const presets={
+    '🔥 Mais vendido':{icon:'🔥',text:'Mais vendido',color:'#C62828'},
+    '⭐ Novidade':{icon:'⭐',text:'Novidade',color:'#9A7B2F'},
+    '💎 Premium':{icon:'💎',text:'Premium',color:'#55759B'},
+    '♥ Recomendado':{icon:'♥',text:'Recomendado',color:'#A83D62'},
+    '':{icon:'',text:'',color:'#C62828'}
+  };
+  function applyPreset(value){
+    const d=presets[value]||{icon:'✨',text:value||'',color:'#C62828'};
+    const input=document.getElementById('item-badge');
+    if(input) input.value=d.text;
+    const icon=document.getElementById('item-badge-icon'); if(icon) icon.value=d.icon;
+    const color=document.getElementById('item-badge-color'); if(color) color.value=d.color;
+    const mode=document.getElementById(value?'item-badgemode-manual':'item-badgemode-off'); if(mode) mode.checked=true;
+    document.querySelectorAll('.v120-badge-preset').forEach(b=>b.classList.toggle('is-selected',b.dataset.badge===value));
+    if(typeof updateItemLivePreview==='function') updateItemLivePreview();
+  }
+  window.setLocalBadgePreset=applyPreset;
+  window.setLocalBadgeCustom=function(value){
+    const input=document.getElementById('item-badge'); if(input) input.value=value||'';
+    const mode=document.getElementById(value?'item-badgemode-manual':'item-badgemode-off'); if(mode) mode.checked=true;
+    document.querySelectorAll('.v120-badge-preset').forEach(b=>b.classList.toggle('is-selected',b.dataset.badge===value));
+    if(typeof updateItemLivePreview==='function') updateItemLivePreview();
+  };
+})();
+</script>
+
+<style id="shog-v124-panel-badge-final">
+/* v124 FINAL — um único lugar para escolher o ícone: os presets. Controles técnicos antigos ficam ocultos, dados preservados. */
+#item-modal .v122-badge-tools .field:nth-child(1),#item-modal .v122-badge-tools .field:nth-child(4){display:none!important;}
+#item-modal .v122-badge-tools{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-width:430px!important;}
+#item-modal .v120-badge-presets{display:flex!important;flex-wrap:wrap!important;gap:7px!important;}
+#item-modal .v120-badge-preset{min-height:38px!important;padding:8px 12px!important;border-radius:10px!important;font-size:11px!important;}
+#item-modal .v120-badge-custom input{min-height:44px!important;}
+</style>
+<script id="shog-v124-panel-badge-final-js">
+(function(){
+  const presets={
+    '🔥 Mais vendido':{icon:'🔥',text:'Mais vendido',color:'#C62828'},
+    '⭐ Novidade':{icon:'⭐',text:'Novidade',color:'#9A7B2F'},
+    '💎 Premium':{icon:'💎',text:'Premium',color:'#55759B'},
+    '♥ Recomendado':{icon:'♥',text:'Recomendado',color:'#A83D62'},
+    '':{icon:'',text:'',color:'#C62828'}
+  };
+  window.setLocalBadgePreset=function(value){
+    const d=presets[value]||{icon:'✨',text:value||'',color:'#C62828'};
+    const input=document.getElementById('item-badge'); if(input) input.value=d.text;
+    const icon=document.getElementById('item-badge-icon'); if(icon) icon.value=d.icon;
+    const color=document.getElementById('item-badge-color'); if(color) color.value=d.color;
+    const mode=document.getElementById(value?'item-badgemode-manual':'item-badgemode-off'); if(mode) mode.checked=true;
+    document.querySelectorAll('.v120-badge-preset').forEach(b=>b.classList.toggle('is-selected',b.dataset.badge===value));
+    if(typeof updateItemLivePreview==='function') updateItemLivePreview();
+  };
+  window.setLocalBadgeCustom=function(value){
+    const input=document.getElementById('item-badge'); if(input) input.value=value||'';
+    const icon=document.getElementById('item-badge-icon'); if(icon && !value) icon.value='';
+    const mode=document.getElementById(value?'item-badgemode-manual':'item-badgemode-off'); if(mode) mode.checked=true;
+    document.querySelectorAll('.v120-badge-preset').forEach(b=>b.classList.toggle('is-selected',b.dataset.badge===value));
+    if(typeof updateItemLivePreview==='function') updateItemLivePreview();
+  };
+})();
+</script>
 </body>
 </html>
