@@ -903,6 +903,7 @@ body{font-size:13px;letter-spacing:-.01em;}
 @media(max-width:420px){.mi-grid{grid-template-columns:1fr!important;}.stats-grid{grid-template-columns:1fr 1fr!important;}.content{padding:10px;padding-bottom:76px;}}
 </style>
 
+<style id="v125-part4-mobile-fix">
 /* v125 PARTE 4 — experiência mobile administrativa */
 @media(max-width:760px){
   html{scroll-behavior:smooth;}
@@ -953,7 +954,7 @@ body{font-size:13px;letter-spacing:-.01em;}
   .mi-card{grid-template-columns:72px minmax(0,1fr);}
   .mi-card-image{width:72px!important;height:72px!important;}
 }
-
+</style>
 </head>
 <body>
 <!-- LOGIN -->
@@ -3796,47 +3797,7 @@ function connectSSE(){
     // abrir o Painel), deixa passar pra não perder a primeira impressão à toa.
     if(activeStationInfo.active === false) return;
     let win = window.open('', '_blank', 'width=380,height=600');
-    if(win) win.document.write('<body style="font-family:sans-serif;padding:24px;color:#666;">Carregando pedido...
-<script>
-/* v125 PARTE 4 — navegação e ergonomia mobile, sem alterar o modo cliente */
-(function(){
-  'use strict';
-  function isMobile(){ return window.matchMedia && window.matchMedia('(max-width:760px)').matches; }
-  function syncMobileNav(){
-    if(!isMobile()) return;
-    const active=document.querySelector('.page.active');
-    const id=active && active.id ? active.id.replace('page-','') : 'pedidos';
-    document.querySelectorAll('#mobile-bottom-nav .mobile-nav-item').forEach(b=>b.classList.remove('active'));
-    let key=id;
-    if(id==='pedidos') key='inicio';
-    const btn=document.querySelector('#mobile-bottom-nav .mobile-nav-item[data-page="'+key+'"]');
-    if(btn) btn.classList.add('active');
-  }
-  function closeMobileSidebar(){
-    if(!isMobile()) return;
-    const side=document.querySelector('.sidebar');
-    if(side && !side.classList.contains('collapsed')){ try{ toggleSidebarCollapse(); }catch(e){} }
-  }
-  window.addEventListener('resize',syncMobileNav,{passive:true});
-  document.addEventListener('click',function(e){
-    const nav=e.target.closest && e.target.closest('#mobile-bottom-nav .mobile-nav-item');
-    if(nav){ setTimeout(function(){ syncMobileNav(); closeMobileSidebar(); },40); }
-  });
-  document.addEventListener('DOMContentLoaded',function(){
-    setTimeout(syncMobileNav,250);
-    const observer=new MutationObserver(function(){ syncMobileNav(); });
-    document.querySelectorAll('.page').forEach(function(p){ observer.observe(p,{attributes:true,attributeFilter:['class']}); });
-    document.addEventListener('keydown',function(e){
-      if(e.key==='Escape' && isMobile()){
-        const open=document.querySelector('.modal-overlay.show,.modal-overlay[style*="display: flex"],.modal-overlay[style*="display:flex"]');
-        if(open) return;
-        closeMobileSidebar();
-      }
-    });
-  });
-})();
-</script>
-</body>');
+    if(win) win.document.write('<body style="font-family:sans-serif;padding:24px;color:#666;">Carregando pedido...</body>');
     openBrowserTicket(r.order, r.station, r.deliveryWindow, win).catch(()=>{});
   });
   // v90: outro Painel abriu (ou assumiu por failover) a Estação Ativa de Impressão — atualiza
@@ -10807,6 +10768,29 @@ if(token){
   document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{addSaveBar();addReviewTools();polishSettings()},180));
   const oldGo=window.goPage;
   if(oldGo) window.goPage=function(id){const r=oldGo.apply(this,arguments);if(id==='mensagens'){setTimeout(addSaveBar,100)}if(id==='avaliacoes'){setTimeout(addReviewTools,100)}if(id==='configuracoes'){setTimeout(polishSettings,100)}return r;};
+})();
+</script>
+<script id="v125-part4-mobile-js">
+(function(){
+  'use strict';
+  function isMobile(){ return window.matchMedia && window.matchMedia('(max-width:760px)').matches; }
+  function syncMobileNav(){
+    if(!isMobile()) return;
+    var active=document.querySelector('.page.active');
+    var id=active && active.id ? active.id.replace('page-','') : 'pedidos';
+    document.querySelectorAll('#mobile-bottom-nav .mobile-nav-item').forEach(function(b){ b.classList.toggle('active', b.dataset.page===id || (id==='pedidos' && b.dataset.page==='inicio')); });
+  }
+  function closeMobileSidebar(){
+    if(!isMobile()) return;
+    var side=document.querySelector('.sidebar');
+    if(side && !side.classList.contains('collapsed')){ try{ toggleSidebarCollapse(); }catch(e){} }
+  }
+  window.addEventListener('resize',syncMobileNav,{passive:true});
+  document.addEventListener('click',function(e){
+    var nav=e.target.closest && e.target.closest('#mobile-bottom-nav .mobile-nav-item');
+    if(nav) setTimeout(function(){ syncMobileNav(); closeMobileSidebar(); },40);
+  });
+  document.addEventListener('DOMContentLoaded',function(){ setTimeout(syncMobileNav,250); });
 })();
 </script>
 </body>
