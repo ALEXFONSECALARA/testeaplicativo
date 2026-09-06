@@ -3799,7 +3799,7 @@ async function resyncOrders(){
       // SSE + sincronização podem enxergar o mesmo pedido quase ao mesmo tempo.
       if(alertedOrderIds.has(o.id)) return;
       alertedOrderIds.set(o.id, now);
-      if(Number(cfg.sound) !== 0) playBeep();
+      if(Number(cfg.sound) !== 0) playBeep(o);
       showToast('🔔 Novo Pedido!', `${o.id} — ${o.name} — R$ ${Number(o.total).toFixed(2).replace('.', ',')}`, 6000);
     });
   } catch (e) {
@@ -4178,12 +4178,29 @@ function unlockMobileAlertAudio(){
     mobileAlertAudioUnlocked=true;
   }catch(e){}
 }
-function playBeep(){
+function speakNewOrderAlert(order){
+  try{
+    if(!isAdminMobile() || !('speechSynthesis' in window) || !mobileAlertAudioUnlocked) return;
+    window.speechSynthesis.cancel();
+    const text = 'Novo pedido recebido' + (order && order.id ? ', pedido ' + String(order.id).replace(/[^a-zA-Z0-9-]/g,' ') : '') + '.';
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'pt-BR';
+    u.rate = 1.02;
+    u.pitch = 1.0;
+    u.volume = Math.min(1, Math.max(.35, Number(alertVolume()) || .8));
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function playBeep(order){
   try{
     if(isAdminMobile()){
       unlockMobileAlertAudio();
-      if(navigator.vibrate) navigator.vibrate([120,70,120]);
-      if(mobileAlertAudioCtx && mobileAlertAudioUnlocked){ playAlertSound(alertSoundChoice(),mobileAlertAudioCtx); return; }
+      if(navigator.vibrate) navigator.vibrate([120,70,120,70,180]);
+      if(mobileAlertAudioCtx && mobileAlertAudioUnlocked){
+        playAlertSound(alertSoundChoice(),mobileAlertAudioCtx);
+        setTimeout(function(){ speakNewOrderAlert(order); }, 180);
+        return;
+      }
     }
   }catch(e){}
   playAlertSound(alertSoundChoice());
