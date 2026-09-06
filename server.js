@@ -54,6 +54,9 @@ const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 // v60: log de falhas de impressão (impressão remota/automática) — fica em disco pra dar pra
 // conferir depois o que falhou e por quê, além do aviso mostrado na hora pra quem clicou em imprimir.
 const PRINT_LOG_FILE = path.join(DATA_DIR, 'print-log.json');
+const SERVER_ERROR_LOG_MAX_BYTES = 2 * 1024 * 1024;
+function rotateServerLogIfNeeded(file){ try { if(fs.existsSync(file) && fs.statSync(file).size > SERVER_ERROR_LOG_MAX_BYTES){ const rotated=file+'.1'; try{ if(fs.existsSync(rotated)) fs.unlinkSync(rotated); }catch(e){} fs.renameSync(file,rotated); } } catch(e){} }
+
 // v98 — AI ROUTER: cache de leitura de imagem (evita reanalisar a mesma foto de nota fiscal/
 // catálogo duas vezes) e log de uso da IA (provedor, modelo, tempo, erro, fallback usado — NUNCA
 // a chave de API). Ver seção "AI ROUTER" mais abaixo, perto de chamarIA().
@@ -3681,7 +3684,7 @@ function estimateDeliveryWindow(order, cfg) {
         try {
           const log = readJSON(PRINT_LOG_FILE);
           log.unshift({ orderId, station, error: String(error || 'Falha desconhecida').slice(0, 500), ts: new Date().toISOString(), retryable:true });
-          fs.writeFileSync(PRINT_LOG_FILE, JSON.stringify(log.slice(0, 500), null, 2));
+          writeJSON(PRINT_LOG_FILE, log.slice(0, 200));
         } catch (e) { console.error('⚠️  Não consegui gravar print-log.json:', e.message); }
       }
       broadcast('print-result', { orderId, station, ok: !!ok, error: error || null });
