@@ -18,10 +18,9 @@
 - Não foram alteradas APIs, banco ou páginas do cliente além do estilo/posição do badge no cardápio.
 
 
-# v128 — pacote completo
-- Interface do editor de produtos simplificada com cards recolhíveis, barra superior fixa e atalho Primeiro campo.
-- Ações do card do cardápio reorganizadas em controles compactos.
-- Tamanho, peso e unidade preservados e exibidos no cardápio.
-- Impressão padrão ajustada para 80 mm/Bematech: fonte 14 e 48 colunas.
-- Bip duplo ESC/POS após impressão real e teste.
-- Barra de filtros de reservas fixada no topo.
+## v127 — evolução solicitada
+- Corrigido o modal de **Nova Reserva**: o overlay é movido para `body` ao abrir e não fica preso a uma página oculta.
+- Central de Impressão: padrão de fonte reduzido para **14 px**, com largura padrão segura de **48 colunas** para térmicas de 80 mm/Bematech quando não houver largura configurada.
+- Impressão térmica: adicionado **bip duplo** ESC/POS ao final da impressão.
+- Cards de Configurações: controles antigos em menu `⋮` substituídos por ações diretas e compactas: **Expandir/Fechar, Ocultar/Mostrar, Fixar, 1º campo, Favoritar e Fechar**.
+- `Fixar` passou a usar posicionamento sticky no topo do grupo; `Ocultar` não desativa mais os próprios controles.

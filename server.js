@@ -173,7 +173,7 @@ const DEFAULT_CFG = {
   },
   // ── Impressão do comprovante ──
   printFont: 'Verdana, sans-serif',      // 'monospace' | 'sans-serif' | 'serif' | outras opções na tela de config
-  printSize: 14,                // tamanho da fonte em px — padrão térmica 80 mm / Bematech
+  printSize: 14,                // padrão seguro para bobina térmica 80 mm (Bematech)
   printColor: '#000000',        // cor do texto
   // ── Logotipo ──
   logoShape: 'retangular',      // 'redondo' | 'quadrado' | 'retangular'
@@ -1893,6 +1893,7 @@ const ESC = {
   center: '\x1B\x61\x01', left: '\x1B\x61\x00',
   doubleOn: '\x1D\x21\x11', doubleOff: '\x1D\x21\x00',
   cut: '\x1D\x56\x01',
+  doubleBeep: '\x1B\x42\x02\x02',
   feed: '\n\n\n'
 };
 
@@ -1933,7 +1934,7 @@ function tamanhoImpressaoTermica(printSize) {
 function buildTicketText(lines, cfg) {
   const tam = tamanhoImpressaoTermica(cfg && cfg.printSize);
   const body = tam.on + lines.join('\n') + tam.off;
-  return ESC.init + body + ESC.feed + ESC.cut;
+  return ESC.init + body + ESC.feed + ESC.doubleBeep + ESC.cut;
 }
 
 // v93 — via de RESERVA DE MESA (impressora de rede/USB direta). Mesma ideia/layout das vias de
