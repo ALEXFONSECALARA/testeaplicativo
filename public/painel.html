@@ -602,10 +602,6 @@ table{max-width:100%;}
 .topbar{backdrop-filter:blur(10px) saturate(140%);-webkit-backdrop-filter:blur(10px) saturate(140%);background:color-mix(in srgb, var(--panel) 88%, transparent);}
 .modal-overlay{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
 .modal{border:2px solid var(--gold);animation:modalPopIn .2s cubic-bezier(.2,.8,.3,1) both;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 24px 60px rgba(0,0,0,.5),0 0 0 5px rgba(201,168,76,.12),0 0 30px rgba(201,168,76,.22);}
-/* v128 — modal de mensagens/fundo do chat: cabe na tela sem cortar conteúdo */
-#admin-chatbg-modal .modal{width:min(460px,calc(100vw - 32px));max-width:460px;max-height:calc(100vh - 32px);overflow:auto;}
-#admin-chatbg-modal .modal-body{padding:16px;}
-@media(max-width:760px){#admin-chatbg-modal .modal{width:calc(100vw - 20px);max-width:none;max-height:calc(100dvh - 20px);border-radius:12px;}#admin-chatbg-modal .modal-body{padding:12px;}}
 @keyframes modalPopIn{from{opacity:0;transform:scale(.96) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
 .page{animation:pageFadeIn .22s ease both;}
 @keyframes pageFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
@@ -1150,8 +1146,7 @@ body{font-size:13px;letter-spacing:-.01em;}
 <div class="nav-section">Principal</div>
 <button class="nav-item active" data-page="pedidos" onclick="goPage('pedidos')"><span class="ni">📊</span> Pedidos <span class="nb" id="nb-pedidos" style="display:none">0</span></button>
 <button class="nav-item" data-min-role="vendas" data-page="reservas" onclick="goPage('reservas')"><span class="ni">📅</span> Reservas <span class="nb" id="nb-reservas" style="display:none">0</span></button>
-<button class="nav-item" data-min-role="vendas" data-page="mensagens" onclick="goPage('mensagens');setTimeout(()=>typeof switchMensagensTab==='function'&&switchMensagensTab('inbox'),0)"><span class="ni">💬</span> Chat Express</button>
-<button class="nav-item" data-min-role="vendas" data-page="central-mensagens" onclick="goPage('mensagens');setTimeout(()=>typeof switchMensagensTab==='function'&&switchMensagensTab('central'),0)"><span class="ni">📣</span> Central de Mensagens</button>
+<button class="nav-item" data-min-role="vendas" data-page="mensagens" onclick="goPage('mensagens')"><span class="ni">💬</span> Central de Mensagens </button>
 <div class="nav-section" data-min-role="admin">Gestão</div>
 <button class="nav-item" data-min-role="admin" data-page="motoboys" data-perm="restaurante.configurarSetores" onclick="goPage('motoboys')"><span class="ni">🛵</span> Motoboys</button>
 <button class="nav-item" data-min-role="admin" data-page="cardapio" data-perm="cardapio.editarProduto" onclick="goPage('cardapio')"><span class="ni">🍱</span> Cardápio</button>
@@ -11266,44 +11261,3 @@ if(token){
 </script>
 </body>
 </html>
-
-<style id="v129-chat-express-separated">
-/* v129 — Chat Express separado da Central de Mensagens; área de conversa grande, estilo v126. */
-#page-mensagens[data-chat-express="1"] > div:first-child{display:none!important;}
-#page-mensagens[data-chat-express="1"] #msg-tab-inbox{display:block!important;}
-#page-mensagens[data-chat-express="1"] #msg-tab-central{display:none!important;}
-#page-mensagens[data-chat-express="1"] #wa-admin-wrap{
-  height:calc(100dvh - 145px)!important;
-  min-height:560px!important;
-  margin:0 -24px!important;
-  border-top:1px solid var(--border);
-  border-radius:0!important;
-}
-#page-mensagens[data-chat-express="1"] #msg-tab-inbox > .settings-card{
-  margin:0 -24px!important; padding:0!important; border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important;
-}
-#page-mensagens[data-chat-express="1"] #msg-tab-inbox > .settings-card > .settings-card-title,
-#page-mensagens[data-chat-express="1"] #msg-tab-inbox > .settings-card > div:nth-child(2),
-#page-mensagens[data-chat-express="1"] #msg-tab-inbox > .settings-card > div:nth-child(3){display:none!important;}
-@media(max-width:760px){
- #page-mensagens[data-chat-express="1"] #wa-admin-wrap{height:calc(100dvh - 78px)!important;min-height:520px!important;margin:0 -12px!important;}
- #page-mensagens[data-chat-express="1"] #msg-tab-inbox > .settings-card{margin:0 -12px!important;}
-}
-</style>
-<script id="v129-chat-express-separated-js">
-(function(){
-  const oldSwitch=window.switchMensagensTab;
-  if(typeof oldSwitch==='function' && !oldSwitch.__v129wrapped){
-    function wrapped(tab){
-      const p=document.getElementById('page-mensagens');
-      if(p) p.dataset.chatExpress=tab==='inbox'?'1':'0';
-      const title=document.getElementById('topbar-title');
-      if(title && tab==='inbox') title.textContent='Chat Express';
-      if(title && tab==='central') title.textContent='Central de Mensagens';
-      return oldSwitch.apply(this,arguments);
-    }
-    wrapped.__v129wrapped=true;
-    window.switchMensagensTab=wrapped;
-  }
-})();
-</script>
