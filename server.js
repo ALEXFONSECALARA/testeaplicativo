@@ -54,9 +54,6 @@ const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 // v60: log de falhas de impressão (impressão remota/automática) — fica em disco pra dar pra
 // conferir depois o que falhou e por quê, além do aviso mostrado na hora pra quem clicou em imprimir.
 const PRINT_LOG_FILE = path.join(DATA_DIR, 'print-log.json');
-const SERVER_ERROR_LOG_MAX_BYTES = 2 * 1024 * 1024;
-function rotateServerLogIfNeeded(file){ try { if(fs.existsSync(file) && fs.statSync(file).size > SERVER_ERROR_LOG_MAX_BYTES){ const rotated=file+'.1'; try{ if(fs.existsSync(rotated)) fs.unlinkSync(rotated); }catch(e){} fs.renameSync(file,rotated); } } catch(e){} }
-
 // v98 — AI ROUTER: cache de leitura de imagem (evita reanalisar a mesma foto de nota fiscal/
 // catálogo duas vezes) e log de uso da IA (provedor, modelo, tempo, erro, fallback usado — NUNCA
 // a chave de API). Ver seção "AI ROUTER" mais abaixo, perto de chamarIA().
@@ -3684,7 +3681,7 @@ function estimateDeliveryWindow(order, cfg) {
         try {
           const log = readJSON(PRINT_LOG_FILE);
           log.unshift({ orderId, station, error: String(error || 'Falha desconhecida').slice(0, 500), ts: new Date().toISOString(), retryable:true });
-          writeJSON(PRINT_LOG_FILE, log.slice(0, 200));
+          fs.writeFileSync(PRINT_LOG_FILE, JSON.stringify(log.slice(0, 500), null, 2));
         } catch (e) { console.error('⚠️  Não consegui gravar print-log.json:', e.message); }
       }
       broadcast('print-result', { orderId, station, ok: !!ok, error: error || null });
@@ -3785,7 +3782,7 @@ function estimateDeliveryWindow(order, cfg) {
       try { fs.accessSync(file, fs.constants.R_OK | fs.constants.W_OK); checks[name] = true; } catch (_) { checks[name] = false; }
     }
     const ok = Object.values(checks).every(Boolean);
-    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.125', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
+    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.126', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
   }
 
   // ── GET /api/print-agent/status — o painel consulta pra mostrar se tem algum Agente Local
@@ -5197,8 +5194,24 @@ function estimateDeliveryWindow(order, cfg) {
         // (Configurações → 🏪 Restaurante → 🤖 Automações). Quando ligado, a reserva já nasce
         // confirmada, sem precisar ninguém clicar em "Confirmar" no painel.
         status: cfg.autoAcceptReservations ? 'confirmada' : 'pendente',
-        // v125-part1: permite recuperar a impressão automática de reserva após queda de conexão.
-        autoPrintEligible: !!cfg.print,
+        // v126 — BUG CORRIGIDO ("reserva imprimia mesmo com aceite automático desligado"): esse
+        // campo usava `cfg.print` (só o interruptor GERAL de impressão automática), igual a
+        // impressão automática de PEDIDO usava até a v91 — e foi corrigido lá pra usar
+        // `cfg.autoAcceptOrders` na v92 (ver comentário logo abaixo, perto do broadcast de
+        // 'new-order'), pelo mesmo motivo: sem o aceite automático ligado, a reserva fica
+        // pendente esperando alguém CONFIRMAR manualmente no painel, e imprimir sozinha nesse
+        // caso desperdiça papel se a loja recusar a reserva depois. Reserva nunca recebeu o
+        // mesmo ajuste — ficou usando só `cfg.print` até agora. Corrigido pra espelhar o padrão
+        // de pedido: só marca elegível pra impressão automática quando o aceite automático de
+        // RESERVA (`cfg.autoAcceptReservations`) também está ligado. Diferente de pedido (que só
+        // pode ser CRIADO com a loja aberta — cfg.open já trava lá em cima), reserva continua
+        // podendo ser criada com a loja fechada de propósito (é o que permite reservar um dia
+        // futuro com antecedência — ver o novo botão "📅 Nova Reserva" no painel), então aqui
+        // cfg.open também entra direto na conta: se a reserva foi criada com a loja fechada,
+        // ela não nasce elegível pra impressão automática (nem agora nem quando o Agente Local
+        // reconectar depois via fila de recuperação) — só uma reserva criada com a loja já
+        // aberta é que sai sozinha na impressora.
+        autoPrintEligible: !!(cfg.autoAcceptReservations && Number(cfg.open)),
         name, phone, people, date, time,
         notes: String(body.notes || '').slice(0, 200),
         storeReply: '' // v33: mensagem da loja pro cliente (aparece na tela de acompanhamento)
@@ -5211,7 +5224,15 @@ function estimateDeliveryWindow(order, cfg) {
       // "caixa" (é quem normalmente recebe o cliente/atende a reserva). Se essa via estiver
       // desativada ou sem impressora configurada, simplesmente não imprime nada (sem erro pro
       // cliente) — a reserva já foi salva e confirmada normalmente de qualquer jeito.
-      if (Number(cfg.print)) {
+      // v126 — reforçado: além do interruptor geral (cfg.print), agora só imprime de verdade
+      // se reservation.autoPrintEligible for true — ou seja, loja ABERTA agora (cfg.open) E
+      // aceite automático de reserva ligado (cfg.autoAcceptReservations), calculado ali em
+      // cima na criação do objeto (mesma regra pedida pra pedido também). A reserva continua
+      // sendo CRIADA normalmente mesmo com a loja fechada (é assim que dá pra reservar com
+      // antecedência pra um dia futuro, ver o botão "📅 Nova Reserva" no painel); só não sai
+      // sozinha na impressora se tiver nascido fora do horário de funcionamento ou sem o
+      // aceite automático ligado — nesses casos a loja confirma/imprime manualmente depois.
+      if (Number(cfg.print) && reservation.autoPrintEligible) {
         const printerCfg = cfg.stations && cfg.stations.caixa;
         if (printerCfg && printerCfg.active !== false) {
           try {
