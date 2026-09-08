@@ -2977,7 +2977,7 @@ function renderMenu() {
             ${badgeAboveName ? badgeHtml : ''}
             <div class="item-name">${item.name}</div>
             ${badgeBelowName ? badgeHtml : ''}
-            <div class="item-desc${item.desc ? ' clamped' : ''}" id="desc-${key}">${item.desc}${[item.qty,item.size,item.weight?(item.weight+' '+(item.weightUnit||'g')):''].filter(Boolean).length ? ` <span class="item-portion-inline">· ${esc([item.qty,item.size,item.weight?(item.weight+' '+(item.weightUnit||'g')):''].filter(Boolean).join(' · '))}</span>` : ''}</div>
+            <div class="item-desc${item.desc ? ' clamped' : ''}" id="desc-${key}">${item.desc}${item.qty ? ` <span class="item-portion-inline">· ${esc(item.qty)}</span>` : ''}</div>
             ${item.desc ? `<button type="button" class="item-desc-toggle" id="desc-toggle-${key}" onclick="toggleItemDesc('${key}', event)">⌄ Ver mais</button>` : ''}
             ${badgeHtml ? `<div class="item-badge-wrap-below-desc">${badgeHtml}</div>` : ''}
             ${cartQty > 0 ? `<div class="mi-in-cart-tag">🛒 ${cartQty} no carrinho</div>` : ''}

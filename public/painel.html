@@ -515,16 +515,18 @@ table{max-width:100%;}
 @media (max-width:620px){ .settings-grid{grid-template-columns:1fr;} }
 .save-all-bar{position:sticky;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:14px 20px;margin:24px -20px -20px;display:flex;align-items:center;justify-content:flex-end;gap:14px;box-shadow:0 -4px 20px rgba(0,0,0,.25);}
 .settings-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
-.card-menu-wrap{position:relative;}
-.card-menu-btn{background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);color:var(--gold);cursor:pointer;opacity:1;font-size:16px;font-weight:700;padding:2px 9px;border-radius:7px;line-height:1.4;}
-.card-menu-btn:hover{background:var(--gold);color:#1a1405;border-color:var(--gold);}
-.card-menu-dropdown{position:absolute;top:26px;right:0;background:var(--card);border:1px solid var(--border2);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.5);min-width:190px;z-index:50;overflow:hidden;display:none;}
-.card-menu-dropdown.open{display:block;}
-.card-menu-item{display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;color:var(--white);font-size:12.5px;text-align:left;padding:9px 12px;cursor:pointer;transition:background .12s;}
-.card-menu-item:hover{background:rgba(255,255,255,.06);}
-.card-menu-item .cmi-icon{font-size:14px;width:16px;text-align:center;}
-.card-menu-item.active-state{color:var(--gold);}
-.card-menu-item.danger{color:var(--red-lt);border-top:1px solid var(--border);margin-top:2px;}
+.card-menu-wrap{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.card-action-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:28px;padding:4px 8px;border:1px solid var(--border2);border-radius:8px;background:rgba(255,255,255,.035);color:var(--muted);font-size:10.5px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s ease;}
+.card-action-btn:hover{background:rgba(255,255,255,.08);color:var(--white);border-color:var(--gold);}
+.card-action-btn.active-state{color:var(--gold);border-color:rgba(201,168,76,.55);background:rgba(201,168,76,.10);}
+.card-action-btn.danger{color:var(--red-lt);}
+.card-action-btn .cmi-icon{font-size:12px;}
+.card-pinned{position:sticky!important;top:10px;z-index:20;box-shadow:0 10px 28px rgba(0,0,0,.18);}
+.settings-card.card-minimized>.settings-card-title{border-bottom:0;}
+@media(max-width:700px){
+  .card-action-btn{font-size:0;min-width:30px;width:30px;padding:4px;}
+  .card-action-btn .cmi-icon{font-size:14px;}
+}
 .card-minimized{padding-bottom:20px;}
 .card-pinned{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
 .card-favorited{border-color:var(--gold);}
@@ -801,23 +803,16 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
   html,body{max-width:100%!important;overflow-x:hidden!important;}
 }
 
-/* v127 — UI enxuta: cards recolhíveis, topo fixo, foco rápido e formulário de item simplificado */
-.settings-card,.item-editor-card{position:relative;overflow:hidden;transition:box-shadow .18s ease,border-color .18s ease,transform .18s ease;}
-.settings-card:hover,.item-editor-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.10);}
-.v127-card-head{display:flex;align-items:center;gap:8px;min-height:42px;cursor:pointer;user-select:none;}
-.v127-card-head .v127-title{font-weight:800;flex:1;}
-.v127-toggle{border:1px solid var(--border);background:var(--bg);color:var(--muted);width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;}
-.v127-card.is-collapsed>.v127-card-body{display:none!important;}
-.v127-card.is-collapsed .v127-toggle{transform:rotate(-90deg);}
-.v127-sticky-tools{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(10px);padding:8px 0;margin-bottom:8px;border-bottom:1px solid var(--border);}
-.v127-focus-btn{font-size:11px;padding:6px 9px;border:1px solid var(--border);background:var(--bg);color:var(--fg);border-radius:8px;cursor:pointer;}
-.v127-focus-btn:hover{border-color:var(--red);}
-.v127-quick-presets{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px;}
-.v127-quick-presets button{border:1px solid var(--border);background:var(--bg);color:var(--fg);border-radius:9px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;}
-.v127-quick-presets button:hover{border-color:var(--red);color:var(--red-lt);}
-.v127-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.v127-meta-chip{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:9px;padding:7px 9px;background:var(--bg);font-size:11px;}
-@media(max-width:700px){.v127-meta-grid{grid-template-columns:1fr;}}
+/* v127 — interface compacta para cards e modal de Nova Reserva */
+body.modal-open{overflow:hidden;}
+#new-reservation-modal{z-index:10050!important;}
+#new-reservation-modal .modal{width:min(560px,96vw)!important;max-width:560px!important;max-height:min(90vh,760px)!important;border-radius:16px!important;}
+#new-reservation-modal .modal-header{position:sticky;top:0;z-index:2;}
+#new-reservation-modal .modal-footer{position:sticky;bottom:0;z-index:2;background:var(--card);border-top:1px solid var(--border);}
+.settings-card-title{gap:10px;}
+@media(max-width:700px){
+  #new-reservation-modal .modal{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;border-radius:0!important;}
+}
 </style>
 <style id="shog-modern-v1">
 /* Shogatsu — interface enxuta/moderna v1 */
@@ -1966,7 +1961,7 @@ body{font-size:13px;letter-spacing:-.01em;}
 <option value='"Trebuchet MS", sans-serif'>Arredondada (Trebuchet)</option>
 </select>
 </div>
-<div class="field"><label style="font-size:10px;">Tamanho (px)</label><input id="print-size" max="20" min="9" value="12" oninput="updatePrintFontPreview()" type="number"/></div>
+<div class="field"><label style="font-size:10px;">Tamanho (px)</label><input id="print-size" max="28" min="10" oninput="updatePrintFontPreview()" type="number"/></div>
 <div class="field" style="flex:0 0 100%;"><label style="font-size:10px;">Pré-visualização</label>
 <div id="print-font-preview" style="background:#fff;color:#000;padding:10px 14px;border-radius:6px;font-size:14px;">SHOGATSU — Pedido #AB12CD · R$ 45,00</div>
 </div>
@@ -2501,13 +2496,12 @@ body{font-size:13px;letter-spacing:-.01em;}
 <button class="modal-close" onclick="closeModal('item-modal')">✕</button>
 </div>
 <div class="modal-body">
-<div class="v127-sticky-tools"><button type="button" class="v127-focus-btn" onclick="focusFirstItemField()">↗ Primeiro campo</button><button type="button" class="v127-focus-btn" onclick="setItemEditorCards(true)">＋ Expandir</button><button type="button" class="v127-focus-btn" onclick="setItemEditorCards(false)">− Fechar cards</button></div>
 <input id="item-edit-si" type="hidden"/><input id="item-edit-ii" type="hidden"/>
 <input id="item-image" type="hidden"/><input id="item-image-pos" type="hidden" value="50,50"/>
 <div class="item-editor-grid">
 <div>
 <div class="item-editor-card item-editor-section">
-<div class="item-editor-section-title" data-v127-card-title onclick="toggleItemEditorCard(this)"><span>📸 Foto do produto</span><span class="item-photo-meta" id="item-photo-status">Recomendado: imagem nítida e bem iluminada</span></div>
+<div class="item-editor-section-title"><span>📸 Foto do produto</span><span class="item-photo-meta" id="item-photo-status">Recomendado: imagem nítida e bem iluminada</span></div>
 <div class="item-editor-section-sub">A foto é o destaque principal do produto. Você pode trocar ou remover quando quiser.</div>
 <div class="item-photo-hero" id="item-photo-wrap" onclick="document.getElementById('item-photo-file').click()">
 <img alt="Foto do produto" class="photo-preview" id="item-photo-preview"/>
@@ -2525,22 +2519,18 @@ body{font-size:13px;letter-spacing:-.01em;}
 </div>
 </div>
 <div class="item-editor-card item-editor-section">
-<div class="item-editor-section-title" data-v127-card-title onclick="toggleItemEditorCard(this)">🍣 Informações do produto <button type="button" class="v127-toggle" onclick="event.stopPropagation();toggleItemEditorCard(this.parentElement)" aria-label="Expandir ou fechar">⌄</button></div>
+<div class="item-editor-section-title">🍣 Informações do produto</div>
 <div class="item-form-highlight">
 <div class="field"><label>Nome do produto *</label><input id="item-name" oninput="updateItemLivePreview()" placeholder="Ex.: Salmão Maçaricado"/></div>
 <div class="field"><label>Preço *</label><input id="item-price" oninput="updateItemLivePreview()" placeholder="0,00" step="0.01" type="number"/></div>
 </div>
 <div class="field"><label>Descrição</label><textarea id="item-desc" oninput="updateItemLivePreview()" placeholder="Explique o que vem no prato, ingredientes e diferenciais..."></textarea></div>
-<div class="field-row">
-<div class="field"><label>Tamanho</label><select id="item-size" onchange="updateItemLivePreview()"><option value="">Sem tamanho</option><option>Pequeno</option><option>Médio</option><option>Grande</option><option>Individual</option><option>Família</option></select></div>
-<div class="field"><label>Peso</label><div style="display:flex;gap:6px;"><input id="item-weight" oninput="updateItemLivePreview()" min="0" step="1" inputmode="numeric" placeholder="Ex.: 500" type="number"/><select id="item-weight-unit" onchange="updateItemLivePreview()" style="max-width:90px;"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="L">L</option></select></div></div>
-<div class="field"><label>Porção <span style="color:var(--muted)">opcional</span></label><input id="item-qty" list="item-qty-presets" placeholder="Ex.: 8 peças"/></div>
-</div>
+<div class="field-row"><div class="field"><label>Porção / tamanho</label><input id="item-qty" list="item-qty-presets" placeholder="Ex.: 8 peças ou 500 ml"/></div></div>
 <datalist id="item-qty-presets"><option value="4 peças"></option><option value="6 peças"></option><option value="8 peças"></option><option value="10 peças"></option><option value="12 peças"></option><option value="16 peças"></option><option value="20 peças"></option><option value="250 ml"></option><option value="300 ml"></option><option value="350 ml"></option><option value="400 ml"></option><option value="500 ml"></option><option value="600 ml"></option><option value="700 ml"></option><option value="1 L"></option></datalist>
 <div class="v122-portion-chips" id="item-qty-chips"><button type="button" onclick="setItemQtyPreset('4 peças')">4</button><button type="button" onclick="setItemQtyPreset('6 peças')">6</button><button type="button" onclick="setItemQtyPreset('8 peças')">8</button><button type="button" onclick="setItemQtyPreset('10 peças')">10</button><button type="button" onclick="setItemQtyPreset('12 peças')">12</button><button type="button" onclick="setItemQtyPreset('250 ml')">250 ml</button><button type="button" onclick="setItemQtyPreset('350 ml')">350 ml</button><button type="button" onclick="setItemQtyPreset('500 ml')">500 ml</button><button type="button" onclick="setItemQtyPreset('1 L')">1 L</button></div>
 </div>
 <div class="item-editor-card item-editor-section v120-local-badge-card">
-<div class="item-editor-section-title" data-v127-card-title onclick="toggleItemEditorCard(this)"><span>🏷 Destaque no cardápio</span><span class="v120-local-badge-label">Rápido</span></div>
+<div class="item-editor-section-title"><span>🏷 Destaque no cardápio</span><span class="v120-local-badge-label">Rápido</span></div>
 <div class="item-editor-section-sub">Escolha um selo pronto ou escreva o seu. O selo fica abaixo da descrição e antes do preço, dentro do card do cliente, sem cobrir a foto.</div>
 <div class="v120-badge-presets" role="group" aria-label="Selos prontos">
 <button type="button" class="v120-badge-preset" data-badge="🔥 Mais vendido" onclick="setLocalBadgePreset('🔥 Mais vendido')">🔥 Mais vendido</button>
@@ -2559,7 +2549,7 @@ body{font-size:13px;letter-spacing:-.01em;}
 <div style="display:none"><input id="item-badgemode-global" name="item-badgemode" type="radio" value="global"/><input id="item-badgemode-manual" name="item-badgemode" type="radio" value="manual"/><input id="item-badgemode-off" name="item-badgemode" type="radio" value="off"/></div>
 </div>
 <div class="item-editor-card">
-<div class="item-editor-section-title" data-v127-card-title onclick="toggleItemEditorCard(this)"><span>⚙️ Opções e adicionais</span><button class="btn secondary sm" onclick="addVariantGroup()" type="button">+ Adicionar grupo</button></div>
+<div class="item-editor-section-title"><span>⚙️ Opções e adicionais</span><button class="btn secondary sm" onclick="addVariantGroup()" type="button">+ Adicionar grupo</button></div>
 <div class="item-editor-section-sub">Tamanho, sabor, molhos ou complementos. Use somente quando o cliente realmente precisar escolher.</div>
 <div id="item-variants-list" style="display:flex;flex-direction:column;gap:10px;"></div>
 </div>
@@ -2571,7 +2561,7 @@ body{font-size:13px;letter-spacing:-.01em;}
 <div class="item-preview-content">
 <div class="item-preview-name" id="item-live-preview-name">Nome do produto</div>
 <div class="item-preview-desc" id="item-live-preview-desc">A descrição do produto aparecerá aqui.</div>
-<div class="item-preview-bottom"><span class="item-preview-price" id="item-live-preview-price">R$ 0,00</span><span class="item-preview-pill" id="item-live-preview-qty">Porção</span></div><div id="item-live-preview-meta" style="font-size:10px;color:var(--muted);margin-top:6px;">Detalhes do produto</div>
+<div class="item-preview-bottom"><span class="item-preview-price" id="item-live-preview-price">R$ 0,00</span><span class="item-preview-pill" id="item-live-preview-qty">Porção</span></div>
 </div>
 </div>
 <div class="item-editor-card" style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.6;">
@@ -2671,13 +2661,6 @@ body{font-size:13px;letter-spacing:-.01em;}
 </div>
 <div class="modal-body">
 <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Registre aqui uma reserva recebida por telefone, WhatsApp ou balcão. Escolha a data e o horário — só aparecem horários dentro do funcionamento daquele dia.</div>
-<div class="v127-quick-presets" aria-label="Reservas pré-definidas">
-<button type="button" onclick="applyReservationPreset(2)">2 pessoas</button>
-<button type="button" onclick="applyReservationPreset(4)">4 pessoas</button>
-<button type="button" onclick="applyReservationPreset(6)">6 pessoas</button>
-<button type="button" onclick="applyReservationPreset(8)">8 pessoas</button>
-</div>
-<div style="font-size:10px;color:var(--muted);margin:-4px 0 10px;">Pré-definição preenche somente a quantidade de pessoas; data e horário continuam livres.</div>
 <div class="field"><label style="font-size:10px;">Nome completo *</label><input type="text" id="new-rsv-name" placeholder="Nome do cliente"/></div>
 <div class="field-row">
 <div class="field"><label style="font-size:10px;">WhatsApp / Telefone *</label><input type="tel" id="new-rsv-phone" placeholder="(22) 99999-9999"/></div>
@@ -3540,23 +3523,16 @@ function setupCardControls(){
       const wrap = document.createElement('span');
       wrap.className = 'card-menu-wrap';
       wrap.innerHTML =
-        '<button type="button" class="card-menu-btn" data-menu-toggle title="Mais opções">⋮</button>' +
-        '<div class="card-menu-dropdown">' +
-          '<button type="button" class="card-menu-item" data-act="fav"><span class="cmi-icon">⭐</span> Favoritar</button>' +
-          '<button type="button" class="card-menu-item" data-act="pin"><span class="cmi-icon">📌</span> Fixar no topo do grupo</button>' +
-          '<button type="button" class="card-menu-item" data-act="min"><span class="cmi-icon">➖</span> Minimizar</button>' +
-          '<button type="button" class="card-menu-item" data-act="hide"><span class="cmi-icon">👁️</span> Ocultar/Mostrar conteúdo</button>' +
-          '<button type="button" class="card-menu-item" data-act="cfg"><span class="cmi-icon">⚙️</span> Ir pro primeiro campo</button>' +
-          '<button type="button" class="card-menu-item danger" data-act="close"><span class="cmi-icon">✖</span> Fechar este card</button>' +
-        '</div>';
+        '<button type="button" class="card-action-btn" data-act="min" title="Expandir ou fechar conteúdo"><span class="cmi-icon">↕</span><span class="cmi-label">Expandir</span></button>' +
+        '<button type="button" class="card-action-btn" data-act="hide" title="Ocultar ou mostrar conteúdo"><span class="cmi-icon">👁</span><span class="cmi-label">Ocultar</span></button>' +
+        '<button type="button" class="card-action-btn" data-act="pin" title="Fixar este card no topo"><span class="cmi-icon">📌</span><span class="cmi-label">Fixar</span></button>' +
+        '<button type="button" class="card-action-btn" data-act="cfg" title="Ir para o primeiro campo"><span class="cmi-icon">↳</span><span class="cmi-label">1º campo</span></button>' +
+        '<button type="button" class="card-action-btn" data-act="fav" title="Adicionar aos favoritos"><span class="cmi-icon">☆</span><span class="cmi-label">Favorito</span></button>' +
+        '<button type="button" class="card-action-btn danger" data-act="close" title="Fechar este card"><span class="cmi-icon">✕</span><span class="cmi-label">Fechar</span></button>';
       titleEl.appendChild(wrap);
-      wrap.querySelector('[data-menu-toggle]').addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleCardMenu(wrap);
-      });
-      wrap.querySelector('.card-menu-dropdown').addEventListener('click', (e) => {
-        const btn = e.target.closest('.card-menu-item');
-        if (btn) { handleCardControlClick(card, cardId, btn.dataset.act); closeAllCardMenus(); }
+      wrap.addEventListener('click', (e) => {
+        const btn = e.target.closest('.card-action-btn');
+        if (btn) { e.preventDefault(); e.stopPropagation(); handleCardControlClick(card, cardId, btn.dataset.act); }
       });
     }
 
@@ -3570,27 +3546,30 @@ function setupCardControls(){
 // v77: marca em negrito/dourado, no mini-menu "⋮", quais opções já estão ativas nesse card
 // (favoritado / fixado / minimizado / oculto) — só um retoque visual, sem mudar a lógica.
 function syncCardMenuActiveState(card, state){
-  const dropdown = card.querySelector('.card-menu-dropdown');
-  if (!dropdown) return;
-  const map = { fav:'favorite', pin:'pinned', min:'minimized', hide:'hidden' };
-  dropdown.querySelectorAll('.card-menu-item[data-act]').forEach(btn => {
-    const field = map[btn.dataset.act];
-    if (field) btn.classList.toggle('active-state', !!state[field]);
+  const wrap = card.querySelector('.card-menu-wrap');
+  if (!wrap) return;
+  const fields = { fav:'favorite', pin:'pinned', min:'minimized', hide:'hidden' };
+  const labels = {
+    min: state.minimized ? 'Fechar' : 'Expandir',
+    hide: state.hidden ? 'Mostrar' : 'Ocultar',
+    pin: state.pinned ? 'Fixado' : 'Fixar',
+    fav: state.favorite ? 'Favorito' : 'Favoritar'
+  };
+  wrap.querySelectorAll('.card-action-btn[data-act]').forEach(btn=>{
+    const act=btn.dataset.act;
+    const field=fields[act];
+    if(field) btn.classList.toggle('active-state', !!state[field]);
+    const label=btn.querySelector('.cmi-label');
+    if(label && labels[act]) label.textContent=labels[act];
+    const icon=btn.querySelector('.cmi-icon');
+    if(icon && act==='min') icon.textContent=state.minimized?'↕':'↕';
+    if(icon && act==='hide') icon.textContent=state.hidden?'👁':'◉';
+    if(icon && act==='pin') icon.textContent=state.pinned?'📌':'📍';
+    if(icon && act==='fav') icon.textContent=state.favorite?'★':'☆';
   });
 }
 // v77: só um menu "⋮" aberto por vez, e fecha ao clicar fora — mesmo padrão já usado nos modais.
-function closeAllCardMenus(){
-  document.querySelectorAll('.card-menu-dropdown.open').forEach(d => d.classList.remove('open'));
-}
-function toggleCardMenu(wrap){
-  const dropdown = wrap.querySelector('.card-menu-dropdown');
-  const willOpen = !dropdown.classList.contains('open');
-  closeAllCardMenus();
-  if (willOpen) dropdown.classList.add('open');
-}
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.card-menu-wrap')) closeAllCardMenus();
-});
+function closeAllCardMenus(){} function toggleCardMenu(){}
 
 // v69: mostra/esconde a seção "⭐ Favoritos" dependendo se tem algum card favoritado
 function updateFavSectionVisibility(){
@@ -3727,12 +3706,10 @@ function applyCardState(card, state){
     else card._homeParent.appendChild(card);
   }
   if (state.pinned && card.parentElement) card.parentElement.prepend(card);
-  card.style.opacity = state.hidden ? '.35' : '';
-  card.style.pointerEvents = state.hidden ? 'none' : '';
-  // BUG CORRIGIDO (v80): "pointerEvents:none" no card inteiro travava também o próprio botão
-  // "⋮ Mais opções" (que é filho do card) — depois de "Ocultar/Mostrar conteúdo" uma vez, o
-  // menu ficava impossível de clicar de novo pra reverter, parecia travado/bugado. Agora o
-  // título (onde mora o "⋮") sempre continua clicável, mesmo com o resto do card oculto.
+  // v127: "Ocultar" agora oculta visualmente o conteúdo sem desativar o card inteiro.
+  // Assim os próprios controles continuam sempre utilizáveis para "Mostrar" novamente.
+  card.style.opacity = state.hidden ? '.72' : '';
+  card.style.pointerEvents = '';
   if (titleEl) titleEl.style.pointerEvents = 'auto';
 }
 
@@ -4024,79 +4001,7 @@ function connectSSE(){
     // abrir o Painel), deixa passar pra não perder a primeira impressão à toa.
     if(activeStationInfo.active === false) return;
     let win = window.open('', '_blank', 'width=380,height=600');
-    if(win) win.document.write('<body style="font-family:sans-serif;padding:24px;color:#666;">Carregando pedido...
-<style id="shog-v128-ui">
-/* v128 — interface compacta: menos botões, mais foco */
-.v128-card{border:1px solid var(--border)!important;background:var(--card)!important;border-radius:14px!important;overflow:hidden!important;transition:border-color .15s,box-shadow .15s!important}
-.v128-card .v128-head{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;cursor:pointer;user-select:none;position:sticky;top:0;z-index:3;background:color-mix(in srgb,var(--card) 94%,transparent)!important;backdrop-filter:blur(8px)}
-.v128-card .v128-head strong{font-size:12px;flex:1}.v128-card .v128-chevron{font-size:15px;color:var(--muted);width:28px;height:28px;border:1px solid var(--border);border-radius:8px;display:grid;place-items:center}
-.v128-card.is-collapsed>.v128-body{display:none!important}.v128-card.is-collapsed .v128-chevron{transform:rotate(-90deg)}
-#item-modal .item-editor-card.v128-card{padding:0!important;background:var(--panel)!important;border:1px solid var(--border)!important;border-radius:14px!important;box-shadow:none!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title{margin:0!important;padding:11px 12px!important;border-bottom:1px solid var(--border)!important;display:flex!important;align-items:center!important;gap:8px!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title:after{content:'Clique para abrir';font-size:9px;color:var(--muted);font-weight:500;margin-left:auto}
-#item-modal .item-editor-card.v128-card:not(.is-collapsed)>.item-editor-section-title:after{content:'Aberto'}
-#item-modal .item-editor-card.v128-card>.v128-body{padding:12px!important}
-#item-modal .v128-sticky-top{position:sticky!important;top:0!important;z-index:20!important;background:var(--panel)!important;border-bottom:1px solid var(--border)!important}
-#item-modal .v128-first-field{scroll-margin-top:85px}
-#item-modal .v128-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--border)}
-#item-modal .v128-toolbar .btn{min-height:34px!important;height:34px!important;padding:0 10px!important;font-size:10px!important;border-radius:9px!important}
-#item-modal .v128-meta-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-#item-modal .v128-meta-grid .field{margin:0!important}
-#item-modal .v128-size-select{width:100%}
-#item-modal .v128-weight{display:grid;grid-template-columns:1fr 76px;gap:6px}
-#page-cardapio .mi-card{border-radius:14px!important;box-shadow:0 4px 18px rgba(0,0,0,.08)!important;transform:none!important}
-#page-cardapio .mi-card:hover{transform:translateY(-1px)!important}
-#page-cardapio .mi-card-actions{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px!important}
-#page-cardapio .mi-card-actions button{width:100%!important;height:34px!important;border-radius:9px!important;font-size:12px!important}
-#page-cardapio .mi-card-actions .ca-avail.off{opacity:.9}
-#page-cardapio .mi-card .mi-card-tags{gap:4px!important}
-#page-cardapio .mi-card .mi-badge{font-size:9px!important;padding:4px 7px!important}
-#page-cardapio .v128-visibility{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--border)}
-#reservas-filterbar{position:sticky!important;top:0!important;z-index:10!important;background:var(--bg)!important;padding:8px 0!important}
-#page-reservas .order-card{border-radius:14px!important;box-shadow:0 3px 14px rgba(0,0,0,.06)!important}
-#page-impressao .settings-card{border-radius:14px!important}
-#page-impressao .settings-card-title{font-weight:800!important}
-.v128-print-default{font-size:10px;color:var(--muted);margin-top:4px}
-@media(max-width:720px){#item-modal .v128-meta-grid{grid-template-columns:1fr!important}.v128-card .v128-head{min-height:46px}#page-cardapio .mi-card-actions{grid-template-columns:repeat(3,1fr)!important}}
-</style>
-
-<script id="shog-v128-ui-js">
-(function(){
-  const $=id=>document.getElementById(id);
-  function wrapCard(card){
-    if(!card || card.dataset.v128==='1') return;
-    const title=card.querySelector('[data-v127-card-title]'); if(!title) return;
-    card.dataset.v128='1'; card.classList.add('v128-card');
-    const head=document.createElement('div'); head.className='v128-head';
-    const strong=document.createElement('strong'); strong.textContent=title.textContent.replace(/[⌄›]/g,'').trim();
-    const chev=document.createElement('span'); chev.className='v128-chevron'; chev.textContent='⌄';
-    head.append(strong,chev);
-    const body=document.createElement('div'); body.className='v128-body';
-    while(title.nextSibling) body.appendChild(title.nextSibling);
-    title.remove(); card.prepend(head,body);
-    head.onclick=()=>{card.classList.toggle('is-collapsed'); if(!card.classList.contains('is-collapsed')) setTimeout(()=>head.scrollIntoView({block:'nearest'}),0);};
-  }
-  function enhanceItemModal(){
-    const modal=$('item-modal'); if(!modal) return;
-    modal.querySelectorAll('.item-editor-card').forEach(wrapCard);
-    const body=modal.querySelector('.modal-body'); if(body && !body.querySelector('.v128-toolbar')){
-      const tb=document.createElement('div'); tb.className='v128-toolbar v128-sticky-top';
-      tb.innerHTML='<button type="button" class="btn secondary" id="v128-first">↟ Primeiro campo</button><button type="button" class="btn secondary" id="v128-open-all">Expandir</button><button type="button" class="btn secondary" id="v128-close-all">Fechar</button>';
-      body.prepend(tb);
-      $('v128-first').onclick=()=>{const el=$('item-name'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{el.focus();el.select?.()},250)}};
-      $('v128-open-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach(c=>c.classList.remove('is-collapsed'));
-      $('v128-close-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach((c,i)=>{if(i>0)c.classList.add('is-collapsed')});
-    }
-    const name=$('item-name'); if(name) name.classList.add('v128-first-field');
-  }
-  const oldOpen=window.openEditItem; if(oldOpen) window.openEditItem=function(){const r=oldOpen.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldNew=window.openAddItem; if(oldNew) window.openAddItem=function(){const r=oldNew.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldRender=window.renderMenuItems; if(oldRender) window.renderMenuItems=function(){const r=oldRender.apply(this,arguments);setTimeout(enhanceItemModal,20);return r;};
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(enhanceItemModal,120));
-})();
-</script>
-
-</body>');
+    if(win) win.document.write('<body style="font-family:sans-serif;padding:24px;color:#666;">Carregando pedido...</body>');
 
     openBrowserTicket(r.order, r.station, r.deliveryWindow, win).catch(()=>{});
   });
@@ -5573,79 +5478,7 @@ function printQrImage(imgId, label){
       window.onafterprint = function(){ try{ window.close(); }catch(e){} };
       setTimeout(function(){ try{ window.close(); }catch(e){} }, 45000);
     <\/script>
-  
-<style id="shog-v128-ui">
-/* v128 — interface compacta: menos botões, mais foco */
-.v128-card{border:1px solid var(--border)!important;background:var(--card)!important;border-radius:14px!important;overflow:hidden!important;transition:border-color .15s,box-shadow .15s!important}
-.v128-card .v128-head{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;cursor:pointer;user-select:none;position:sticky;top:0;z-index:3;background:color-mix(in srgb,var(--card) 94%,transparent)!important;backdrop-filter:blur(8px)}
-.v128-card .v128-head strong{font-size:12px;flex:1}.v128-card .v128-chevron{font-size:15px;color:var(--muted);width:28px;height:28px;border:1px solid var(--border);border-radius:8px;display:grid;place-items:center}
-.v128-card.is-collapsed>.v128-body{display:none!important}.v128-card.is-collapsed .v128-chevron{transform:rotate(-90deg)}
-#item-modal .item-editor-card.v128-card{padding:0!important;background:var(--panel)!important;border:1px solid var(--border)!important;border-radius:14px!important;box-shadow:none!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title{margin:0!important;padding:11px 12px!important;border-bottom:1px solid var(--border)!important;display:flex!important;align-items:center!important;gap:8px!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title:after{content:'Clique para abrir';font-size:9px;color:var(--muted);font-weight:500;margin-left:auto}
-#item-modal .item-editor-card.v128-card:not(.is-collapsed)>.item-editor-section-title:after{content:'Aberto'}
-#item-modal .item-editor-card.v128-card>.v128-body{padding:12px!important}
-#item-modal .v128-sticky-top{position:sticky!important;top:0!important;z-index:20!important;background:var(--panel)!important;border-bottom:1px solid var(--border)!important}
-#item-modal .v128-first-field{scroll-margin-top:85px}
-#item-modal .v128-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--border)}
-#item-modal .v128-toolbar .btn{min-height:34px!important;height:34px!important;padding:0 10px!important;font-size:10px!important;border-radius:9px!important}
-#item-modal .v128-meta-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-#item-modal .v128-meta-grid .field{margin:0!important}
-#item-modal .v128-size-select{width:100%}
-#item-modal .v128-weight{display:grid;grid-template-columns:1fr 76px;gap:6px}
-#page-cardapio .mi-card{border-radius:14px!important;box-shadow:0 4px 18px rgba(0,0,0,.08)!important;transform:none!important}
-#page-cardapio .mi-card:hover{transform:translateY(-1px)!important}
-#page-cardapio .mi-card-actions{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px!important}
-#page-cardapio .mi-card-actions button{width:100%!important;height:34px!important;border-radius:9px!important;font-size:12px!important}
-#page-cardapio .mi-card-actions .ca-avail.off{opacity:.9}
-#page-cardapio .mi-card .mi-card-tags{gap:4px!important}
-#page-cardapio .mi-card .mi-badge{font-size:9px!important;padding:4px 7px!important}
-#page-cardapio .v128-visibility{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--border)}
-#reservas-filterbar{position:sticky!important;top:0!important;z-index:10!important;background:var(--bg)!important;padding:8px 0!important}
-#page-reservas .order-card{border-radius:14px!important;box-shadow:0 3px 14px rgba(0,0,0,.06)!important}
-#page-impressao .settings-card{border-radius:14px!important}
-#page-impressao .settings-card-title{font-weight:800!important}
-.v128-print-default{font-size:10px;color:var(--muted);margin-top:4px}
-@media(max-width:720px){#item-modal .v128-meta-grid{grid-template-columns:1fr!important}.v128-card .v128-head{min-height:46px}#page-cardapio .mi-card-actions{grid-template-columns:repeat(3,1fr)!important}}
-</style>
-
-<script id="shog-v128-ui-js">
-(function(){
-  const $=id=>document.getElementById(id);
-  function wrapCard(card){
-    if(!card || card.dataset.v128==='1') return;
-    const title=card.querySelector('[data-v127-card-title]'); if(!title) return;
-    card.dataset.v128='1'; card.classList.add('v128-card');
-    const head=document.createElement('div'); head.className='v128-head';
-    const strong=document.createElement('strong'); strong.textContent=title.textContent.replace(/[⌄›]/g,'').trim();
-    const chev=document.createElement('span'); chev.className='v128-chevron'; chev.textContent='⌄';
-    head.append(strong,chev);
-    const body=document.createElement('div'); body.className='v128-body';
-    while(title.nextSibling) body.appendChild(title.nextSibling);
-    title.remove(); card.prepend(head,body);
-    head.onclick=()=>{card.classList.toggle('is-collapsed'); if(!card.classList.contains('is-collapsed')) setTimeout(()=>head.scrollIntoView({block:'nearest'}),0);};
-  }
-  function enhanceItemModal(){
-    const modal=$('item-modal'); if(!modal) return;
-    modal.querySelectorAll('.item-editor-card').forEach(wrapCard);
-    const body=modal.querySelector('.modal-body'); if(body && !body.querySelector('.v128-toolbar')){
-      const tb=document.createElement('div'); tb.className='v128-toolbar v128-sticky-top';
-      tb.innerHTML='<button type="button" class="btn secondary" id="v128-first">↟ Primeiro campo</button><button type="button" class="btn secondary" id="v128-open-all">Expandir</button><button type="button" class="btn secondary" id="v128-close-all">Fechar</button>';
-      body.prepend(tb);
-      $('v128-first').onclick=()=>{const el=$('item-name'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{el.focus();el.select?.()},250)}};
-      $('v128-open-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach(c=>c.classList.remove('is-collapsed'));
-      $('v128-close-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach((c,i)=>{if(i>0)c.classList.add('is-collapsed')});
-    }
-    const name=$('item-name'); if(name) name.classList.add('v128-first-field');
-  }
-  const oldOpen=window.openEditItem; if(oldOpen) window.openEditItem=function(){const r=oldOpen.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldNew=window.openAddItem; if(oldNew) window.openAddItem=function(){const r=oldNew.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldRender=window.renderMenuItems; if(oldRender) window.renderMenuItems=function(){const r=oldRender.apply(this,arguments);setTimeout(enhanceItemModal,20);return r;};
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(enhanceItemModal,120));
-})();
-</script>
-
-</body></html>`);
+  </body></html>`);
   w.document.close();
 }
 
@@ -5912,79 +5745,7 @@ async function printOrderCore(id, ev, stations, isAuto){
   let win = null;
   if(podePrecisarDeJanela){
     win = window.open('', '_blank', 'width=380,height=600');
-    if(win) win.document.write('<body style="font-family:sans-serif;padding:24px;color:#666;">Carregando pedido...
-<style id="shog-v128-ui">
-/* v128 — interface compacta: menos botões, mais foco */
-.v128-card{border:1px solid var(--border)!important;background:var(--card)!important;border-radius:14px!important;overflow:hidden!important;transition:border-color .15s,box-shadow .15s!important}
-.v128-card .v128-head{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;cursor:pointer;user-select:none;position:sticky;top:0;z-index:3;background:color-mix(in srgb,var(--card) 94%,transparent)!important;backdrop-filter:blur(8px)}
-.v128-card .v128-head strong{font-size:12px;flex:1}.v128-card .v128-chevron{font-size:15px;color:var(--muted);width:28px;height:28px;border:1px solid var(--border);border-radius:8px;display:grid;place-items:center}
-.v128-card.is-collapsed>.v128-body{display:none!important}.v128-card.is-collapsed .v128-chevron{transform:rotate(-90deg)}
-#item-modal .item-editor-card.v128-card{padding:0!important;background:var(--panel)!important;border:1px solid var(--border)!important;border-radius:14px!important;box-shadow:none!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title{margin:0!important;padding:11px 12px!important;border-bottom:1px solid var(--border)!important;display:flex!important;align-items:center!important;gap:8px!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title:after{content:'Clique para abrir';font-size:9px;color:var(--muted);font-weight:500;margin-left:auto}
-#item-modal .item-editor-card.v128-card:not(.is-collapsed)>.item-editor-section-title:after{content:'Aberto'}
-#item-modal .item-editor-card.v128-card>.v128-body{padding:12px!important}
-#item-modal .v128-sticky-top{position:sticky!important;top:0!important;z-index:20!important;background:var(--panel)!important;border-bottom:1px solid var(--border)!important}
-#item-modal .v128-first-field{scroll-margin-top:85px}
-#item-modal .v128-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--border)}
-#item-modal .v128-toolbar .btn{min-height:34px!important;height:34px!important;padding:0 10px!important;font-size:10px!important;border-radius:9px!important}
-#item-modal .v128-meta-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-#item-modal .v128-meta-grid .field{margin:0!important}
-#item-modal .v128-size-select{width:100%}
-#item-modal .v128-weight{display:grid;grid-template-columns:1fr 76px;gap:6px}
-#page-cardapio .mi-card{border-radius:14px!important;box-shadow:0 4px 18px rgba(0,0,0,.08)!important;transform:none!important}
-#page-cardapio .mi-card:hover{transform:translateY(-1px)!important}
-#page-cardapio .mi-card-actions{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px!important}
-#page-cardapio .mi-card-actions button{width:100%!important;height:34px!important;border-radius:9px!important;font-size:12px!important}
-#page-cardapio .mi-card-actions .ca-avail.off{opacity:.9}
-#page-cardapio .mi-card .mi-card-tags{gap:4px!important}
-#page-cardapio .mi-card .mi-badge{font-size:9px!important;padding:4px 7px!important}
-#page-cardapio .v128-visibility{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--border)}
-#reservas-filterbar{position:sticky!important;top:0!important;z-index:10!important;background:var(--bg)!important;padding:8px 0!important}
-#page-reservas .order-card{border-radius:14px!important;box-shadow:0 3px 14px rgba(0,0,0,.06)!important}
-#page-impressao .settings-card{border-radius:14px!important}
-#page-impressao .settings-card-title{font-weight:800!important}
-.v128-print-default{font-size:10px;color:var(--muted);margin-top:4px}
-@media(max-width:720px){#item-modal .v128-meta-grid{grid-template-columns:1fr!important}.v128-card .v128-head{min-height:46px}#page-cardapio .mi-card-actions{grid-template-columns:repeat(3,1fr)!important}}
-</style>
-
-<script id="shog-v128-ui-js">
-(function(){
-  const $=id=>document.getElementById(id);
-  function wrapCard(card){
-    if(!card || card.dataset.v128==='1') return;
-    const title=card.querySelector('[data-v127-card-title]'); if(!title) return;
-    card.dataset.v128='1'; card.classList.add('v128-card');
-    const head=document.createElement('div'); head.className='v128-head';
-    const strong=document.createElement('strong'); strong.textContent=title.textContent.replace(/[⌄›]/g,'').trim();
-    const chev=document.createElement('span'); chev.className='v128-chevron'; chev.textContent='⌄';
-    head.append(strong,chev);
-    const body=document.createElement('div'); body.className='v128-body';
-    while(title.nextSibling) body.appendChild(title.nextSibling);
-    title.remove(); card.prepend(head,body);
-    head.onclick=()=>{card.classList.toggle('is-collapsed'); if(!card.classList.contains('is-collapsed')) setTimeout(()=>head.scrollIntoView({block:'nearest'}),0);};
-  }
-  function enhanceItemModal(){
-    const modal=$('item-modal'); if(!modal) return;
-    modal.querySelectorAll('.item-editor-card').forEach(wrapCard);
-    const body=modal.querySelector('.modal-body'); if(body && !body.querySelector('.v128-toolbar')){
-      const tb=document.createElement('div'); tb.className='v128-toolbar v128-sticky-top';
-      tb.innerHTML='<button type="button" class="btn secondary" id="v128-first">↟ Primeiro campo</button><button type="button" class="btn secondary" id="v128-open-all">Expandir</button><button type="button" class="btn secondary" id="v128-close-all">Fechar</button>';
-      body.prepend(tb);
-      $('v128-first').onclick=()=>{const el=$('item-name'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{el.focus();el.select?.()},250)}};
-      $('v128-open-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach(c=>c.classList.remove('is-collapsed'));
-      $('v128-close-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach((c,i)=>{if(i>0)c.classList.add('is-collapsed')});
-    }
-    const name=$('item-name'); if(name) name.classList.add('v128-first-field');
-  }
-  const oldOpen=window.openEditItem; if(oldOpen) window.openEditItem=function(){const r=oldOpen.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldNew=window.openAddItem; if(oldNew) window.openAddItem=function(){const r=oldNew.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldRender=window.renderMenuItems; if(oldRender) window.renderMenuItems=function(){const r=oldRender.apply(this,arguments);setTimeout(enhanceItemModal,20);return r;};
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(enhanceItemModal,120));
-})();
-</script>
-
-</body>');
+    if(win) win.document.write('<body style="font-family:sans-serif;padding:24px;color:#666;">Carregando pedido...</body>');
   }
   let printedAny=false, blockedAny=false, fellBackAny=false, delegatedAny=false, usedWin=false;
   // v58: impressão simultânea de verdade — vias que imprimem direto no hardware (Rede/USB) não
@@ -6293,7 +6054,7 @@ function openBrowserReservationTicket(reservation){
   const win = window.open('', '_blank', 'width=380,height=600');
   if(!win){ showToast('⚠️ Pop-up bloqueado', 'Permita pop-ups pra esse site pra imprimir a via da reserva.', 5000); return; }
   const pf = cfg.printFont||'monospace';
-  const ps = Number(cfg.printSize)||12;
+  const ps = Number(cfg.printSize)||14;
   const pc = cfg.printColor||'#000000';
   const scale = ps/14;
   const dataFmt = reservation.date ? new Date(reservation.date+'T00:00').toLocaleDateString('pt-BR') : '';
@@ -6301,7 +6062,7 @@ function openBrowserReservationTicket(reservation){
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Reserva ${reservation.id}</title>
   <style>
     @page{ margin:0; }
-    body{font-family:${pf};width:100%;max-width:302px;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word;} @media screen and (max-width:520px){body{width:100vw;max-width:100vw;padding:10px 8px;overflow-x:hidden;} .t-item{align-items:flex-start;gap:6px;} .t-item span:first-child{min-width:0;overflow-wrap:anywhere;word-break:break-word;} .t-item span:last-child{flex:0 0 auto;} .t-row,.t-bullet-item{overflow-wrap:anywhere;word-break:break-word;}} @media print{body{width:100%;max-width:100%;padding:4px;overflow:visible;}}
+    body{font-family:${pf};width:302px;max-width:100%;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word;} @media screen and (max-width:520px){body{width:100vw;max-width:100vw;padding:10px 8px;overflow-x:hidden;} .t-item{align-items:flex-start;gap:6px;} .t-item span:first-child{min-width:0;overflow-wrap:anywhere;word-break:break-word;} .t-item span:last-child{flex:0 0 auto;} .t-row,.t-bullet-item{overflow-wrap:anywhere;word-break:break-word;}} @media print{body{width:100%;max-width:100%;padding:4px;overflow:visible;}}
     .t-center{text-align:center;}
     .t-title{font-size:${Math.round(17*scale)}px;font-weight:800;letter-spacing:2px;}
     .t-sub{font-size:${Math.round(11*scale)}px;letter-spacing:1.5px;margin-top:2px;color:#555;}
@@ -6332,79 +6093,7 @@ function openBrowserReservationTicket(reservation){
     <div class="t-hr-solid"></div>
     <div class="t-row t-center">Reservado em ${new Date(reservation.createdAt).toLocaleString('pt-BR')}</div>
     <script>window.onload=function(){setTimeout(function(){window.print();},60);};<\/script>
-  
-<style id="shog-v128-ui">
-/* v128 — interface compacta: menos botões, mais foco */
-.v128-card{border:1px solid var(--border)!important;background:var(--card)!important;border-radius:14px!important;overflow:hidden!important;transition:border-color .15s,box-shadow .15s!important}
-.v128-card .v128-head{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;cursor:pointer;user-select:none;position:sticky;top:0;z-index:3;background:color-mix(in srgb,var(--card) 94%,transparent)!important;backdrop-filter:blur(8px)}
-.v128-card .v128-head strong{font-size:12px;flex:1}.v128-card .v128-chevron{font-size:15px;color:var(--muted);width:28px;height:28px;border:1px solid var(--border);border-radius:8px;display:grid;place-items:center}
-.v128-card.is-collapsed>.v128-body{display:none!important}.v128-card.is-collapsed .v128-chevron{transform:rotate(-90deg)}
-#item-modal .item-editor-card.v128-card{padding:0!important;background:var(--panel)!important;border:1px solid var(--border)!important;border-radius:14px!important;box-shadow:none!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title{margin:0!important;padding:11px 12px!important;border-bottom:1px solid var(--border)!important;display:flex!important;align-items:center!important;gap:8px!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title:after{content:'Clique para abrir';font-size:9px;color:var(--muted);font-weight:500;margin-left:auto}
-#item-modal .item-editor-card.v128-card:not(.is-collapsed)>.item-editor-section-title:after{content:'Aberto'}
-#item-modal .item-editor-card.v128-card>.v128-body{padding:12px!important}
-#item-modal .v128-sticky-top{position:sticky!important;top:0!important;z-index:20!important;background:var(--panel)!important;border-bottom:1px solid var(--border)!important}
-#item-modal .v128-first-field{scroll-margin-top:85px}
-#item-modal .v128-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--border)}
-#item-modal .v128-toolbar .btn{min-height:34px!important;height:34px!important;padding:0 10px!important;font-size:10px!important;border-radius:9px!important}
-#item-modal .v128-meta-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-#item-modal .v128-meta-grid .field{margin:0!important}
-#item-modal .v128-size-select{width:100%}
-#item-modal .v128-weight{display:grid;grid-template-columns:1fr 76px;gap:6px}
-#page-cardapio .mi-card{border-radius:14px!important;box-shadow:0 4px 18px rgba(0,0,0,.08)!important;transform:none!important}
-#page-cardapio .mi-card:hover{transform:translateY(-1px)!important}
-#page-cardapio .mi-card-actions{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px!important}
-#page-cardapio .mi-card-actions button{width:100%!important;height:34px!important;border-radius:9px!important;font-size:12px!important}
-#page-cardapio .mi-card-actions .ca-avail.off{opacity:.9}
-#page-cardapio .mi-card .mi-card-tags{gap:4px!important}
-#page-cardapio .mi-card .mi-badge{font-size:9px!important;padding:4px 7px!important}
-#page-cardapio .v128-visibility{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--border)}
-#reservas-filterbar{position:sticky!important;top:0!important;z-index:10!important;background:var(--bg)!important;padding:8px 0!important}
-#page-reservas .order-card{border-radius:14px!important;box-shadow:0 3px 14px rgba(0,0,0,.06)!important}
-#page-impressao .settings-card{border-radius:14px!important}
-#page-impressao .settings-card-title{font-weight:800!important}
-.v128-print-default{font-size:10px;color:var(--muted);margin-top:4px}
-@media(max-width:720px){#item-modal .v128-meta-grid{grid-template-columns:1fr!important}.v128-card .v128-head{min-height:46px}#page-cardapio .mi-card-actions{grid-template-columns:repeat(3,1fr)!important}}
-</style>
-
-<script id="shog-v128-ui-js">
-(function(){
-  const $=id=>document.getElementById(id);
-  function wrapCard(card){
-    if(!card || card.dataset.v128==='1') return;
-    const title=card.querySelector('[data-v127-card-title]'); if(!title) return;
-    card.dataset.v128='1'; card.classList.add('v128-card');
-    const head=document.createElement('div'); head.className='v128-head';
-    const strong=document.createElement('strong'); strong.textContent=title.textContent.replace(/[⌄›]/g,'').trim();
-    const chev=document.createElement('span'); chev.className='v128-chevron'; chev.textContent='⌄';
-    head.append(strong,chev);
-    const body=document.createElement('div'); body.className='v128-body';
-    while(title.nextSibling) body.appendChild(title.nextSibling);
-    title.remove(); card.prepend(head,body);
-    head.onclick=()=>{card.classList.toggle('is-collapsed'); if(!card.classList.contains('is-collapsed')) setTimeout(()=>head.scrollIntoView({block:'nearest'}),0);};
-  }
-  function enhanceItemModal(){
-    const modal=$('item-modal'); if(!modal) return;
-    modal.querySelectorAll('.item-editor-card').forEach(wrapCard);
-    const body=modal.querySelector('.modal-body'); if(body && !body.querySelector('.v128-toolbar')){
-      const tb=document.createElement('div'); tb.className='v128-toolbar v128-sticky-top';
-      tb.innerHTML='<button type="button" class="btn secondary" id="v128-first">↟ Primeiro campo</button><button type="button" class="btn secondary" id="v128-open-all">Expandir</button><button type="button" class="btn secondary" id="v128-close-all">Fechar</button>';
-      body.prepend(tb);
-      $('v128-first').onclick=()=>{const el=$('item-name'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{el.focus();el.select?.()},250)}};
-      $('v128-open-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach(c=>c.classList.remove('is-collapsed'));
-      $('v128-close-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach((c,i)=>{if(i>0)c.classList.add('is-collapsed')});
-    }
-    const name=$('item-name'); if(name) name.classList.add('v128-first-field');
-  }
-  const oldOpen=window.openEditItem; if(oldOpen) window.openEditItem=function(){const r=oldOpen.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldNew=window.openAddItem; if(oldNew) window.openAddItem=function(){const r=oldNew.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldRender=window.renderMenuItems; if(oldRender) window.renderMenuItems=function(){const r=oldRender.apply(this,arguments);setTimeout(enhanceItemModal,20);return r;};
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(enhanceItemModal,120));
-})();
-</script>
-
-</body></html>`);
+  </body></html>`);
   win.document.close();
 }
 
@@ -6446,14 +6135,14 @@ function openBrowserTicket(order, station, deliveryWindow, existingWin){
   const win = existingWin || window.open('', '_blank', 'width=380,height=600');
   if(!win){ showToast('⚠️ Pop-up bloqueado', 'Permita pop-ups pra esse site pra imprimir os pedidos.', 5000); return; }
   const pf = cfg.printFont||'monospace';
-  const ps = Number(cfg.printSize)||12;
+  const ps = Number(cfg.printSize)||14;
   const pc = cfg.printColor||'#000000';
   const scale = ps/14; // 14px é o tamanho de referência dos elementos abaixo
   win.document.open(); // limpa o "Carregando pedido..." pré-escrito antes de gravar o ticket final
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pedido ${order.id}</title>
   <style>
     @page{ margin:0; }
-    body{font-family:${pf};width:100%;max-width:302px;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;}
+    body{font-family:${pf};width:302px;max-width:100%;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;}
     .t-center{text-align:center;}
     .t-title{font-size:${Math.round(17*scale)}px;font-weight:800;letter-spacing:2px;}
     .t-sub{font-size:${Math.round(11*scale)}px;letter-spacing:1.5px;margin-top:2px;color:#555;}
@@ -6520,79 +6209,7 @@ function openBrowserTicket(order, station, deliveryWindow, existingWin){
       // navegadores/SOs), garante que o painel não fica esperando pra sempre a via seguinte.
       setTimeout(notifyOpenerDone, 20000);
     <\/script>
-  
-<style id="shog-v128-ui">
-/* v128 — interface compacta: menos botões, mais foco */
-.v128-card{border:1px solid var(--border)!important;background:var(--card)!important;border-radius:14px!important;overflow:hidden!important;transition:border-color .15s,box-shadow .15s!important}
-.v128-card .v128-head{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;cursor:pointer;user-select:none;position:sticky;top:0;z-index:3;background:color-mix(in srgb,var(--card) 94%,transparent)!important;backdrop-filter:blur(8px)}
-.v128-card .v128-head strong{font-size:12px;flex:1}.v128-card .v128-chevron{font-size:15px;color:var(--muted);width:28px;height:28px;border:1px solid var(--border);border-radius:8px;display:grid;place-items:center}
-.v128-card.is-collapsed>.v128-body{display:none!important}.v128-card.is-collapsed .v128-chevron{transform:rotate(-90deg)}
-#item-modal .item-editor-card.v128-card{padding:0!important;background:var(--panel)!important;border:1px solid var(--border)!important;border-radius:14px!important;box-shadow:none!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title{margin:0!important;padding:11px 12px!important;border-bottom:1px solid var(--border)!important;display:flex!important;align-items:center!important;gap:8px!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title:after{content:'Clique para abrir';font-size:9px;color:var(--muted);font-weight:500;margin-left:auto}
-#item-modal .item-editor-card.v128-card:not(.is-collapsed)>.item-editor-section-title:after{content:'Aberto'}
-#item-modal .item-editor-card.v128-card>.v128-body{padding:12px!important}
-#item-modal .v128-sticky-top{position:sticky!important;top:0!important;z-index:20!important;background:var(--panel)!important;border-bottom:1px solid var(--border)!important}
-#item-modal .v128-first-field{scroll-margin-top:85px}
-#item-modal .v128-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--border)}
-#item-modal .v128-toolbar .btn{min-height:34px!important;height:34px!important;padding:0 10px!important;font-size:10px!important;border-radius:9px!important}
-#item-modal .v128-meta-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-#item-modal .v128-meta-grid .field{margin:0!important}
-#item-modal .v128-size-select{width:100%}
-#item-modal .v128-weight{display:grid;grid-template-columns:1fr 76px;gap:6px}
-#page-cardapio .mi-card{border-radius:14px!important;box-shadow:0 4px 18px rgba(0,0,0,.08)!important;transform:none!important}
-#page-cardapio .mi-card:hover{transform:translateY(-1px)!important}
-#page-cardapio .mi-card-actions{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px!important}
-#page-cardapio .mi-card-actions button{width:100%!important;height:34px!important;border-radius:9px!important;font-size:12px!important}
-#page-cardapio .mi-card-actions .ca-avail.off{opacity:.9}
-#page-cardapio .mi-card .mi-card-tags{gap:4px!important}
-#page-cardapio .mi-card .mi-badge{font-size:9px!important;padding:4px 7px!important}
-#page-cardapio .v128-visibility{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--border)}
-#reservas-filterbar{position:sticky!important;top:0!important;z-index:10!important;background:var(--bg)!important;padding:8px 0!important}
-#page-reservas .order-card{border-radius:14px!important;box-shadow:0 3px 14px rgba(0,0,0,.06)!important}
-#page-impressao .settings-card{border-radius:14px!important}
-#page-impressao .settings-card-title{font-weight:800!important}
-.v128-print-default{font-size:10px;color:var(--muted);margin-top:4px}
-@media(max-width:720px){#item-modal .v128-meta-grid{grid-template-columns:1fr!important}.v128-card .v128-head{min-height:46px}#page-cardapio .mi-card-actions{grid-template-columns:repeat(3,1fr)!important}}
-</style>
-
-<script id="shog-v128-ui-js">
-(function(){
-  const $=id=>document.getElementById(id);
-  function wrapCard(card){
-    if(!card || card.dataset.v128==='1') return;
-    const title=card.querySelector('[data-v127-card-title]'); if(!title) return;
-    card.dataset.v128='1'; card.classList.add('v128-card');
-    const head=document.createElement('div'); head.className='v128-head';
-    const strong=document.createElement('strong'); strong.textContent=title.textContent.replace(/[⌄›]/g,'').trim();
-    const chev=document.createElement('span'); chev.className='v128-chevron'; chev.textContent='⌄';
-    head.append(strong,chev);
-    const body=document.createElement('div'); body.className='v128-body';
-    while(title.nextSibling) body.appendChild(title.nextSibling);
-    title.remove(); card.prepend(head,body);
-    head.onclick=()=>{card.classList.toggle('is-collapsed'); if(!card.classList.contains('is-collapsed')) setTimeout(()=>head.scrollIntoView({block:'nearest'}),0);};
-  }
-  function enhanceItemModal(){
-    const modal=$('item-modal'); if(!modal) return;
-    modal.querySelectorAll('.item-editor-card').forEach(wrapCard);
-    const body=modal.querySelector('.modal-body'); if(body && !body.querySelector('.v128-toolbar')){
-      const tb=document.createElement('div'); tb.className='v128-toolbar v128-sticky-top';
-      tb.innerHTML='<button type="button" class="btn secondary" id="v128-first">↟ Primeiro campo</button><button type="button" class="btn secondary" id="v128-open-all">Expandir</button><button type="button" class="btn secondary" id="v128-close-all">Fechar</button>';
-      body.prepend(tb);
-      $('v128-first').onclick=()=>{const el=$('item-name'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{el.focus();el.select?.()},250)}};
-      $('v128-open-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach(c=>c.classList.remove('is-collapsed'));
-      $('v128-close-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach((c,i)=>{if(i>0)c.classList.add('is-collapsed')});
-    }
-    const name=$('item-name'); if(name) name.classList.add('v128-first-field');
-  }
-  const oldOpen=window.openEditItem; if(oldOpen) window.openEditItem=function(){const r=oldOpen.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldNew=window.openAddItem; if(oldNew) window.openAddItem=function(){const r=oldNew.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldRender=window.renderMenuItems; if(oldRender) window.renderMenuItems=function(){const r=oldRender.apply(this,arguments);setTimeout(enhanceItemModal,20);return r;};
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(enhanceItemModal,120));
-})();
-</script>
-
-</body></html>`);
+  </body></html>`);
   win.document.close();
   // v45: a Promise só resolve quando ESSA via termina de imprimir (evento acima ou o timeout
   // de segurança) — é o que permite ao painel esperar uma via terminar antes de abrir/imprimir
@@ -6987,13 +6604,21 @@ function filterReservations(f){
 function timeStrToMinutes(t){ const [h,m]=String(t||'0:0').split(':').map(Number); return (h||0)*60+(m||0); }
 function minutesToTimeStr(m){ const h=Math.floor(m/60), mm=m%60; return String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0'); }
 function openNewReservationModal(){
+  const modal=document.getElementById('new-reservation-modal');
+  if(!modal){ showToast('⚠️ Modal indisponível','O formulário de Nova Reserva não foi carregado. Atualize o painel.',5000); return; }
+  // v127: o modal ficava dentro da página "Reservas". Em alguns fluxos de troca de página
+  // o pai ainda estava oculto e o overlay não aparecia. Ao abrir, ele passa para o body,
+  // ficando independente da página ativa e sempre visível acima do painel.
+  if(modal.parentElement!==document.body) document.body.appendChild(modal);
   ['new-rsv-name','new-rsv-phone','new-rsv-people','new-rsv-date','new-rsv-notes'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
-  document.getElementById('new-rsv-time').value='';
-  document.getElementById('new-rsv-date-warning').style.display='none';
-  document.getElementById('new-rsv-time-slots-wrap').style.display='none';
-  document.getElementById('new-rsv-status').textContent='';
-  const btn=document.getElementById('new-rsv-submit-btn'); btn.disabled=false; btn.textContent='✅ Criar Reserva';
-  openModal('new-reservation-modal');
+  const timeEl=document.getElementById('new-rsv-time'); if(timeEl) timeEl.value='';
+  const warn=document.getElementById('new-rsv-date-warning'); if(warn) warn.style.display='none';
+  const slotsWrap=document.getElementById('new-rsv-time-slots-wrap'); if(slotsWrap) slotsWrap.style.display='none';
+  const status=document.getElementById('new-rsv-status'); if(status) status.textContent='';
+  const btn=document.getElementById('new-rsv-submit-btn'); if(btn){ btn.disabled=false; btn.textContent='✅ Criar Reserva'; }
+  modal.classList.add('open');
+  document.body.classList.add('modal-open');
+  setTimeout(()=>document.getElementById('new-rsv-name')?.focus(),80);
 }
 function onNewRsvDateChange(){
   const dateVal = document.getElementById('new-rsv-date').value;
@@ -8086,7 +7711,6 @@ function updateItemLivePreview(){
   const d=document.getElementById('item-live-preview-desc'); if(d)d.textContent=desc;
   const pr=document.getElementById('item-live-preview-price'); if(pr)pr.textContent='R$ '+price.toFixed(2).replace('.',',');
   const q=document.getElementById('item-live-preview-qty'); if(q)q.textContent=qty;
-  const meta=document.getElementById('item-live-preview-meta'); if(meta){const size=document.getElementById('item-size')?.value||'';const w=document.getElementById('item-weight')?.value||'';const u=document.getElementById('item-weight-unit')?.value||'g';meta.textContent=[size,w?(w+' '+u):''].filter(Boolean).join(' · ')||'Detalhes do produto';}
   const src=document.getElementById('item-image')?.value||''; const img=document.getElementById('item-live-preview-img'); const ph=document.getElementById('item-live-preview-placeholder');
   if(img&&ph){ if(src){img.src=src;img.style.display='block';ph.style.display='none';img.style.objectPosition=(document.getElementById('item-image-pos')?.value||'50,50').replace(',', '% ')+'%';} else {img.removeAttribute('src');img.style.display='none';ph.style.display='flex';} }
 }
@@ -8193,8 +7817,7 @@ function openAddItem(){
   document.getElementById('item-modal-title').textContent='Novo Item';
   document.getElementById('item-edit-si').value=activeCatIdx;
   document.getElementById('item-edit-ii').value=-1;
-  ['item-name','item-desc','item-qty','item-badge','item-weight'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  if(document.getElementById('item-size'))document.getElementById('item-size').value=''; if(document.getElementById('item-weight-unit'))document.getElementById('item-weight-unit').value='g';
+  ['item-name','item-desc','item-qty','item-badge'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('item-price').value='';
   document.getElementById('item-badgemode-global').checked=true;
   if(document.getElementById('item-badge-icon'))document.getElementById('item-badge-icon').value='🔥';
@@ -8205,7 +7828,7 @@ function openAddItem(){
   editingVariants=[];
   renderVariantGroups();
   updateItemLivePreview();
-  openModal('item-modal'); setTimeout(focusFirstItemField,80);
+  openModal('item-modal');
 }
 function openEditItem(si,ii){
   const item=menu[si].items[ii];
@@ -8216,9 +7839,6 @@ function openEditItem(si,ii){
   document.getElementById('item-desc').value=item.desc||'';
   document.getElementById('item-price').value=item.price;
   document.getElementById('item-qty').value=item.qty||'';
-  if(document.getElementById('item-size'))document.getElementById('item-size').value=item.size||'';
-  if(document.getElementById('item-weight'))document.getElementById('item-weight').value=item.weight||'';
-  if(document.getElementById('item-weight-unit'))document.getElementById('item-weight-unit').value=item.weightUnit||'g';
   document.getElementById('item-badge').value=item.badge||'';
   if(document.getElementById('item-badge-icon'))document.getElementById('item-badge-icon').value=item.badgeIcon||'🔥';
   if(document.getElementById('item-badge-size'))document.getElementById('item-badge-size').value=String(item.badgeSize||13);
@@ -8229,7 +7849,7 @@ function openEditItem(si,ii){
   editingVariants=JSON.parse(JSON.stringify(item.variants||[]));
   renderVariantGroups();
   updateItemLivePreview();
-  openModal('item-modal'); setTimeout(focusFirstItemField,80);
+  openModal('item-modal');
 }
 // v75: BUG "Estações" saiu da edição do item — agora só existe em nível de Categoria
 // (Cardápio → editar categoria → "Imprime na(s) via(s) de:"). Todo item herda automaticamente
@@ -8321,9 +7941,6 @@ async function saveItem(){
     name,desc:document.getElementById('item-desc').value.trim(),
     price:parseFloat(document.getElementById('item-price').value)||0,
     qty:document.getElementById('item-qty').value.trim(),
-    size:document.getElementById('item-size')?.value||'',
-    weight:document.getElementById('item-weight')?.value ? Number(document.getElementById('item-weight').value) : '',
-    weightUnit:document.getElementById('item-weight-unit')?.value||'g',
     badge:document.getElementById('item-badge').value.trim(),
     badgeIcon:document.getElementById('item-badge-icon')?.value||'🔥',
     badgeSize:parseInt(document.getElementById('item-badge-size')?.value)||13,
@@ -8912,79 +8529,7 @@ function printCourierReport(){
       <div class="p-sign"><div class="p-sign-line"></div><div>Assinatura do Motoboy</div></div>
     </div>
     <button onclick="window.print()" style="margin-top:24px;padding:8px 16px;">🖨 Imprimir</button>
-    
-<style id="shog-v128-ui">
-/* v128 — interface compacta: menos botões, mais foco */
-.v128-card{border:1px solid var(--border)!important;background:var(--card)!important;border-radius:14px!important;overflow:hidden!important;transition:border-color .15s,box-shadow .15s!important}
-.v128-card .v128-head{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;cursor:pointer;user-select:none;position:sticky;top:0;z-index:3;background:color-mix(in srgb,var(--card) 94%,transparent)!important;backdrop-filter:blur(8px)}
-.v128-card .v128-head strong{font-size:12px;flex:1}.v128-card .v128-chevron{font-size:15px;color:var(--muted);width:28px;height:28px;border:1px solid var(--border);border-radius:8px;display:grid;place-items:center}
-.v128-card.is-collapsed>.v128-body{display:none!important}.v128-card.is-collapsed .v128-chevron{transform:rotate(-90deg)}
-#item-modal .item-editor-card.v128-card{padding:0!important;background:var(--panel)!important;border:1px solid var(--border)!important;border-radius:14px!important;box-shadow:none!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title{margin:0!important;padding:11px 12px!important;border-bottom:1px solid var(--border)!important;display:flex!important;align-items:center!important;gap:8px!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title:after{content:'Clique para abrir';font-size:9px;color:var(--muted);font-weight:500;margin-left:auto}
-#item-modal .item-editor-card.v128-card:not(.is-collapsed)>.item-editor-section-title:after{content:'Aberto'}
-#item-modal .item-editor-card.v128-card>.v128-body{padding:12px!important}
-#item-modal .v128-sticky-top{position:sticky!important;top:0!important;z-index:20!important;background:var(--panel)!important;border-bottom:1px solid var(--border)!important}
-#item-modal .v128-first-field{scroll-margin-top:85px}
-#item-modal .v128-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--border)}
-#item-modal .v128-toolbar .btn{min-height:34px!important;height:34px!important;padding:0 10px!important;font-size:10px!important;border-radius:9px!important}
-#item-modal .v128-meta-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-#item-modal .v128-meta-grid .field{margin:0!important}
-#item-modal .v128-size-select{width:100%}
-#item-modal .v128-weight{display:grid;grid-template-columns:1fr 76px;gap:6px}
-#page-cardapio .mi-card{border-radius:14px!important;box-shadow:0 4px 18px rgba(0,0,0,.08)!important;transform:none!important}
-#page-cardapio .mi-card:hover{transform:translateY(-1px)!important}
-#page-cardapio .mi-card-actions{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px!important}
-#page-cardapio .mi-card-actions button{width:100%!important;height:34px!important;border-radius:9px!important;font-size:12px!important}
-#page-cardapio .mi-card-actions .ca-avail.off{opacity:.9}
-#page-cardapio .mi-card .mi-card-tags{gap:4px!important}
-#page-cardapio .mi-card .mi-badge{font-size:9px!important;padding:4px 7px!important}
-#page-cardapio .v128-visibility{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--border)}
-#reservas-filterbar{position:sticky!important;top:0!important;z-index:10!important;background:var(--bg)!important;padding:8px 0!important}
-#page-reservas .order-card{border-radius:14px!important;box-shadow:0 3px 14px rgba(0,0,0,.06)!important}
-#page-impressao .settings-card{border-radius:14px!important}
-#page-impressao .settings-card-title{font-weight:800!important}
-.v128-print-default{font-size:10px;color:var(--muted);margin-top:4px}
-@media(max-width:720px){#item-modal .v128-meta-grid{grid-template-columns:1fr!important}.v128-card .v128-head{min-height:46px}#page-cardapio .mi-card-actions{grid-template-columns:repeat(3,1fr)!important}}
-</style>
-
-<script id="shog-v128-ui-js">
-(function(){
-  const $=id=>document.getElementById(id);
-  function wrapCard(card){
-    if(!card || card.dataset.v128==='1') return;
-    const title=card.querySelector('[data-v127-card-title]'); if(!title) return;
-    card.dataset.v128='1'; card.classList.add('v128-card');
-    const head=document.createElement('div'); head.className='v128-head';
-    const strong=document.createElement('strong'); strong.textContent=title.textContent.replace(/[⌄›]/g,'').trim();
-    const chev=document.createElement('span'); chev.className='v128-chevron'; chev.textContent='⌄';
-    head.append(strong,chev);
-    const body=document.createElement('div'); body.className='v128-body';
-    while(title.nextSibling) body.appendChild(title.nextSibling);
-    title.remove(); card.prepend(head,body);
-    head.onclick=()=>{card.classList.toggle('is-collapsed'); if(!card.classList.contains('is-collapsed')) setTimeout(()=>head.scrollIntoView({block:'nearest'}),0);};
-  }
-  function enhanceItemModal(){
-    const modal=$('item-modal'); if(!modal) return;
-    modal.querySelectorAll('.item-editor-card').forEach(wrapCard);
-    const body=modal.querySelector('.modal-body'); if(body && !body.querySelector('.v128-toolbar')){
-      const tb=document.createElement('div'); tb.className='v128-toolbar v128-sticky-top';
-      tb.innerHTML='<button type="button" class="btn secondary" id="v128-first">↟ Primeiro campo</button><button type="button" class="btn secondary" id="v128-open-all">Expandir</button><button type="button" class="btn secondary" id="v128-close-all">Fechar</button>';
-      body.prepend(tb);
-      $('v128-first').onclick=()=>{const el=$('item-name'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{el.focus();el.select?.()},250)}};
-      $('v128-open-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach(c=>c.classList.remove('is-collapsed'));
-      $('v128-close-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach((c,i)=>{if(i>0)c.classList.add('is-collapsed')});
-    }
-    const name=$('item-name'); if(name) name.classList.add('v128-first-field');
-  }
-  const oldOpen=window.openEditItem; if(oldOpen) window.openEditItem=function(){const r=oldOpen.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldNew=window.openAddItem; if(oldNew) window.openAddItem=function(){const r=oldNew.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldRender=window.renderMenuItems; if(oldRender) window.renderMenuItems=function(){const r=oldRender.apply(this,arguments);setTimeout(enhanceItemModal,20);return r;};
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(enhanceItemModal,120));
-})();
-</script>
-
-</body></html>`);
+    </body></html>`);
   win.document.close();
 }
 
@@ -10240,7 +9785,7 @@ function loadPrinterCentral(){
   const custAlertEl=document.getElementById('cfg-customer-alert-sound');
   if(custAlertEl) custAlertEl.value=cfg.customerAlertSound||'classico';
   const fontEl=document.getElementById('print-font'); if(fontEl) fontEl.value=cfg.printFont||'monospace';
-  const sizeEl=document.getElementById('print-size'); if(sizeEl) sizeEl.value=cfg.printSize||12;
+  const sizeEl=document.getElementById('print-size'); if(sizeEl) sizeEl.value=cfg.printSize||14;
   const colorEl=document.getElementById('print-color'); if(colorEl) colorEl.value=cfg.printColor||'#000000';
   updatePrintFontPreview();
 }
@@ -10341,7 +9886,7 @@ async function savePrinterCentral(){
   const custAlertEl=document.getElementById('cfg-customer-alert-sound');
   if(custAlertEl) cfg.customerAlertSound = custAlertEl.value||'classico';
   cfg.printFont = document.getElementById('print-font').value;
-  cfg.printSize = parseInt(document.getElementById('print-size').value)||12;
+  cfg.printSize = Math.min(17, Math.max(10, parseInt(document.getElementById('print-size').value)||14));
   cfg.printColor = document.getElementById('print-color').value||'#000000';
   // cfg.stations/cfg.stationOrder já ficam atualizados ao vivo (updateStationField/moveStation)
   const res = await apiPost('/api/config', { cfg, menu });
@@ -10361,9 +9906,6 @@ async function savePrinterCentral(){
 // então sempre abre recolhido — mais rápido de escanear a lista inteira de vias.
 let stationsExpanded = {};
 function toggleStationExpanded(key){ stationsExpanded[key] = !stationsExpanded[key]; renderStationsSettings(); }
-// v127 — cards de configurações podem ser recolhidos sem perder conteúdo.
-function toggleV127Card(btn){ const card=btn.closest('.v127-card'); if(!card)return; card.classList.toggle('is-collapsed'); btn.setAttribute('aria-expanded',String(!card.classList.contains('is-collapsed'))); }
-
 const STATION_METHOD_SHORT = { navegador:'🖥 Navegador', automatica:'🤖 Automática', rede:'🌐 Rede (IP)', usb:'🔌 USB' };
 const STATION_METHOD_HINT = {
   navegador: 'Pede confirmação de impressão sempre (janela do navegador) — não precisa configurar nada.',
@@ -10935,17 +10477,22 @@ async function restoreBackup(){
 // openModal() agora é o único jeito de abrir um modal: fecha qualquer outro aberto primeiro.
 // ═══════════════════════════════════════════
 function closeModal(id){const el=document.getElementById(id); if(el) el.classList.remove('open');}
-function closeAllModals(){ document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); }
+function closeAllModals(){
+  document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+  document.body.classList.remove('modal-open');
+}
 function openModal(id){
   closeAllModals();
   const el = document.getElementById(id);
   if(!el){ console.warn('openModal: modal não encontrado ->', id); return; }
+  if(el.parentElement!==document.body) document.body.appendChild(el);
   el.classList.add('open');
+  document.body.classList.add('modal-open');
 }
-document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m){m.classList.remove('open');document.body.classList.remove('modal-open');}});});
 // ESC fecha o modal que estiver aberto no momento (só existe um por vez, ver openModal acima)
 document.addEventListener('keydown', e=>{
-  if(e.key==='Escape'){ const open=document.querySelector('.modal-overlay.open'); if(open) open.classList.remove('open'); }
+  if(e.key==='Escape'){ const open=document.querySelector('.modal-overlay.open'); if(open){open.classList.remove('open');document.body.classList.remove('modal-open');} }
 });
 
 // Em celulares, libera o Web Audio no primeiro toque para que o próximo pedido toque na hora.
@@ -11415,14 +10962,6 @@ if(token){
 (function(){
   const $=id=>document.getElementById(id);
   window.setItemQtyPreset=function(v){const el=$('item-qty');if(el){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));el.focus();}};
-// v127 — reserva pré-definida: atalhos rápidos sem esconder data/horário.
-function applyReservationPreset(people){ const el=document.getElementById('new-rsv-people'); if(el){el.value=people; el.focus();} }
-function toggleItemEditorCard(title){ const card=title?.closest('.item-editor-card'); if(!card)return; card.classList.toggle('v127-card'); card.classList.toggle('is-collapsed'); const b=title.querySelector('.v127-toggle'); if(b)b.textContent=card.classList.contains('is-collapsed')?'›':'⌄'; }
-function setItemEditorCards(expand){ document.querySelectorAll('#item-modal .item-editor-card').forEach(card=>{ if(card.querySelector('[data-v127-card-title]')){card.classList.add('v127-card');card.classList.toggle('is-collapsed',!expand); const b=card.querySelector('.v127-toggle'); if(b)b.textContent=expand?'⌄':'›'; }}); }
-
-// v127 — abrir editor sempre no primeiro campo útil.
-function focusFirstItemField(){ const el=document.getElementById('item-name'); if(el){el.focus();el.select?.();} }
-
   function badgeDefaults(){return {icon:'🔥',size:'13',color:'#C62828',textColor:'#FFFFFF'};}
   function syncBadgeControls(item){const d=badgeDefaults(), x=item||{}; if($('item-badge-icon'))$('item-badge-icon').value=x.badgeIcon||d.icon; if($('item-badge-size'))$('item-badge-size').value=String(x.badgeSize||d.size); if($('item-badge-color'))$('item-badge-color').value=x.badgeColor||d.color; if($('item-badge-text-color'))$('item-badge-text-color').value=x.badgeTextColor||d.textColor;}
   window.syncV122BadgeControls=syncBadgeControls;
@@ -11740,77 +11279,5 @@ function focusFirstItemField(){ const el=document.getElementById('item-name'); i
   document.addEventListener('click',function(e){ if(e.target.closest && e.target.closest('[onclick*="setPedidosView"],#ptab-kanban')) setTimeout(refresh,150); });
 })();
 </script>
-
-<style id="shog-v128-ui">
-/* v128 — interface compacta: menos botões, mais foco */
-.v128-card{border:1px solid var(--border)!important;background:var(--card)!important;border-radius:14px!important;overflow:hidden!important;transition:border-color .15s,box-shadow .15s!important}
-.v128-card .v128-head{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;cursor:pointer;user-select:none;position:sticky;top:0;z-index:3;background:color-mix(in srgb,var(--card) 94%,transparent)!important;backdrop-filter:blur(8px)}
-.v128-card .v128-head strong{font-size:12px;flex:1}.v128-card .v128-chevron{font-size:15px;color:var(--muted);width:28px;height:28px;border:1px solid var(--border);border-radius:8px;display:grid;place-items:center}
-.v128-card.is-collapsed>.v128-body{display:none!important}.v128-card.is-collapsed .v128-chevron{transform:rotate(-90deg)}
-#item-modal .item-editor-card.v128-card{padding:0!important;background:var(--panel)!important;border:1px solid var(--border)!important;border-radius:14px!important;box-shadow:none!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title{margin:0!important;padding:11px 12px!important;border-bottom:1px solid var(--border)!important;display:flex!important;align-items:center!important;gap:8px!important}
-#item-modal .item-editor-card.v128-card>.item-editor-section-title:after{content:'Clique para abrir';font-size:9px;color:var(--muted);font-weight:500;margin-left:auto}
-#item-modal .item-editor-card.v128-card:not(.is-collapsed)>.item-editor-section-title:after{content:'Aberto'}
-#item-modal .item-editor-card.v128-card>.v128-body{padding:12px!important}
-#item-modal .v128-sticky-top{position:sticky!important;top:0!important;z-index:20!important;background:var(--panel)!important;border-bottom:1px solid var(--border)!important}
-#item-modal .v128-first-field{scroll-margin-top:85px}
-#item-modal .v128-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--border)}
-#item-modal .v128-toolbar .btn{min-height:34px!important;height:34px!important;padding:0 10px!important;font-size:10px!important;border-radius:9px!important}
-#item-modal .v128-meta-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-#item-modal .v128-meta-grid .field{margin:0!important}
-#item-modal .v128-size-select{width:100%}
-#item-modal .v128-weight{display:grid;grid-template-columns:1fr 76px;gap:6px}
-#page-cardapio .mi-card{border-radius:14px!important;box-shadow:0 4px 18px rgba(0,0,0,.08)!important;transform:none!important}
-#page-cardapio .mi-card:hover{transform:translateY(-1px)!important}
-#page-cardapio .mi-card-actions{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px!important}
-#page-cardapio .mi-card-actions button{width:100%!important;height:34px!important;border-radius:9px!important;font-size:12px!important}
-#page-cardapio .mi-card-actions .ca-avail.off{opacity:.9}
-#page-cardapio .mi-card .mi-card-tags{gap:4px!important}
-#page-cardapio .mi-card .mi-badge{font-size:9px!important;padding:4px 7px!important}
-#page-cardapio .v128-visibility{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--border)}
-#reservas-filterbar{position:sticky!important;top:0!important;z-index:10!important;background:var(--bg)!important;padding:8px 0!important}
-#page-reservas .order-card{border-radius:14px!important;box-shadow:0 3px 14px rgba(0,0,0,.06)!important}
-#page-impressao .settings-card{border-radius:14px!important}
-#page-impressao .settings-card-title{font-weight:800!important}
-.v128-print-default{font-size:10px;color:var(--muted);margin-top:4px}
-@media(max-width:720px){#item-modal .v128-meta-grid{grid-template-columns:1fr!important}.v128-card .v128-head{min-height:46px}#page-cardapio .mi-card-actions{grid-template-columns:repeat(3,1fr)!important}}
-</style>
-
-<script id="shog-v128-ui-js">
-(function(){
-  const $=id=>document.getElementById(id);
-  function wrapCard(card){
-    if(!card || card.dataset.v128==='1') return;
-    const title=card.querySelector('[data-v127-card-title]'); if(!title) return;
-    card.dataset.v128='1'; card.classList.add('v128-card');
-    const head=document.createElement('div'); head.className='v128-head';
-    const strong=document.createElement('strong'); strong.textContent=title.textContent.replace(/[⌄›]/g,'').trim();
-    const chev=document.createElement('span'); chev.className='v128-chevron'; chev.textContent='⌄';
-    head.append(strong,chev);
-    const body=document.createElement('div'); body.className='v128-body';
-    while(title.nextSibling) body.appendChild(title.nextSibling);
-    title.remove(); card.prepend(head,body);
-    head.onclick=()=>{card.classList.toggle('is-collapsed'); if(!card.classList.contains('is-collapsed')) setTimeout(()=>head.scrollIntoView({block:'nearest'}),0);};
-  }
-  function enhanceItemModal(){
-    const modal=$('item-modal'); if(!modal) return;
-    modal.querySelectorAll('.item-editor-card').forEach(wrapCard);
-    const body=modal.querySelector('.modal-body'); if(body && !body.querySelector('.v128-toolbar')){
-      const tb=document.createElement('div'); tb.className='v128-toolbar v128-sticky-top';
-      tb.innerHTML='<button type="button" class="btn secondary" id="v128-first">↟ Primeiro campo</button><button type="button" class="btn secondary" id="v128-open-all">Expandir</button><button type="button" class="btn secondary" id="v128-close-all">Fechar</button>';
-      body.prepend(tb);
-      $('v128-first').onclick=()=>{const el=$('item-name'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{el.focus();el.select?.()},250)}};
-      $('v128-open-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach(c=>c.classList.remove('is-collapsed'));
-      $('v128-close-all').onclick=()=>modal.querySelectorAll('.v128-card').forEach((c,i)=>{if(i>0)c.classList.add('is-collapsed')});
-    }
-    const name=$('item-name'); if(name) name.classList.add('v128-first-field');
-  }
-  const oldOpen=window.openEditItem; if(oldOpen) window.openEditItem=function(){const r=oldOpen.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldNew=window.openAddItem; if(oldNew) window.openAddItem=function(){const r=oldNew.apply(this,arguments);setTimeout(enhanceItemModal,80);return r;};
-  const oldRender=window.renderMenuItems; if(oldRender) window.renderMenuItems=function(){const r=oldRender.apply(this,arguments);setTimeout(enhanceItemModal,20);return r;};
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(enhanceItemModal,120));
-})();
-</script>
-
 </body>
 </html>
