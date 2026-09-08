@@ -1,3 +1,5 @@
-# Shogatsu v129
+# Shogatsu v120
 
-Evolução focada no Chat Express: navegação separada da Central de Mensagens e área de conversa ampliada em estilo v126.
+Evolução administrativa focada em simplicidade, digitação rápida, responsividade e estética japonesa premium.
+
+A impressão automática e os recursos existentes permanecem compatíveis.
