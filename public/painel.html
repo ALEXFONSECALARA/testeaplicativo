@@ -515,18 +515,16 @@ table{max-width:100%;}
 @media (max-width:620px){ .settings-grid{grid-template-columns:1fr;} }
 .save-all-bar{position:sticky;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:14px 20px;margin:24px -20px -20px;display:flex;align-items:center;justify-content:flex-end;gap:14px;box-shadow:0 -4px 20px rgba(0,0,0,.25);}
 .settings-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
-.card-menu-wrap{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
-.card-action-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:28px;padding:4px 8px;border:1px solid var(--border2);border-radius:8px;background:rgba(255,255,255,.035);color:var(--muted);font-size:10.5px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s ease;}
-.card-action-btn:hover{background:rgba(255,255,255,.08);color:var(--white);border-color:var(--gold);}
-.card-action-btn.active-state{color:var(--gold);border-color:rgba(201,168,76,.55);background:rgba(201,168,76,.10);}
-.card-action-btn.danger{color:var(--red-lt);}
-.card-action-btn .cmi-icon{font-size:12px;}
-.card-pinned{position:sticky!important;top:10px;z-index:20;box-shadow:0 10px 28px rgba(0,0,0,.18);}
-.settings-card.card-minimized>.settings-card-title{border-bottom:0;}
-@media(max-width:700px){
-  .card-action-btn{font-size:0;min-width:30px;width:30px;padding:4px;}
-  .card-action-btn .cmi-icon{font-size:14px;}
-}
+.card-menu-wrap{position:relative;}
+.card-menu-btn{background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);color:var(--gold);cursor:pointer;opacity:1;font-size:16px;font-weight:700;padding:2px 9px;border-radius:7px;line-height:1.4;}
+.card-menu-btn:hover{background:var(--gold);color:#1a1405;border-color:var(--gold);}
+.card-menu-dropdown{position:absolute;top:26px;right:0;background:var(--card);border:1px solid var(--border2);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.5);min-width:190px;z-index:50;overflow:hidden;display:none;}
+.card-menu-dropdown.open{display:block;}
+.card-menu-item{display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;color:var(--white);font-size:12.5px;text-align:left;padding:9px 12px;cursor:pointer;transition:background .12s;}
+.card-menu-item:hover{background:rgba(255,255,255,.06);}
+.card-menu-item .cmi-icon{font-size:14px;width:16px;text-align:center;}
+.card-menu-item.active-state{color:var(--gold);}
+.card-menu-item.danger{color:var(--red-lt);border-top:1px solid var(--border);margin-top:2px;}
 .card-minimized{padding-bottom:20px;}
 .card-pinned{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
 .card-favorited{border-color:var(--gold);}
@@ -604,6 +602,10 @@ table{max-width:100%;}
 .topbar{backdrop-filter:blur(10px) saturate(140%);-webkit-backdrop-filter:blur(10px) saturate(140%);background:color-mix(in srgb, var(--panel) 88%, transparent);}
 .modal-overlay{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
 .modal{border:2px solid var(--gold);animation:modalPopIn .2s cubic-bezier(.2,.8,.3,1) both;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 24px 60px rgba(0,0,0,.5),0 0 0 5px rgba(201,168,76,.12),0 0 30px rgba(201,168,76,.22);}
+/* v128 — modal de mensagens/fundo do chat: cabe na tela sem cortar conteúdo */
+#admin-chatbg-modal .modal{width:min(460px,calc(100vw - 32px));max-width:460px;max-height:calc(100vh - 32px);overflow:auto;}
+#admin-chatbg-modal .modal-body{padding:16px;}
+@media(max-width:760px){#admin-chatbg-modal .modal{width:calc(100vw - 20px);max-width:none;max-height:calc(100dvh - 20px);border-radius:12px;}#admin-chatbg-modal .modal-body{padding:12px;}}
 @keyframes modalPopIn{from{opacity:0;transform:scale(.96) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
 .page{animation:pageFadeIn .22s ease both;}
 @keyframes pageFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
@@ -801,17 +803,6 @@ button:active, .btn:active, [role="button"]:active { filter: brightness(1.25) sa
 /* Impressão do pedido: conteúdo sempre cabe na largura disponível da tela e da folha. */
 @media screen and (max-width:520px){
   html,body{max-width:100%!important;overflow-x:hidden!important;}
-}
-
-/* v127 — interface compacta para cards e modal de Nova Reserva */
-body.modal-open{overflow:hidden;}
-#new-reservation-modal{z-index:10050!important;}
-#new-reservation-modal .modal{width:min(560px,96vw)!important;max-width:560px!important;max-height:min(90vh,760px)!important;border-radius:16px!important;}
-#new-reservation-modal .modal-header{position:sticky;top:0;z-index:2;}
-#new-reservation-modal .modal-footer{position:sticky;bottom:0;z-index:2;background:var(--card);border-top:1px solid var(--border);}
-.settings-card-title{gap:10px;}
-@media(max-width:700px){
-  #new-reservation-modal .modal{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;border-radius:0!important;}
 }
 </style>
 <style id="shog-modern-v1">
@@ -3523,16 +3514,23 @@ function setupCardControls(){
       const wrap = document.createElement('span');
       wrap.className = 'card-menu-wrap';
       wrap.innerHTML =
-        '<button type="button" class="card-action-btn" data-act="min" title="Expandir ou fechar conteúdo"><span class="cmi-icon">↕</span><span class="cmi-label">Expandir</span></button>' +
-        '<button type="button" class="card-action-btn" data-act="hide" title="Ocultar ou mostrar conteúdo"><span class="cmi-icon">👁</span><span class="cmi-label">Ocultar</span></button>' +
-        '<button type="button" class="card-action-btn" data-act="pin" title="Fixar este card no topo"><span class="cmi-icon">📌</span><span class="cmi-label">Fixar</span></button>' +
-        '<button type="button" class="card-action-btn" data-act="cfg" title="Ir para o primeiro campo"><span class="cmi-icon">↳</span><span class="cmi-label">1º campo</span></button>' +
-        '<button type="button" class="card-action-btn" data-act="fav" title="Adicionar aos favoritos"><span class="cmi-icon">☆</span><span class="cmi-label">Favorito</span></button>' +
-        '<button type="button" class="card-action-btn danger" data-act="close" title="Fechar este card"><span class="cmi-icon">✕</span><span class="cmi-label">Fechar</span></button>';
+        '<button type="button" class="card-menu-btn" data-menu-toggle title="Mais opções">⋮</button>' +
+        '<div class="card-menu-dropdown">' +
+          '<button type="button" class="card-menu-item" data-act="fav"><span class="cmi-icon">⭐</span> Favoritar</button>' +
+          '<button type="button" class="card-menu-item" data-act="pin"><span class="cmi-icon">📌</span> Fixar no topo do grupo</button>' +
+          '<button type="button" class="card-menu-item" data-act="min"><span class="cmi-icon">➖</span> Minimizar</button>' +
+          '<button type="button" class="card-menu-item" data-act="hide"><span class="cmi-icon">👁️</span> Ocultar/Mostrar conteúdo</button>' +
+          '<button type="button" class="card-menu-item" data-act="cfg"><span class="cmi-icon">⚙️</span> Ir pro primeiro campo</button>' +
+          '<button type="button" class="card-menu-item danger" data-act="close"><span class="cmi-icon">✖</span> Fechar este card</button>' +
+        '</div>';
       titleEl.appendChild(wrap);
-      wrap.addEventListener('click', (e) => {
-        const btn = e.target.closest('.card-action-btn');
-        if (btn) { e.preventDefault(); e.stopPropagation(); handleCardControlClick(card, cardId, btn.dataset.act); }
+      wrap.querySelector('[data-menu-toggle]').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCardMenu(wrap);
+      });
+      wrap.querySelector('.card-menu-dropdown').addEventListener('click', (e) => {
+        const btn = e.target.closest('.card-menu-item');
+        if (btn) { handleCardControlClick(card, cardId, btn.dataset.act); closeAllCardMenus(); }
       });
     }
 
@@ -3546,30 +3544,27 @@ function setupCardControls(){
 // v77: marca em negrito/dourado, no mini-menu "⋮", quais opções já estão ativas nesse card
 // (favoritado / fixado / minimizado / oculto) — só um retoque visual, sem mudar a lógica.
 function syncCardMenuActiveState(card, state){
-  const wrap = card.querySelector('.card-menu-wrap');
-  if (!wrap) return;
-  const fields = { fav:'favorite', pin:'pinned', min:'minimized', hide:'hidden' };
-  const labels = {
-    min: state.minimized ? 'Fechar' : 'Expandir',
-    hide: state.hidden ? 'Mostrar' : 'Ocultar',
-    pin: state.pinned ? 'Fixado' : 'Fixar',
-    fav: state.favorite ? 'Favorito' : 'Favoritar'
-  };
-  wrap.querySelectorAll('.card-action-btn[data-act]').forEach(btn=>{
-    const act=btn.dataset.act;
-    const field=fields[act];
-    if(field) btn.classList.toggle('active-state', !!state[field]);
-    const label=btn.querySelector('.cmi-label');
-    if(label && labels[act]) label.textContent=labels[act];
-    const icon=btn.querySelector('.cmi-icon');
-    if(icon && act==='min') icon.textContent=state.minimized?'↕':'↕';
-    if(icon && act==='hide') icon.textContent=state.hidden?'👁':'◉';
-    if(icon && act==='pin') icon.textContent=state.pinned?'📌':'📍';
-    if(icon && act==='fav') icon.textContent=state.favorite?'★':'☆';
+  const dropdown = card.querySelector('.card-menu-dropdown');
+  if (!dropdown) return;
+  const map = { fav:'favorite', pin:'pinned', min:'minimized', hide:'hidden' };
+  dropdown.querySelectorAll('.card-menu-item[data-act]').forEach(btn => {
+    const field = map[btn.dataset.act];
+    if (field) btn.classList.toggle('active-state', !!state[field]);
   });
 }
 // v77: só um menu "⋮" aberto por vez, e fecha ao clicar fora — mesmo padrão já usado nos modais.
-function closeAllCardMenus(){} function toggleCardMenu(){}
+function closeAllCardMenus(){
+  document.querySelectorAll('.card-menu-dropdown.open').forEach(d => d.classList.remove('open'));
+}
+function toggleCardMenu(wrap){
+  const dropdown = wrap.querySelector('.card-menu-dropdown');
+  const willOpen = !dropdown.classList.contains('open');
+  closeAllCardMenus();
+  if (willOpen) dropdown.classList.add('open');
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.card-menu-wrap')) closeAllCardMenus();
+});
 
 // v69: mostra/esconde a seção "⭐ Favoritos" dependendo se tem algum card favoritado
 function updateFavSectionVisibility(){
@@ -3706,10 +3701,12 @@ function applyCardState(card, state){
     else card._homeParent.appendChild(card);
   }
   if (state.pinned && card.parentElement) card.parentElement.prepend(card);
-  // v127: "Ocultar" agora oculta visualmente o conteúdo sem desativar o card inteiro.
-  // Assim os próprios controles continuam sempre utilizáveis para "Mostrar" novamente.
-  card.style.opacity = state.hidden ? '.72' : '';
-  card.style.pointerEvents = '';
+  card.style.opacity = state.hidden ? '.35' : '';
+  card.style.pointerEvents = state.hidden ? 'none' : '';
+  // BUG CORRIGIDO (v80): "pointerEvents:none" no card inteiro travava também o próprio botão
+  // "⋮ Mais opções" (que é filho do card) — depois de "Ocultar/Mostrar conteúdo" uma vez, o
+  // menu ficava impossível de clicar de novo pra reverter, parecia travado/bugado. Agora o
+  // título (onde mora o "⋮") sempre continua clicável, mesmo com o resto do card oculto.
   if (titleEl) titleEl.style.pointerEvents = 'auto';
 }
 
@@ -6062,7 +6059,7 @@ function openBrowserReservationTicket(reservation){
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Reserva ${reservation.id}</title>
   <style>
     @page{ margin:0; }
-    body{font-family:${pf};width:302px;max-width:100%;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word;} @media screen and (max-width:520px){body{width:100vw;max-width:100vw;padding:10px 8px;overflow-x:hidden;} .t-item{align-items:flex-start;gap:6px;} .t-item span:first-child{min-width:0;overflow-wrap:anywhere;word-break:break-word;} .t-item span:last-child{flex:0 0 auto;} .t-row,.t-bullet-item{overflow-wrap:anywhere;word-break:break-word;}} @media print{body{width:100%;max-width:100%;padding:4px;overflow:visible;}}
+    body{font-family:${pf};width:100%;max-width:302px;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word;} @media screen and (max-width:520px){body{width:100vw;max-width:100vw;padding:10px 8px;overflow-x:hidden;} .t-item{align-items:flex-start;gap:6px;} .t-item span:first-child{min-width:0;overflow-wrap:anywhere;word-break:break-word;} .t-item span:last-child{flex:0 0 auto;} .t-row,.t-bullet-item{overflow-wrap:anywhere;word-break:break-word;}} @media print{body{width:100%;max-width:100%;padding:4px;overflow:visible;}}
     .t-center{text-align:center;}
     .t-title{font-size:${Math.round(17*scale)}px;font-weight:800;letter-spacing:2px;}
     .t-sub{font-size:${Math.round(11*scale)}px;letter-spacing:1.5px;margin-top:2px;color:#555;}
@@ -6142,7 +6139,7 @@ function openBrowserTicket(order, station, deliveryWindow, existingWin){
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pedido ${order.id}</title>
   <style>
     @page{ margin:0; }
-    body{font-family:${pf};width:302px;max-width:100%;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;}
+    body{font-family:${pf};width:100%;max-width:302px;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;}
     .t-center{text-align:center;}
     .t-title{font-size:${Math.round(17*scale)}px;font-weight:800;letter-spacing:2px;}
     .t-sub{font-size:${Math.round(11*scale)}px;letter-spacing:1.5px;margin-top:2px;color:#555;}
@@ -6604,21 +6601,13 @@ function filterReservations(f){
 function timeStrToMinutes(t){ const [h,m]=String(t||'0:0').split(':').map(Number); return (h||0)*60+(m||0); }
 function minutesToTimeStr(m){ const h=Math.floor(m/60), mm=m%60; return String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0'); }
 function openNewReservationModal(){
-  const modal=document.getElementById('new-reservation-modal');
-  if(!modal){ showToast('⚠️ Modal indisponível','O formulário de Nova Reserva não foi carregado. Atualize o painel.',5000); return; }
-  // v127: o modal ficava dentro da página "Reservas". Em alguns fluxos de troca de página
-  // o pai ainda estava oculto e o overlay não aparecia. Ao abrir, ele passa para o body,
-  // ficando independente da página ativa e sempre visível acima do painel.
-  if(modal.parentElement!==document.body) document.body.appendChild(modal);
   ['new-rsv-name','new-rsv-phone','new-rsv-people','new-rsv-date','new-rsv-notes'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
-  const timeEl=document.getElementById('new-rsv-time'); if(timeEl) timeEl.value='';
-  const warn=document.getElementById('new-rsv-date-warning'); if(warn) warn.style.display='none';
-  const slotsWrap=document.getElementById('new-rsv-time-slots-wrap'); if(slotsWrap) slotsWrap.style.display='none';
-  const status=document.getElementById('new-rsv-status'); if(status) status.textContent='';
-  const btn=document.getElementById('new-rsv-submit-btn'); if(btn){ btn.disabled=false; btn.textContent='✅ Criar Reserva'; }
-  modal.classList.add('open');
-  document.body.classList.add('modal-open');
-  setTimeout(()=>document.getElementById('new-rsv-name')?.focus(),80);
+  document.getElementById('new-rsv-time').value='';
+  document.getElementById('new-rsv-date-warning').style.display='none';
+  document.getElementById('new-rsv-time-slots-wrap').style.display='none';
+  document.getElementById('new-rsv-status').textContent='';
+  const btn=document.getElementById('new-rsv-submit-btn'); btn.disabled=false; btn.textContent='✅ Criar Reserva';
+  openModal('new-reservation-modal');
 }
 function onNewRsvDateChange(){
   const dateVal = document.getElementById('new-rsv-date').value;
@@ -9886,7 +9875,7 @@ async function savePrinterCentral(){
   const custAlertEl=document.getElementById('cfg-customer-alert-sound');
   if(custAlertEl) cfg.customerAlertSound = custAlertEl.value||'classico';
   cfg.printFont = document.getElementById('print-font').value;
-  cfg.printSize = Math.min(17, Math.max(10, parseInt(document.getElementById('print-size').value)||14));
+  cfg.printSize = parseInt(document.getElementById('print-size').value)||14;
   cfg.printColor = document.getElementById('print-color').value||'#000000';
   // cfg.stations/cfg.stationOrder já ficam atualizados ao vivo (updateStationField/moveStation)
   const res = await apiPost('/api/config', { cfg, menu });
@@ -10477,22 +10466,17 @@ async function restoreBackup(){
 // openModal() agora é o único jeito de abrir um modal: fecha qualquer outro aberto primeiro.
 // ═══════════════════════════════════════════
 function closeModal(id){const el=document.getElementById(id); if(el) el.classList.remove('open');}
-function closeAllModals(){
-  document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
-  document.body.classList.remove('modal-open');
-}
+function closeAllModals(){ document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); }
 function openModal(id){
   closeAllModals();
   const el = document.getElementById(id);
   if(!el){ console.warn('openModal: modal não encontrado ->', id); return; }
-  if(el.parentElement!==document.body) document.body.appendChild(el);
   el.classList.add('open');
-  document.body.classList.add('modal-open');
 }
-document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m){m.classList.remove('open');document.body.classList.remove('modal-open');}});});
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
 // ESC fecha o modal que estiver aberto no momento (só existe um por vez, ver openModal acima)
 document.addEventListener('keydown', e=>{
-  if(e.key==='Escape'){ const open=document.querySelector('.modal-overlay.open'); if(open){open.classList.remove('open');document.body.classList.remove('modal-open');} }
+  if(e.key==='Escape'){ const open=document.querySelector('.modal-overlay.open'); if(open) open.classList.remove('open'); }
 });
 
 // Em celulares, libera o Web Audio no primeiro toque para que o próximo pedido toque na hora.
