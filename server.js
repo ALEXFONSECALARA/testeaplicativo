@@ -173,7 +173,7 @@ const DEFAULT_CFG = {
   },
   // ── Impressão do comprovante ──
   printFont: 'Verdana, sans-serif',      // 'monospace' | 'sans-serif' | 'serif' | outras opções na tela de config
-  printSize: 20,                // tamanho da fonte em px
+  printSize: 14,                // tamanho da fonte em px — padrão térmica 80 mm / Bematech
   printColor: '#000000',        // cor do texto
   // ── Logotipo ──
   logoShape: 'retangular',      // 'redondo' | 'quadrado' | 'retangular'

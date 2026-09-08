@@ -16,3 +16,12 @@
 - Aviso Sonoro do Cliente unificado visualmente com Alertas de pedidos, preservando IDs e funções existentes.
 - Funcionamento por dia convertido para grade compacta e responsiva.
 - Não foram alteradas APIs, banco ou páginas do cliente além do estilo/posição do badge no cardápio.
+
+
+# v128 — pacote completo
+- Interface do editor de produtos simplificada com cards recolhíveis, barra superior fixa e atalho Primeiro campo.
+- Ações do card do cardápio reorganizadas em controles compactos.
+- Tamanho, peso e unidade preservados e exibidos no cardápio.
+- Impressão padrão ajustada para 80 mm/Bematech: fonte 14 e 48 colunas.
+- Bip duplo ESC/POS após impressão real e teste.
+- Barra de filtros de reservas fixada no topo.
