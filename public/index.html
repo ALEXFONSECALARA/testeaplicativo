@@ -1648,10 +1648,22 @@ function onRsvDateChange(){
   const slotsEl = document.getElementById('rsv-time-slots');
   document.getElementById('rsv-time').value = '';
   if (!dateVal) { warnEl.style.display='none'; slotsWrap.style.display='none'; return; }
+  // v126 — datas específicas bloqueadas pra reserva (feriado, evento fechado etc.), mesmo
+  // em dias que normalmente aceitam reserva (Configurações → 📅 Disponibilidade de Reserva).
+  if (cfg.reservations && Array.isArray(cfg.reservations.blockedDates) && cfg.reservations.blockedDates.includes(dateVal)) {
+    warnEl.textContent = '⛔ Sem reservas disponíveis nessa data — escolha outra.';
+    warnEl.style.display = 'block';
+    slotsWrap.style.display = 'none';
+    return;
+  }
+  // v126 — horário PRÓPRIO de reserva, se configurado (pode ser diferente do horário normal
+  // de funcionamento da loja) — cai no horário normal se "usar mesmo horário da loja" estiver
+  // ligado (padrão, comportamento de sempre).
+  const effectiveSchedule = (cfg.reservations && cfg.reservations.useStoreSchedule===false && Array.isArray(cfg.reservations.schedule)) ? cfg.reservations.schedule : cfg.weekSchedule;
   const weekday = new Date(dateVal + 'T00:00').getDay();
-  const daySchedule = (cfg.weekSchedule && cfg.weekSchedule[weekday]) || null;
+  const daySchedule = (effectiveSchedule && effectiveSchedule[weekday]) || null;
   if (daySchedule && daySchedule.open === false) {
-    warnEl.textContent = '⛔ Fechado nesse dia — escolha outra data.';
+    warnEl.textContent = '⛔ Sem reservas disponíveis nesse dia — escolha outra data.';
     warnEl.style.display = 'block';
     slotsWrap.style.display = 'none';
     return;

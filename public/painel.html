@@ -1949,6 +1949,12 @@ body{font-size:13px;letter-spacing:-.01em;}
 </select>
 </div>
 <div class="field"><label style="font-size:10px;">Tamanho (px)</label><input id="print-size" max="28" min="10" oninput="updatePrintFontPreview()" type="number"/></div>
+<div class="field"><label style="font-size:10px;">Largura da bobina</label>
+<select id="print-width" onchange="updatePrintFontPreview()">
+<option value="80mm">80mm (48 colunas) — padrão</option>
+<option value="58mm">58mm (32 colunas)</option>
+</select>
+</div>
 <div class="field" style="flex:0 0 100%;"><label style="font-size:10px;">Pré-visualização</label>
 <div id="print-font-preview" style="background:#fff;color:#000;padding:10px 14px;border-radius:6px;font-size:14px;">SHOGATSU — Pedido #AB12CD · R$ 45,00</div>
 </div>
@@ -2128,6 +2134,28 @@ body{font-size:13px;letter-spacing:-.01em;}
 </div>
 <div class="field"><label>Avaliação</label><input id="cfg-reviewPrompt" placeholder="O que você achou do seu pedido?"/></div>
 <div class="field v122-review-phrases-source" style="display:none"><label>Frases prontas</label><div id="review-phrases-list" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div></div>
+</div>
+<!-- v126 — NOVO ("botão pra definir que dia/horário está liberado pra reservar"): antes a
+     reserva de mesa não tinha NENHUMA tela própria de configuração — usava sempre o mesmo
+     horário de funcionamento da loja, sem opção de mudar. -->
+<div class="settings-card">
+<div class="settings-card-title">📅 Disponibilidade de Reserva</div>
+<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Controla quando o cliente consegue pedir reserva de mesa pelo cardápio — pode ser diferente do horário de funcionamento normal da loja (ex: só aceitar reserva até uma hora antes de fechar).</div>
+<div class="field"><label style="display:flex;align-items:center;gap:8px;"><input id="rsv-enabled" type="checkbox"/> Reserva de mesa habilitada</label></div>
+<div class="field-row" style="gap:8px;">
+<div class="field"><label>Máximo de pessoas por mesa</label><input id="rsv-maxpeople" min="1" type="number"/></div>
+<div class="field"><label>Nota (opcional, aparece pro cliente)</label><input id="rsv-note" placeholder="ex: Mesas para até 8 pessoas, grupos maiores ligue"/></div>
+</div>
+<div class="field"><label style="display:flex;align-items:center;gap:8px;"><input id="rsv-use-store-schedule" onchange="toggleReservationScheduleEditor()" type="checkbox"/> Usar o mesmo horário de funcionamento da loja</label></div>
+<div class="field" id="rsv-schedule-wrap" style="display:none;"><label>Horário próprio pra reserva</label><div id="reservation-schedule-editor" style="display:flex;flex-direction:column;gap:6px;"></div></div>
+<div class="field">
+<label>Datas fechadas pra reserva (feriado, evento etc.)</label>
+<div style="display:flex;gap:8px;margin-top:4px;">
+<input id="rsv-blockdate-input" type="date"/>
+<button class="btn secondary sm" onclick="addReservationBlockedDate()" type="button">+ Bloquear data</button>
+</div>
+<div id="rsv-blocked-dates-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
+</div>
 </div>
 <div class="settings-card">
 <div class="settings-card-title">🎨 Aparência do Cardápio</div>
@@ -5004,6 +5032,66 @@ function collectWeekScheduleFromEditor(){
 }
 
 // ═══════════════════════════════════════════
+// v126 — NOVO: HORÁRIO PRÓPRIO DE RESERVA + DATAS BLOQUEADAS
+// Mesmo padrão do editor de "Funcionamento por dia" acima, só que pra
+// cfg.reservations.schedule (só existe/importa quando "usar mesmo horário da loja" está
+// desligado — ver toggleReservationScheduleEditor()).
+// ═══════════════════════════════════════════
+let reservationBlockedDatesDraft = [];
+function toggleReservationScheduleEditor(){
+  const useStore = document.getElementById('rsv-use-store-schedule').checked;
+  document.getElementById('rsv-schedule-wrap').style.display = useStore ? 'none' : 'block';
+}
+function renderReservationScheduleEditor(){
+  const el = document.getElementById('reservation-schedule-editor');
+  if(!el) return;
+  const rs = (cfg.reservations && Array.isArray(cfg.reservations.schedule) && cfg.reservations.schedule.length===7) ? cfg.reservations.schedule : WEEK_DAY_LABELS.map(()=>({open:true,openTime:'18:00',closeTime:'23:00'}));
+  el.innerHTML = rs.map((d,i)=>`
+    <div class="v120-week-row ${d.open?'is-open':'is-closed'}">
+      <label class="v120-week-day"><input type="checkbox" id="rsv-ws-open-${i}" ${d.open?'checked':''} onchange="rsvWsToggleDay(${i})"/><span>${WEEK_DAY_LABELS[i]}</span></label>
+      <input type="time" id="rsv-ws-openTime-${i}" value="${d.openTime||'18:00'}" ${d.open?'':'disabled'} aria-label="Abertura reserva ${WEEK_DAY_LABELS[i]}"/>
+      <span>—</span>
+      <input type="time" id="rsv-ws-closeTime-${i}" value="${d.closeTime||'23:00'}" ${d.open?'':'disabled'} aria-label="Fechamento reserva ${WEEK_DAY_LABELS[i]}"/>
+    </div>`).join('');
+}
+function rsvWsToggleDay(i){
+  const on = document.getElementById('rsv-ws-open-'+i).checked;
+  document.getElementById('rsv-ws-openTime-'+i).disabled = !on;
+  document.getElementById('rsv-ws-closeTime-'+i).disabled = !on;
+}
+function collectReservationScheduleFromEditor(){
+  if(!document.getElementById('reservation-schedule-editor')) return (cfg.reservations&&cfg.reservations.schedule)||DEFAULT_WEEK_SCHEDULE_FALLBACK();
+  return WEEK_DAY_LABELS.map((_,i)=>({
+    open: document.getElementById('rsv-ws-open-'+i).checked,
+    openTime: document.getElementById('rsv-ws-openTime-'+i).value || '18:00',
+    closeTime: document.getElementById('rsv-ws-closeTime-'+i).value || '23:00'
+  }));
+}
+function DEFAULT_WEEK_SCHEDULE_FALLBACK(){ return WEEK_DAY_LABELS.map(()=>({open:true,openTime:'18:00',closeTime:'23:00'})); }
+function renderReservationBlockedDates(){
+  const el = document.getElementById('rsv-blocked-dates-list');
+  if(!el) return;
+  el.innerHTML = reservationBlockedDatesDraft.length ? reservationBlockedDatesDraft.map(d=>`
+    <span class="btn secondary sm" style="display:inline-flex;align-items:center;gap:6px;cursor:default;">
+      ${new Date(d+'T00:00').toLocaleDateString('pt-BR')}
+      <button type="button" onclick="removeReservationBlockedDate('${d}')" style="border:none;background:none;color:var(--red-lt);cursor:pointer;font-size:13px;padding:0;" title="Remover bloqueio">✕</button>
+    </span>`).join('') : `<span style="font-size:11px;color:var(--muted);">Nenhuma data bloqueada.</span>`;
+}
+function addReservationBlockedDate(){
+  const input = document.getElementById('rsv-blockdate-input');
+  const d = input.value;
+  if(!d) return;
+  if(!reservationBlockedDatesDraft.includes(d)) reservationBlockedDatesDraft.push(d);
+  reservationBlockedDatesDraft.sort();
+  input.value = '';
+  renderReservationBlockedDates();
+}
+function removeReservationBlockedDate(d){
+  reservationBlockedDatesDraft = reservationBlockedDatesDraft.filter(x=>x!==d);
+  renderReservationBlockedDates();
+}
+
+// ═══════════════════════════════════════════
 // v47: SPLASH SCREEN PREMIUM — administração das fotos/duração/efeito
 // ═══════════════════════════════════════════
 let splashDraftPhotos = [];
@@ -6597,13 +6685,28 @@ function filterReservations(f){
 function timeStrToMinutes(t){ const [h,m]=String(t||'0:0').split(':').map(Number); return (h||0)*60+(m||0); }
 function minutesToTimeStr(m){ const h=Math.floor(m/60), mm=m%60; return String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0'); }
 function openNewReservationModal(){
-  ['new-rsv-name','new-rsv-phone','new-rsv-people','new-rsv-date','new-rsv-notes'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
-  document.getElementById('new-rsv-time').value='';
-  document.getElementById('new-rsv-date-warning').style.display='none';
-  document.getElementById('new-rsv-time-slots-wrap').style.display='none';
-  document.getElementById('new-rsv-status').textContent='';
-  const btn=document.getElementById('new-rsv-submit-btn'); btn.disabled=false; btn.textContent='✅ Criar Reserva';
-  openModal('new-reservation-modal');
+  try {
+    ['new-rsv-name','new-rsv-phone','new-rsv-people','new-rsv-date','new-rsv-notes'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+    document.getElementById('new-rsv-time').value='';
+    document.getElementById('new-rsv-date-warning').style.display='none';
+    document.getElementById('new-rsv-time-slots-wrap').style.display='none';
+    document.getElementById('new-rsv-status').textContent='';
+    const btn=document.getElementById('new-rsv-submit-btn'); btn.disabled=false; btn.textContent='✅ Criar Reserva';
+    openModal('new-reservation-modal');
+  } catch(e) {
+    // v127 — defesa extra: se algo inesperado quebrar aqui, mostra isso na tela em vez de
+    // falhar caladinho (era exatamente esse silêncio que tornava o bug relatado impossível
+    // de diagnosticar sem acesso ao DevTools de quem estava usando).
+    console.error('openNewReservationModal falhou:', e);
+    if(typeof showToast==='function') showToast('⚠️ Erro ao abrir Nova Reserva', e.message||'Tente recarregar a página.', 6000);
+  }
+}
+// v126 — horário EFETIVO de reserva: usa o próprio horário de reserva (cfg.reservations.schedule)
+// se "usar mesmo horário da loja" estiver desligado; senão cai no horário normal da loja
+// (cfg.weekSchedule), igual sempre foi.
+function effectiveReservationSchedule(){
+  if(cfg.reservations && cfg.reservations.useStoreSchedule===false && Array.isArray(cfg.reservations.schedule)) return cfg.reservations.schedule;
+  return cfg.weekSchedule;
 }
 function onNewRsvDateChange(){
   const dateVal = document.getElementById('new-rsv-date').value;
@@ -6612,10 +6715,14 @@ function onNewRsvDateChange(){
   const slotsEl = document.getElementById('new-rsv-time-slots');
   document.getElementById('new-rsv-time').value = '';
   if(!dateVal){ warnEl.style.display='none'; slotsWrap.style.display='none'; return; }
+  if(cfg.reservations && Array.isArray(cfg.reservations.blockedDates) && cfg.reservations.blockedDates.includes(dateVal)){
+    warnEl.textContent = '⛔ Essa data está bloqueada pra reserva — escolha outra.';
+    warnEl.style.display='block'; slotsWrap.style.display='none'; return;
+  }
   const weekday = new Date(dateVal+'T00:00').getDay();
-  const daySchedule = (cfg.weekSchedule && cfg.weekSchedule[weekday]) || null;
+  const daySchedule = (effectiveReservationSchedule()||[])[weekday] || null;
   if(daySchedule && daySchedule.open===false){
-    warnEl.textContent = '⛔ A loja não funciona nesse dia da semana — escolha outra data.';
+    warnEl.textContent = '⛔ A loja não aceita reserva nesse dia da semana — escolha outra data.';
     warnEl.style.display='block'; slotsWrap.style.display='none'; return;
   }
   warnEl.style.display='none'; slotsWrap.style.display='block';
@@ -8752,6 +8859,15 @@ function loadSettings(){
   document.getElementById('cfg-name').value=cfg.name||'Shogatsu Culinária Oriental';
   document.getElementById('cfg-days').value=cfg.days||'Ter–Dom';
   renderWeekScheduleEditor();
+  // v126 — carrega os campos de Disponibilidade de Reserva
+  const rsvEnEl=document.getElementById('rsv-enabled'); if(rsvEnEl) rsvEnEl.checked = !!(cfg.reservations&&cfg.reservations.enabled);
+  const rsvMaxEl=document.getElementById('rsv-maxpeople'); if(rsvMaxEl) rsvMaxEl.value = (cfg.reservations&&cfg.reservations.maxPeoplePerTable)||12;
+  const rsvNoteEl=document.getElementById('rsv-note'); if(rsvNoteEl) rsvNoteEl.value = (cfg.reservations&&cfg.reservations.note)||'';
+  const rsvUseStoreEl=document.getElementById('rsv-use-store-schedule'); if(rsvUseStoreEl) rsvUseStoreEl.checked = !(cfg.reservations&&cfg.reservations.useStoreSchedule===false);
+  toggleReservationScheduleEditor();
+  renderReservationScheduleEditor();
+  reservationBlockedDatesDraft = (cfg.reservations && Array.isArray(cfg.reservations.blockedDates)) ? [...cfg.reservations.blockedDates] : [];
+  renderReservationBlockedDates();
   renderLogoEditor();
   renderChatAvatarEditor();
   const mensagensIconEl = document.getElementById('mensagens-header-icon');
@@ -9771,6 +9887,7 @@ function loadPrinterCentral(){
   if(custAlertEl) custAlertEl.value=cfg.customerAlertSound||'classico';
   const fontEl=document.getElementById('print-font'); if(fontEl) fontEl.value=cfg.printFont||'monospace';
   const sizeEl=document.getElementById('print-size'); if(sizeEl) sizeEl.value=cfg.printSize||14;
+  const widthEl=document.getElementById('print-width'); if(widthEl) widthEl.value=cfg.printWidth||'80mm';
   const colorEl=document.getElementById('print-color'); if(colorEl) colorEl.value=cfg.printColor||'#000000';
   updatePrintFontPreview();
 }
@@ -9872,6 +9989,7 @@ async function savePrinterCentral(){
   if(custAlertEl) cfg.customerAlertSound = custAlertEl.value||'classico';
   cfg.printFont = document.getElementById('print-font').value;
   cfg.printSize = parseInt(document.getElementById('print-size').value)||14;
+  const widthEl2=document.getElementById('print-width'); cfg.printWidth = (widthEl2&&widthEl2.value)||'80mm';
   cfg.printColor = document.getElementById('print-color').value||'#000000';
   // cfg.stations/cfg.stationOrder já ficam atualizados ao vivo (updateStationField/moveStation)
   const res = await apiPost('/api/config', { cfg, menu });
@@ -9889,8 +10007,26 @@ async function savePrinterCentral(){
 // escondido até precisar — os textos de explicação longos viraram um ⓘ com dica curta (title)
 // no lugar do parágrafo fixo. Estado de expandido/recolhido fica só na tela (não salva),
 // então sempre abre recolhido — mais rápido de escanear a lista inteira de vias.
+// v127 — REFINADO A PEDIDO ("fixar no topo, ir pro primeiro campo, botão expandir/fechar,
+// deixe mais moderno e simples"): a linha compacta (ícone/nome/método/Ativa/Testar/Configurar)
+// de uma via EXPANDIDA agora fica fixa no topo do card (position:sticky) enquanto a pessoa
+// rola pelos campos avançados dela — não perde de vista qual via está mexendo mesmo com o
+// card grande na tela. Ao abrir "⚙️ Configurar", o campo do nome da via já entra com foco,
+// pronto pra editar sem precisar clicar de novo. Transições suaves na expansão/recolhimento
+// (visual mais moderno, sem mudar nenhuma função).
 let stationsExpanded = {};
-function toggleStationExpanded(key){ stationsExpanded[key] = !stationsExpanded[key]; renderStationsSettings(); }
+function toggleStationExpanded(key){
+  stationsExpanded[key] = !stationsExpanded[key];
+  renderStationsSettings();
+  if(stationsExpanded[key]){
+    requestAnimationFrame(()=>{
+      const card = document.querySelector(`.vgroup[data-station="${key}"]`);
+      if(card) card.scrollIntoView({behavior:'smooth', block:'nearest'});
+      const firstField = document.getElementById('station-label-'+key);
+      if(firstField) firstField.focus({preventScroll:true});
+    });
+  }
+}
 const STATION_METHOD_SHORT = { navegador:'🖥 Navegador', automatica:'🤖 Automática', rede:'🌐 Rede (IP)', usb:'🔌 USB' };
 const STATION_METHOD_HINT = {
   navegador: 'Pede confirmação de impressão sempre (janela do navegador) — não precisa configurar nada.',
@@ -9914,8 +10050,8 @@ function renderStationsSettings(){
           <button type="button" class="btn secondary sm" style="padding:2px 7px;line-height:1;" title="Descer prioridade" ${mi===movableKeys.length-1?'disabled':''} onclick="moveStation('${key}',1)">▼</button>
         </div>`;
     return `
-    <div class="vgroup" data-station="${key}" style="${isActive?'':'opacity:.55;'}padding:8px 10px;">
-      <div class="vgroup-head" style="flex-wrap:wrap;margin-bottom:${expanded?'8px':'0'};">
+    <div class="vgroup" data-station="${key}" style="${isActive?'':'opacity:.55;'}padding:8px 10px;transition:background .2s,border-color .2s;${expanded?'border-color:var(--red);':''}">
+      <div class="vgroup-head" style="flex-wrap:wrap;margin-bottom:${expanded?'8px':'0'};${expanded?'position:sticky;top:0;background:var(--bg);z-index:2;padding:4px 0;border-radius:8px;':''}">
         ${moveButtons}
         <span style="font-size:16px;flex:0 0 auto;" title="${(s.icon||'📠').replace(/"/g,'&quot;')}">${(s.icon||'📠').replace(/</g,'')}</span>
         <span style="flex:1;min-width:100px;font-weight:600;font-size:13px;">${esc(s.label||key)}</span>
@@ -9924,17 +10060,17 @@ function renderStationsSettings(){
           <input type="checkbox" ${isActive?'checked':''} onchange="updateStationField('${key}','active',this.checked);renderStationsSettings();"/> Ativa
         </label>
         <button type="button" class="btn secondary sm" onclick="testStationPrint('${key}')" ${isActive?'':'disabled title="Ative essa via pra poder testar"'}>🖨 Testar</button>
-        <button type="button" class="btn secondary sm" onclick="toggleStationExpanded('${key}')">${expanded?'▴ Fechar':'⚙️ Configurar'}</button>
+        <button type="button" class="btn ${expanded?'primary':'secondary'} sm" onclick="toggleStationExpanded('${key}')">${expanded?'▴ Fechar':'⚙️ Configurar'}</button>
       </div>
       ${!isActive?`<div style="font-size:10px;color:var(--red-lt);margin-top:4px;">🔴 Via desativada — pedidos com itens marcados pra essa via não vão gerar nenhuma impressão (e não dá erro nenhum, é intencional) até você reativar aqui.</div>`:''}
       ${expanded?`
-      <div style="border-top:1px dashed var(--border);padding-top:8px;">
+      <div style="border-top:1px dashed var(--border);padding-top:8px;animation:v127-expand .15s ease-out;">
       <div class="field-row" style="flex-wrap:wrap;">
         <div class="field" style="flex:0 0 auto;"><label style="font-size:10px;">Ícone</label>
           <input type="text" value="${(s.icon||'📠').replace(/"/g,'&quot;')}" maxlength="2" placeholder="📠"
             oninput="updateStationField('${key}','icon',this.value)" style="max-width:60px;text-align:center;"/></div>
         <div class="field" style="flex:1;min-width:160px;"><label style="font-size:10px;">Nome dessa via</label>
-          <input type="text" value="${(s.label||key).replace(/"/g,'&quot;')}" placeholder="Nome dessa via"
+          <input type="text" id="station-label-${key}" value="${(s.label||key).replace(/"/g,'&quot;')}" placeholder="Nome dessa via"
             oninput="updateStationField('${key}','label',this.value)"/></div>
         <div class="field" style="flex:1;min-width:200px;"><label style="font-size:10px;">Método de impressão</label>
         <select onchange="updateStationField('${key}','method',this.value);renderStationsSettings();">
@@ -10320,6 +10456,14 @@ async function saveAllSettings(){
   cfg.name   = document.getElementById('cfg-name').value.trim();
   cfg.days   = document.getElementById('cfg-days').value.trim();
   cfg.weekSchedule = collectWeekScheduleFromEditor();
+  // v126 — salva os campos de Disponibilidade de Reserva
+  cfg.reservations = cfg.reservations || {};
+  const rsvEnEl2=document.getElementById('rsv-enabled'); if(rsvEnEl2) cfg.reservations.enabled = rsvEnEl2.checked;
+  const rsvMaxEl2=document.getElementById('rsv-maxpeople'); if(rsvMaxEl2) cfg.reservations.maxPeoplePerTable = parseInt(rsvMaxEl2.value)||12;
+  const rsvNoteEl2=document.getElementById('rsv-note'); if(rsvNoteEl2) cfg.reservations.note = rsvNoteEl2.value.trim();
+  const rsvUseStoreEl2=document.getElementById('rsv-use-store-schedule'); if(rsvUseStoreEl2) cfg.reservations.useStoreSchedule = rsvUseStoreEl2.checked;
+  cfg.reservations.schedule = collectReservationScheduleFromEditor();
+  cfg.reservations.blockedDates = [...reservationBlockedDatesDraft];
   // v33: aparência do cardápio
   const dpsEl2=document.getElementById('cfg-dishphotosize'); if(dpsEl2) cfg.dishPhotoSize = parseInt(dpsEl2.value)||80;
   const mfsEl2=document.getElementById('cfg-menufontscale'); if(mfsEl2) cfg.menuFontScale = parseFloat(mfsEl2.value)||1;
@@ -10466,7 +10610,18 @@ function closeAllModals(){ document.querySelectorAll('.modal-overlay.open').forE
 function openModal(id){
   closeAllModals();
   const el = document.getElementById(id);
-  if(!el){ console.warn('openModal: modal não encontrado ->', id); return; }
+  // v127 — BUG CORRIGIDO ("modal não aparece" sem nenhuma pista visível): antes, se por
+  // qualquer motivo o elemento do modal não existisse na página (ex: deploy incompleto, cache
+  // de service worker servindo um HTML mais velho sem esse modal ainda, extensão de navegador
+  // interferindo no DOM), a função só dava um console.warn — invisível pra quem não abre o
+  // DevTools — e simplesmente não fazia mais nada, dando a impressão de "cliquei e não
+  // aconteceu nada". Agora mostra um toast explicando o problema e sugerindo recarregar a
+  // página, que resolve o caso mais comum (HTML desatualizado em cache).
+  if(!el){
+    console.warn('openModal: modal não encontrado ->', id);
+    if(typeof showToast==='function') showToast('⚠️ Não consegui abrir essa tela', 'Tente recarregar a página (F5) — se persistir, avise o suporte.', 6000);
+    return;
+  }
   el.classList.add('open');
 }
 document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
@@ -10717,6 +10872,7 @@ if(token){
 #page-impressao .btn{min-height:34px!important;padding:7px 11px!important;font-size:10px!important;border-radius:8px!important;}
 #page-impressao #settings-printer-card{padding:12px!important;}
 #page-impressao #stations-list{gap:7px!important;}
+@keyframes v127-expand{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
 #page-impressao .vgroup{padding:8px!important;border-radius:10px!important;}
 #page-impressao .vgroup-head{gap:6px!important;}
 #page-impressao #print-agent-status-box,#page-impressao #print-station-indicator{font-size:10px!important;}
