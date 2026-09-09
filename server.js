@@ -173,8 +173,26 @@ const DEFAULT_CFG = {
   },
   // ── Impressão do comprovante ──
   printFont: 'Verdana, sans-serif',      // 'monospace' | 'sans-serif' | 'serif' | outras opções na tela de config
-  printSize: 20,                // tamanho da fonte em px
+  // v126 — BUG CORRIGIDO ("ajuste padrão de tamanho pra caber na bobina 80mm"): o padrão de
+  // fábrica era 20px, mas 10-17px é a faixa que a impressora térmica trata como "tamanho
+  // normal dela" (ver tamanhoImpressaoTermica() logo abaixo) — 18px ou mais já liga o
+  // dobro de altura (GS ! n). Ou seja: TODA instalação nova, sem ninguém mexer em nada,
+  // já saía imprimindo cada comanda com o dobro da altura normal, gastando o dobro de
+  // bobina em cada impressão. 14px é o tamanho de referência usado em todo o resto do
+  // sistema (ver `scale = ps/14` em public/painel.html) — agora é também o padrão de
+  // fábrica, pra uma instalação nova já imprimir no tamanho normal da impressora até
+  // alguém decidir aumentar de propósito em Configurações → Central de Impressão.
+  printSize: 14,                // tamanho da fonte em px
   printColor: '#000000',        // cor do texto
+  // v126 — NOVO ("ajuste pra caber na bobina 80mm bematech"): até aqui a largura usada pra
+  // alinhar valores à direita e desenhar as linhas tracejadas na impressão direta (USB/rede,
+  // sem Agente Local) era um número FIXO de 32 colunas — que é o certo pra bobina de 58mm,
+  // mas deixa uma bobina de 80mm com bem menos texto por linha do que ela realmente
+  // comporta (a impressora tem espaço de sobra, mas o sistema nunca usava). Esse campo deixa
+  // a pessoa escolher a largura real da bobina que ela tem — 80mm (48 colunas, padrão de
+  // fábrica) ou 58mm (32 colunas) — e o texto passa a ocupar a largura certa em ambos os
+  // casos. Ver printCols() logo abaixo de ESC.
+  printWidth: '80mm',           // '58mm' (32 colunas) | '80mm' (48 colunas)
   // ── Logotipo ──
   logoShape: 'retangular',      // 'redondo' | 'quadrado' | 'retangular'
   logoSize: 40,                  // altura em px
@@ -321,7 +339,30 @@ const DEFAULT_CFG = {
   // e ficam salvas aqui — não apague nem troque manualmente, ou as inscrições já feitas param de funcionar.
   vapid: { publicKey: '', privateKeyJwk: null, subject: 'mailto:contato@shogatsu.com.br' },
   // ── Reserva de Mesas ──
-  reservations: { enabled: true, maxPeoplePerTable: 12, note: '' },
+  reservations: {
+    enabled: true, maxPeoplePerTable: 12, note: '',
+    // v126 — NOVO ("botão pra definir que dia/horário está liberado pra reservar"): até aqui
+    // reserva usava o MESMO horário de funcionamento da loja (cfg.weekSchedule) sem nenhuma
+    // forma de diferenciar — uma loja pode querer aceitar reserva só até 21h mesmo abrindo
+    // até 23h (pra não reservar mesa perto do fechamento), ou não aceitar reserva às
+    // segundas mesmo funcionando pra delivery. `useStoreSchedule: true` (padrão) mantém o
+    // comportamento de sempre — usa cfg.weekSchedule normalmente, sem precisar configurar
+    // nada a mais. Desligando, passa a usar o `schedule` próprio abaixo (mesmo formato do
+    // weekSchedule — 7 posições, domingo=0).
+    useStoreSchedule: true,
+    schedule: [
+      { open: true, openTime: '18:00', closeTime: '23:00' },
+      { open: false, openTime: '18:00', closeTime: '23:00' },
+      { open: true, openTime: '18:00', closeTime: '23:00' },
+      { open: true, openTime: '18:00', closeTime: '23:00' },
+      { open: true, openTime: '18:00', closeTime: '23:00' },
+      { open: true, openTime: '18:00', closeTime: '23:00' },
+      { open: true, openTime: '18:00', closeTime: '23:00' }
+    ],
+    // v126 — NOVO: datas específicas fechadas pra reserva (feriado, evento fechado, etc.),
+    // mesmo em dias que normalmente aceitam — formato 'YYYY-MM-DD'.
+    blockedDates: []
+  },
   // ── Agendamento de Pedidos (cliente escolhe um horário futuro pra retirada/entrega) ──
   scheduling: { enabled: true, minMinutesAhead: 60, maxDaysAhead: 7 },
   // ── v47: Splash Screen Premium — sequência de fotos em tela cheia ao abrir o app, com
@@ -660,7 +701,17 @@ function readConfig() {
       ? DEFAULT_CFG.weekSchedule.map((d, i) => ({ ...d, ...(data.cfg.weekSchedule[i] || {}) }))
       : DEFAULT_CFG.weekSchedule,
     vapid: { ...DEFAULT_CFG.vapid, ...(data.cfg.vapid || {}) },
-    reservations: { ...DEFAULT_CFG.reservations, ...(data.cfg.reservations || {}) },
+    reservations: {
+      ...DEFAULT_CFG.reservations, ...(data.cfg.reservations || {}),
+      // v126 — mesmo cuidado do weekSchedule acima: valida item a item (não deixa a tela
+      // salvar um array incompleto/malformado e quebrar a validação de horário depois).
+      schedule: (Array.isArray(data.cfg.reservations && data.cfg.reservations.schedule) && data.cfg.reservations.schedule.length === 7)
+        ? DEFAULT_CFG.reservations.schedule.map((d, i) => ({ ...d, ...(data.cfg.reservations.schedule[i] || {}) }))
+        : DEFAULT_CFG.reservations.schedule,
+      blockedDates: Array.isArray(data.cfg.reservations && data.cfg.reservations.blockedDates)
+        ? data.cfg.reservations.blockedDates.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(0, 200)
+        : DEFAULT_CFG.reservations.blockedDates
+    },
     scheduling: { ...DEFAULT_CFG.scheduling, ...(data.cfg.scheduling || {}) },
     rodizioPopular: { ...DEFAULT_CFG.rodizioPopular, ...(data.cfg.rodizioPopular || {}) },
     splash: { ...DEFAULT_CFG.splash, ...(data.cfg.splash || {}), photos: Array.isArray(data.cfg.splash && data.cfg.splash.photos) ? data.cfg.splash.photos : DEFAULT_CFG.splash.photos },
@@ -1893,8 +1944,20 @@ const ESC = {
   center: '\x1B\x61\x01', left: '\x1B\x61\x00',
   doubleOn: '\x1D\x21\x11', doubleOff: '\x1D\x21\x00',
   cut: '\x1D\x56\x01',
+  // v126 — NOVO ("fazer um bip duplo ao imprimir"): comando ESC/POS padrão de campainha
+  // (ESC B n t = apita "n" vezes, cada apito com duração "t"×100ms) — suportado pela grande
+  // maioria das térmicas em modo ESC/POS, incluindo Bematech em modo de emulação ESC/POS.
+  // n=2 já dá o bipe duplo pedido numa única comanda; se a impressora não tiver campainha
+  // (ou estiver desligada no hardware), o comando é simplesmente ignorado, sem erro nenhum.
+  beep: '\x1B\x42\x02\x02',
   feed: '\n\n\n'
 };
+// v126 — NOVO: quantas colunas de texto usar pra alinhar valores à direita e desenhar as
+// linhas tracejadas na impressão direta (USB/rede sem Agente Local) — depende da largura
+// real da bobina configurada em cfg.printWidth (ver default acima). 80mm comporta bem mais
+// texto por linha que 58mm; usar sempre 32 (tamanho de 58mm) deixava uma bobina de 80mm com
+// metade da largura sobrando sem uso nenhum.
+function printCols(cfg) { return (cfg && cfg.printWidth === '58mm') ? 32 : 48; }
 
 // v84 — BUG CORRIGIDO ("cliente marca opção de pagamento deve aparecer como pagamento na
 // entrega"): PIX é pago ANTES (pelo gateway/confirmação manual), mas dinheiro/crédito/débito
@@ -1933,14 +1996,18 @@ function tamanhoImpressaoTermica(printSize) {
 function buildTicketText(lines, cfg) {
   const tam = tamanhoImpressaoTermica(cfg && cfg.printSize);
   const body = tam.on + lines.join('\n') + tam.off;
-  return ESC.init + body + ESC.feed + ESC.cut;
+  // v126 — bipe duplo ao final de toda impressão direta (USB/rede), depois do corte —
+  // avisa quem está no balcão/cozinha que saiu uma comanda nova sem precisar olhar pra
+  // impressora o tempo todo.
+  return ESC.init + body + ESC.feed + ESC.cut + ESC.beep;
 }
 
 // v93 — via de RESERVA DE MESA (impressora de rede/USB direta). Mesma ideia/layout das vias de
 // pedido (buildTicketText acima), só que com os dados da reserva em vez do carrinho.
 function buildReservationTicketText(reservation, cfg) {
-  const HR = '--------------------------------';
-  const HR2 = '================================';
+  const cols = printCols(cfg);
+  const HR = '-'.repeat(cols);
+  const HR2 = '='.repeat(cols);
   const lines = [];
   lines.push(ESC.center + ESC.boldOn + (cfg.name || 'SHOGATSU').toUpperCase() + ESC.boldOff);
   lines.push((cfg.tagline || 'CULINARIA ORIENTAL').toUpperCase() + ESC.left);
@@ -2260,6 +2327,19 @@ async function handleRequest(req, res) {
           weekSchedule: (Array.isArray(body.cfg && body.cfg.weekSchedule) && body.cfg.weekSchedule.length === 7)
             ? current.cfg.weekSchedule.map((d, i) => ({ ...d, ...(body.cfg.weekSchedule[i] || {}) }))
             : current.cfg.weekSchedule,
+          // v126 — NOVO: mesma validação cuidadosa do weekSchedule acima, aplicada ao horário
+          // próprio de reserva (Configurações → 📅 Disponibilidade de Reserva) — protege
+          // contra salvar um array incompleto/malformado que quebraria a validação de
+          // horário nas próximas reservas.
+          reservations: {
+            ...current.cfg.reservations, ...(body.cfg && body.cfg.reservations || {}),
+            schedule: (Array.isArray(body.cfg && body.cfg.reservations && body.cfg.reservations.schedule) && body.cfg.reservations.schedule.length === 7)
+              ? current.cfg.reservations.schedule.map((d, i) => ({ ...d, ...(body.cfg.reservations.schedule[i] || {}) }))
+              : current.cfg.reservations.schedule,
+            blockedDates: Array.isArray(body.cfg && body.cfg.reservations && body.cfg.reservations.blockedDates)
+              ? body.cfg.reservations.blockedDates.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(0, 200)
+              : current.cfg.reservations.blockedDates
+          },
           rodizioPopular: { ...current.cfg.rodizioPopular, ...(body.cfg && body.cfg.rodizioPopular || {}) },
           installPromo: { ...current.cfg.installPromo, ...(body.cfg && body.cfg.installPromo || {}) },
           splash: {
@@ -3782,7 +3862,7 @@ function estimateDeliveryWindow(order, cfg) {
       try { fs.accessSync(file, fs.constants.R_OK | fs.constants.W_OK); checks[name] = true; } catch (_) { checks[name] = false; }
     }
     const ok = Object.values(checks).every(Boolean);
-    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.126', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
+    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.127', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
   }
 
   // ── GET /api/print-agent/status — o painel consulta pra mostrar se tem algum Agente Local
@@ -4007,14 +4087,20 @@ function estimateDeliveryWindow(order, cfg) {
 
       // v44: layout ESC/POS redesenhado — cabeçalho centralizado, blocos com título
       // (CLIENTE/ITENS/RESUMO no comprovante; HORÁRIOS/ITENS na via de produção), valores
-      // alinhados à direita (padStart até 32 colunas = largura útil de 58/80mm), TOTAL em
-      // destaque. Sem emoji no ESC/POS puro (impressora térmica não garante suporte a eles);
-      // o emoji fica só na via impressa pelo navegador (openBrowserTicket, no painel.html).
-      const HR = '--------------------------------';
-      const HR2 = '================================';
+      // alinhados à direita (padStart até a largura configurada — ver printCols() acima),
+      // TOTAL em destaque. Sem emoji no ESC/POS puro (impressora térmica não garante suporte
+      // a eles); o emoji fica só na via impressa pelo navegador (openBrowserTicket, no
+      // painel.html).
+      // v126 — BUG CORRIGIDO ("ajuste pra caber na bobina 80mm"): esse 32 aqui era FIXO,
+      // sempre — certo pra 58mm, mas deixava uma bobina de 80mm com metade da largura sem
+      // uso. Agora usa printCols(cfg), que respeita cfg.printWidth (Configurações → Central
+      // de Impressão → Fonte de Impressão → Largura da bobina).
+      const cols = printCols(cfg);
+      const HR = '-'.repeat(cols);
+      const HR2 = '='.repeat(cols);
       const money = v => 'R$ ' + Number(v || 0).toFixed(2).replace('.', ',');
       const rightAlignRow = (label, value) => {
-        const pad = Math.max(1, 32 - label.length - value.length);
+        const pad = Math.max(1, cols - label.length - value.length);
         return label + ' '.repeat(pad) + value;
       };
       const refShort = String(order.id || '').slice(-11).toUpperCase();
@@ -5170,6 +5256,32 @@ function estimateDeliveryWindow(order, cfg) {
   // ═══════════════════════════════════════════
   // RESERVA DE MESAS
   // ═══════════════════════════════════════════
+  // v126 — NOVO ("botão pra definir que dia/horário está liberado pra reservar"): valida de
+  // verdade, no SERVIDOR, se a data/horário pedidos pra reserva estão dentro do horário
+  // liberado — antes só o navegador do cliente filtrava visualmente os horários (só mostrava
+  // botões dentro do expediente), mas nada impedia uma chamada direta à API com qualquer
+  // data/horário (inclusive um dia fechado ou 3h da manhã). Usa cfg.reservations.schedule
+  // (ou cfg.weekSchedule, se "usar mesmo horário da loja" estiver ligado) + a lista de datas
+  // bloqueadas (feriado, evento fechado etc.).
+  function isReservationSlotAvailable(cfg, dateStr, timeStr) {
+    if (!dateStr || !timeStr) return { ok: false, error: 'Escolha data e horário.' };
+    if (cfg.reservations.blockedDates && cfg.reservations.blockedDates.includes(dateStr)) {
+      return { ok: false, error: 'Essa data não está disponível pra reserva.' };
+    }
+    const effectiveSchedule = cfg.reservations.useStoreSchedule ? cfg.weekSchedule : cfg.reservations.schedule;
+    const weekday = new Date(dateStr + 'T00:00:00').getDay();
+    const daySchedule = effectiveSchedule && effectiveSchedule[weekday];
+    if (!daySchedule || daySchedule.open === false) {
+      return { ok: false, error: 'A loja não aceita reserva nesse dia da semana.' };
+    }
+    const toMin = t => { const [h, m] = String(t || '0:0').split(':').map(Number); return (h || 0) * 60 + (m || 0); };
+    const t = toMin(timeStr);
+    const openM = toMin(daySchedule.openTime || '18:00'), closeM = toMin(daySchedule.closeTime || '23:00');
+    if (t < openM || t > closeM - 30) {
+      return { ok: false, error: `Escolha um horário entre ${daySchedule.openTime || '18:00'} e ${daySchedule.closeTime || '23:00'}.` };
+    }
+    return { ok: true };
+  }
   // ── POST /api/reservations — cliente pede uma reserva (fica pendente até a loja confirmar) ──
   if (pathname === '/api/reservations' && req.method === 'POST') {
     try {
@@ -5184,6 +5296,8 @@ function estimateDeliveryWindow(order, cfg) {
       if (!name || !phone) return sendJSON(res, 400, { error: 'Informe nome e telefone.' });
       if (!date || !time) return sendJSON(res, 400, { error: 'Escolha data e horário.' });
       if (!people) return sendJSON(res, 400, { error: 'Informe quantas pessoas.' });
+      const slotCheck = isReservationSlotAvailable(cfg, date, time);
+      if (!slotCheck.ok) return sendJSON(res, 400, { error: slotCheck.error });
       const maxP = Number(cfg.reservations.maxPeoplePerTable) || 12;
       if (people > maxP) return sendJSON(res, 400, { error: `Pra grupos maiores que ${maxP} pessoas, fale direto com a loja pelo WhatsApp.` });
       const list = readJSON(RESERVATIONS_FILE);
