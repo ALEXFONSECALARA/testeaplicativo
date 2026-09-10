@@ -4175,6 +4175,53 @@ function orderTime(iso){
   if(diff<1)return'agora';if(diff<60)return diff+'min';
   return Math.round(diff/60)+'h';
 }
+
+// ═══════════════════════════════════════════
+// v130 — NOVO: PRIORIDADE POR TEMPO DE PREPARO (NORMAL/ATENÇÃO/ATRASADO) — complementa, sem
+// substituir, o alarme sonoro "⚠️ ATRASADO" que já existia (isOrderLate/cfg.lateAlert.minutes
+// — esse é um limite GENÉRICO configurado pelo admin, sempre o mesmo pra qualquer pedido, e
+// dispara som+toast). Este aqui é DIFERENTE: calcula quando o pedido inteiro deve ficar
+// pronto de verdade, olhando o prepTime de CADA estação que tem item nesse pedido (o maior
+// deles, já que as estações trabalham em paralelo — cozinha e sushibar preparam ao mesmo
+// tempo, não em fila) — e mostra uma contagem regressiva ao vivo no card do Kanban, só
+// informativa (sem som), pra dar noção visual de prioridade sem mexer no alarme existente.
+// ═══════════════════════════════════════════
+function orderPrepMinutes(o){
+  const usedStations = new Set();
+  (o.items||[]).forEach(i => (i.stations||[]).forEach(s => usedStations.add(s)));
+  if (!usedStations.size) return 15; // pedido sem via marcada em nenhum item — usa um padrão razoável
+  let max = 0;
+  usedStations.forEach(s => {
+    const p = Number((cfg.stations && cfg.stations[s] && cfg.stations[s].prepTime));
+    if (!isNaN(p)) max = Math.max(max, p);
+  });
+  return max || 15;
+}
+function orderPrepDeadline(o){
+  return new Date(o.createdAt).getTime() + orderPrepMinutes(o) * 60000;
+}
+// Formata "MM:SS restantes" ou "MM:SS de atraso" a partir de uma diferença em ms.
+function formatPrepCountdown(diffMs){
+  const abs = Math.abs(diffMs);
+  const mm = Math.floor(abs / 60000), ss = Math.floor((abs % 60000) / 1000);
+  return String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+}
+// Atualiza só o TEXTO/COR dos countdowns já desenhados (sem re-renderizar o quadro inteiro a
+// cada segundo — re-render completo do Kanban todo segundo seria pesado à toa).
+function updateKanbanCountdowns(){
+  document.querySelectorAll('.k-card-prep[data-deadline]').forEach(el=>{
+    const deadline = Number(el.dataset.deadline);
+    const diff = deadline - Date.now();
+    let icon, label, color, bg;
+    if (diff <= 0) { icon='🚨'; label='ATRASADO · '+formatPrepCountdown(diff); color='#fff'; bg='var(--red)'; }
+    else if (diff <= 5*60000) { icon='⚠'; label=formatPrepCountdown(diff)+' restantes'; color='#1a1405'; bg='var(--gold, #F4B400)'; }
+    else { icon='⏱'; label=formatPrepCountdown(diff)+' restantes'; color='var(--muted)'; bg='transparent'; }
+    el.textContent = icon+' '+label;
+    el.style.color = color;
+    el.style.background = bg;
+  });
+}
+setInterval(updateKanbanCountdowns, 1000);
 // v78: volume dos alertas sonoros (🔊 Alertas, em Configurações) — fica salvo só neste
 // aparelho/navegador (localStorage), não na loja toda, porque cada computador pode estar num
 // ambiente diferente (balcão barulhento x escritório silencioso).
@@ -6897,6 +6944,7 @@ function renderKanban(){
             <span onclick="silenceRingOrder('${o.id}')" style="cursor:pointer;opacity:.85;" title="Silenciar este pedido">🔕</span>
           </div>`:''}
           <div class="k-card-id">${o.ticketNumber?'#'+o.ticketNumber+' · ':''}${o.id} · ${orderTime(o.createdAt)}</div>
+          ${['novo','preparando'].includes(o.shortStatus)?`<div class="k-card-prep" data-deadline="${orderPrepDeadline(o)}" style="font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:5px;display:inline-block;margin-bottom:5px;">⏱ …</div>`:''}
           <div class="k-card-name">${esc(o.name)}</div>
           <div class="k-card-items">${itemsText(o)}</div>
           <div class="k-card-footer">
@@ -6909,6 +6957,7 @@ function renderKanban(){
       </div>
     </div>`;
   }).join('');
+  updateKanbanCountdowns(); // v130 — preenche o countdown na hora, sem esperar o próximo tick de 1s
 }
 
 // ═══════════════════════════════════════════
