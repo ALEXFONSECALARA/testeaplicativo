@@ -6196,7 +6196,12 @@ function openBrowserReservationTicket(reservation){
 
 function openBrowserTicket(order, station, deliveryWindow, existingWin){
   const isCaixa = station==='caixa';
-  const items = isCaixa ? order.items : order.items.filter(i=>(i.stations||[]).includes(station));
+  // v129 — NOVO ("via do motoboy/expedição deve focar em cliente/endereço/pagamento, não na
+  // lista de itens"): aqui o painel TEM acesso ao cfg.stations completo (diferente do Agente
+  // Local, que só enxerga seu próprio config.json de impressora) — então usa o campo real
+  // cfg.stations[x].kind em vez de uma lista de nomes fixa.
+  const isDispatch = !isCaixa && !!(cfg.stations[station] && cfg.stations[station].kind==='dispatch');
+  const items = (isCaixa||isDispatch) ? order.items : order.items.filter(i=>(i.stations||[]).includes(station));
   const money = v => 'R$ '+Number(v||0).toFixed(2).replace('.',',');
   const time = new Date(order.createdAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const dateStr = new Date(order.createdAt).toLocaleDateString('pt-BR');
@@ -6221,6 +6226,21 @@ function openBrowserTicket(order, station, deliveryWindow, existingWin){
     <div class="t-hr"></div>
     <div class="t-item t-total"><span>TOTAL</span><span>${money(order.total)}</span></div>
     <div class="t-row" style="margin-top:8px;">Pagamento: ${esc(payMethodDisplay(order))}${order.troco?` (troco para ${esc(order.troco)})`:''}</div>
+  ` : isDispatch ? `
+    <div class="t-block-title">CLIENTE</div>
+    <div class="t-row">${esc(order.name)}</div>
+    <div class="t-row">📞 ${esc(order.phone)}</div>
+    <div class="t-hr"></div>
+    <div class="t-block-title">ENDEREÇO</div>
+    <div class="t-row">📍 ${esc(order.address||'—')}</div>
+    <div class="t-hr"></div>
+    <div class="t-block-title">PAGAMENTO</div>
+    <div class="t-row">${esc(payMethodDisplay(order))}${order.troco?` (troco para ${esc(order.troco)})`:''}</div>
+    <div class="t-item"><span>Total</span><span>${money(order.total)}</span></div>
+    <div class="t-item"><span>Taxa de entrega</span><span>${money(order.fee)}</span></div>
+    <div class="t-row">🛵 Motoboy: <b>${esc(order.courierName||'A definir')}</b></div>
+    <div class="t-row">⏰ Previsão de entrega: <b>${deliveryWindow||'—'}</b></div>
+    ${order.obs?`<div class="t-hr"></div><div class="t-row"><b>Obs:</b> ${esc(order.obs)}</div>`:''}
   ` : `
     <div class="t-block-title">ITENS DA ${stationLabel(station).toUpperCase()}</div>
     ${items.map(i=>`<div class="t-bullet-item">• ${i.qty}x ${esc(i.name)}</div>`).join('')}
@@ -10102,6 +10122,14 @@ function renderStationsSettings(){
       <div class="field" style="margin-top:8px;max-width:220px;">
         <label style="font-size:10px;">⏱ Tempo de preparo (min) — usado na previsão de saída</label>
         <input type="number" min="0" step="1" value="${s.prepTime??15}" oninput="updateStationField('${key}','prepTime',this.value)"/>
+      </div>
+      <div class="field" style="margin-top:8px;max-width:320px;">
+        <label style="font-size:10px;">📋 Tipo de via</label>
+        <select onchange="updateStationField('${key}','kind',this.value);renderStationsSettings();">
+          <option value="production" ${s.kind!=='dispatch'?'selected':''}>🍳 Produção — lista de itens (cozinha/sushibar/bar)</option>
+          <option value="dispatch" ${s.kind==='dispatch'?'selected':''}>🛵 Despacho — cliente/endereço/pagamento (motoboy/entrega)</option>
+        </select>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;">${s.kind==='dispatch'?'Só imprime em pedidos DELIVERY — mostra endereço, pagamento, troco e motoboy, sem lista de itens.':'Mostra só os itens marcados pra essa via, sem dados do cliente.'}</div>
       </div>`:''}
       ${s.method==='rede'?`
         <div class="field-row" style="margin-top:8px;">
