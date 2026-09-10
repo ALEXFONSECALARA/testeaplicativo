@@ -2040,8 +2040,8 @@ function buildReservationTicketText(reservation, cfg) {
   lines.push((cfg.tagline || 'CULINARIA ORIENTAL').toUpperCase() + ESC.left);
   lines.push(HR2);
   lines.push(ESC.center + 'RESERVA DE MESA' + ESC.left);
+  lines.push(ESC.center + ESC.boldOn + ESC.doubleOn + (reservation.status === 'confirmada' ? 'CONFIRMADA' : 'PENDENTE') + ESC.doubleOff + ESC.boldOff + ESC.left);
   lines.push('Ref.: ' + reservation.id);
-  lines.push('Status: ' + (reservation.status === 'confirmada' ? 'CONFIRMADA' : 'PENDENTE DE CONFIRMACAO'));
   lines.push(HR);
   lines.push(ESC.boldOn + 'CLIENTE' + ESC.boldOff);
   lines.push(HR);
@@ -4165,6 +4165,11 @@ function estimateDeliveryWindow(order, cfg) {
       };
       const refShort = String(order.id || '').slice(-11).toUpperCase();
       const lines = [];
+      // v130 — NOVO VISUAL ("comprovante premium/minimalista/legível"): cabeçalho + Nº do
+      // pedido em destaque (usa ESC.doubleOn, já existente — mesmo recurso do TOTAL), dados
+      // agrupados por finalidade (DATA/HORA/TIPO, CLIENTE, ITENS, PAGAMENTO/TOTAL), sem
+      // elementos decorativos extras. Mesmos dados de sempre — só a composição das linhas
+      // mudou; nenhum comando ESC/POS novo foi criado, nenhuma via/estação/cálculo mudou.
       lines.push(ESC.center + ESC.boldOn + (cfg.name || 'SHOGATSU').toUpperCase() + ESC.boldOff);
       lines.push((cfg.tagline || 'CULINARIA ORIENTAL').toUpperCase() + ESC.left);
       lines.push(HR2);
@@ -4172,11 +4177,12 @@ function estimateDeliveryWindow(order, cfg) {
       if (isCaixa) {
         // ── Via do Caixa: comprovante completo (dados do cliente + horário estimado) ──
         lines.push(ESC.center + 'COMPROVANTE' + ESC.left);
-        lines.push((order.ticketNumber ? 'Pedido Nº ' + order.ticketNumber : 'Pedido #' + order.id));
+        lines.push(ESC.center + ESC.boldOn + ESC.doubleOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + ESC.doubleOff + ESC.boldOff + ESC.left);
+        lines.push(HR);
         lines.push('Data: ' + new Date(order.createdAt).toLocaleDateString('pt-BR'));
         lines.push('Hora: ' + new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
         lines.push('Ref.: #' + refShort);
-        lines.push(order.mode === 'delivery' ? 'ENTREGA (DELIVERY)' : 'RETIRADA');
+        lines.push('Tipo: ' + (order.mode === 'delivery' ? 'ENTREGA (DELIVERY)' : 'RETIRADA'));
         lines.push(HR);
         lines.push(ESC.boldOn + 'CLIENTE' + ESC.boldOff);
         lines.push(HR);
@@ -4187,8 +4193,11 @@ function estimateDeliveryWindow(order, cfg) {
         lines.push(HR);
         lines.push(ESC.boldOn + 'ITENS' + ESC.boldOff);
         lines.push(HR);
-        items.forEach(i => lines.push(rightAlignRow(`${i.qty}x ${i.name}`, money(i.price * i.qty))));
-        if (order.obs) { lines.push(HR); lines.push('Obs: ' + order.obs); }
+        items.forEach(i => {
+          lines.push(ESC.boldOn + tamItem.wideOn + i.qty + 'x  ' + i.name + tamItem.on + ESC.boldOff);
+          lines.push(rightAlignRow('', money(i.price * i.qty)));
+        });
+        if (order.obs) { lines.push(HR); lines.push(ESC.boldOn + 'OBSERVACAO' + ESC.boldOff); lines.push(order.obs); }
         lines.push(HR);
         lines.push(ESC.boldOn + 'RESUMO' + ESC.boldOff);
         lines.push(HR);
@@ -4198,21 +4207,22 @@ function estimateDeliveryWindow(order, cfg) {
           lines.push(rightAlignRow(`Cupom ${order.couponCode}`, '-' + money(order.discount || 0)));
         }
         lines.push(HR);
+        lines.push(ESC.boldOn + 'PAGAMENTO' + ESC.boldOff);
+        lines.push(payMethodTicketLabel(order) + (order.troco ? ' (troco para ' + order.troco + ')' : ''));
+        lines.push(HR);
         lines.push(ESC.boldOn + ESC.doubleOn + rightAlignRow('TOTAL', money(order.total)) + ESC.doubleOff + ESC.boldOff);
         lines.push(HR2);
-        lines.push('Pagamento: ' + payMethodTicketLabel(order) + (order.troco ? ' (troco para ' + order.troco + ')' : ''));
         lines.push(ESC.center + 'Obrigado pela preferencia!' + ESC.left);
         if (cfg.siteUrl) lines.push(ESC.center + cfg.siteUrl + ESC.left);
       } else if (isDispatch) {
-        // v129 — NOVO ("via do motoboy/expedição deve focar em cliente/endereço/pagamento"):
-        // mesmo bloco de dados de entrega do Caixa (endereço, pagamento, troco), sem a lista
-        // de itens — quem vai entregar não precisa conferir prato por prato, só pra onde ir e
-        // quanto cobrar/receber. Reaproveita os mesmos campos do pedido que o Caixa já usa
+        // v129 — NOVO ("via do motoboy/expedição deve focar em cliente/endereço/pagamento, não
+        // na lista de itens"): reaproveita os mesmos campos do pedido que o Caixa já usa
         // (order.address, order.courierName etc.) — não inventa estrutura de dado nova.
         lines.push(ESC.center + ESC.boldOn + ((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase() + ESC.boldOff + ESC.left);
         lines.push(ESC.center + 'VIA DE DESPACHO' + ESC.left);
+        lines.push(ESC.center + ESC.boldOn + ESC.doubleOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + ESC.doubleOff + ESC.boldOff + ESC.left);
         lines.push(HR);
-        lines.push((order.ticketNumber ? 'Pedido Nº ' + order.ticketNumber : 'Pedido #' + order.id) + '  Ref.: #' + refShort);
+        lines.push('Ref.: #' + refShort);
         lines.push(HR);
         lines.push(ESC.boldOn + 'CLIENTE' + ESC.boldOff);
         lines.push(HR);
@@ -4221,7 +4231,7 @@ function estimateDeliveryWindow(order, cfg) {
         lines.push(HR);
         lines.push(ESC.boldOn + 'ENDERECO' + ESC.boldOff);
         lines.push(HR);
-        lines.push(order.address || '—');
+        lines.push(order.address || '-');
         lines.push(HR);
         lines.push(ESC.boldOn + 'PAGAMENTO' + ESC.boldOff);
         lines.push(HR);
@@ -4243,8 +4253,9 @@ function estimateDeliveryWindow(order, cfg) {
           .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         lines.push(ESC.center + ESC.boldOn + ((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase() + ESC.boldOff);
         lines.push('VIA DE PRODUCAO' + ESC.left);
+        lines.push(ESC.center + ESC.boldOn + ESC.doubleOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + ESC.doubleOff + ESC.boldOff + ESC.left);
         lines.push(HR);
-        lines.push((order.ticketNumber ? 'Pedido Nº ' + order.ticketNumber : 'Pedido #' + order.id) + '  Ref.: #' + refShort);
+        lines.push('Ref.: #' + refShort);
         lines.push(order.mode === 'delivery' ? 'DELIVERY' : 'RETIRADA');
         lines.push(HR);
         lines.push(ESC.boldOn + 'HORARIOS' + ESC.boldOff);
@@ -4282,7 +4293,7 @@ function estimateDeliveryWindow(order, cfg) {
         // linha) e só o NOME do item vem maior (largura dobrada) + negrito.
         items.forEach(i => lines.push('* ' + i.qty + 'x ' + ESC.boldOn + tamItem.wideOn + i.name + tamItem.on + ESC.boldOff));
         lines.push(HR);
-        lines.push('Observacoes:');
+        lines.push(ESC.boldOn + 'OBSERVACOES' + ESC.boldOff);
         if (order.obs) lines.push(order.obs);
         else { lines.push('_______________________________'); lines.push('_______________________________'); }
       }
