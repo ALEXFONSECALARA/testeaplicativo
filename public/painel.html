@@ -2541,8 +2541,14 @@ body{font-size:13px;letter-spacing:-.01em;}
 </div>
 <div class="field"><label>Descrição</label><textarea id="item-desc" oninput="updateItemLivePreview()" placeholder="Explique o que vem no prato, ingredientes e diferenciais..."></textarea></div>
 <div class="field-row"><div class="field"><label>Porção / tamanho</label><input id="item-qty" list="item-qty-presets" placeholder="Ex.: 8 peças ou 500 ml"/></div></div>
-<datalist id="item-qty-presets"><option value="4 peças"></option><option value="6 peças"></option><option value="8 peças"></option><option value="10 peças"></option><option value="12 peças"></option><option value="16 peças"></option><option value="20 peças"></option><option value="250 ml"></option><option value="300 ml"></option><option value="350 ml"></option><option value="400 ml"></option><option value="500 ml"></option><option value="600 ml"></option><option value="700 ml"></option><option value="1 L"></option></datalist>
-<div class="v122-portion-chips" id="item-qty-chips"><button type="button" onclick="setItemQtyPreset('4 peças')">4</button><button type="button" onclick="setItemQtyPreset('6 peças')">6</button><button type="button" onclick="setItemQtyPreset('8 peças')">8</button><button type="button" onclick="setItemQtyPreset('10 peças')">10</button><button type="button" onclick="setItemQtyPreset('12 peças')">12</button><button type="button" onclick="setItemQtyPreset('250 ml')">250 ml</button><button type="button" onclick="setItemQtyPreset('350 ml')">350 ml</button><button type="button" onclick="setItemQtyPreset('500 ml')">500 ml</button><button type="button" onclick="setItemQtyPreset('1 L')">1 L</button></div>
+<datalist id="item-qty-presets"><option value="4 peças"></option><option value="6 peças"></option><option value="8 peças"></option><option value="10 peças"></option><option value="12 peças"></option><option value="16 peças"></option><option value="20 peças"></option><option value="250 ml"></option><option value="300 ml"></option><option value="350 ml"></option><option value="400 ml"></option><option value="500 ml"></option><option value="600 ml"></option><option value="700 ml"></option><option value="1 L"></option><option value="100 g"></option><option value="150 g"></option><option value="200 g"></option><option value="250 g"></option><option value="300 g"></option><option value="400 g"></option><option value="500 g"></option><option value="700 g"></option><option value="1 kg"></option><option value="1,5 kg"></option><option value="2 kg"></option></datalist>
+<div class="v122-portion-chips" id="item-qty-chips">
+<button type="button" onclick="setItemQtyPreset('4 peças')">4 peças</button><button type="button" onclick="setItemQtyPreset('6 peças')">6 peças</button><button type="button" onclick="setItemQtyPreset('8 peças')">8 peças</button><button type="button" onclick="setItemQtyPreset('10 peças')">10 peças</button><button type="button" onclick="setItemQtyPreset('12 peças')">12 peças</button>
+<span style="width:1px;background:var(--border2);align-self:stretch;"></span>
+<button type="button" onclick="setItemQtyPreset('250 ml')">250 ml</button><button type="button" onclick="setItemQtyPreset('350 ml')">350 ml</button><button type="button" onclick="setItemQtyPreset('500 ml')">500 ml</button><button type="button" onclick="setItemQtyPreset('1 L')">1 L</button>
+<span style="width:1px;background:var(--border2);align-self:stretch;"></span>
+<button type="button" onclick="setItemQtyPreset('200 g')">200 g</button><button type="button" onclick="setItemQtyPreset('300 g')">300 g</button><button type="button" onclick="setItemQtyPreset('500 g')">500 g</button><button type="button" onclick="setItemQtyPreset('1 kg')">1 kg</button>
+</div>
 </div>
 <div class="item-editor-card item-editor-section v120-local-badge-card">
 <div class="item-editor-section-title"><span>🏷 Destaque no cardápio</span><span class="v120-local-badge-label">Rápido</span></div>
@@ -5841,8 +5847,18 @@ async function printOrderCore(id, ev, stations, isAuto){
   const otherStations = targetStations.filter(st => !directStations.includes(st));
   try{
     if(directStations.length){
+      // v128 — BUG CORRIGIDO ("imprimir várias vias na cozinha trava o sistema"): reforço do
+      // lado do painel pra cima da correção no servidor (sendUSBPrint agora tem teto de 8s lá
+      // — ver server.js) — mesmo que o SERVIDOR trave por algum motivo totalmente diferente,
+      // esse timeout de 15s garante que o botão "Imprimir" nunca fica preso pra sempre. Se uma
+      // via estourar o prazo, ela aparece como falha (o pedido pode ser reimpresso depois) mas
+      // as outras vias que já responderam continuam contando normalmente.
+      const withTimeout = (p, st) => Promise.race([
+        p,
+        new Promise(resolve => setTimeout(() => resolve({ ok:false, data:{ error:`Via "${st}" demorou demais pra responder (mais de 15s) — a impressora pode estar travada ou offline.` } }), 15000))
+      ]);
       const results = await Promise.all(directStations.map(st =>
-        apiPost('/api/print', { orderId:id, station: st, auto: !!isAuto, originId: DEVICE_SESSION_ID, stationId: PRINT_STATION_ID }).then(res => ({ st, res }))
+        withTimeout(apiPost('/api/print', { orderId:id, station: st, auto: !!isAuto, originId: DEVICE_SESSION_ID, stationId: PRINT_STATION_ID }), st).then(res => ({ st, res }))
       ));
       for(const { st, res } of results){
         if(!res.ok){ showToast('⚠️ Falha ao imprimir', res.data.error||`Via "${st}" não pôde ser impressa.`, 5000); continue; }
