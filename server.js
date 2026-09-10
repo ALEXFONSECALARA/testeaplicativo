@@ -1991,7 +1991,13 @@ function tamanhoImpressaoTermica(printSize) {
   else if (s >= 18) { alturaMult = 1; }                   // altura 2x, largura normal (era o único "grande" antes)
   // abaixo de 18 (10 a 17): tamanho padrão da impressora — térmica não imprime menor que isso
   const n = (larguraMult << 4) | alturaMult;
-  return { on: '\x1D\x21' + String.fromCharCode(n), off: ESC.doubleOff };
+  // v128 — NOVO ("nome do item deve ser maior e em negrito"): variante "wide" — mesma altura
+  // configurada (alturaMult), largura +1 nível (até o teto de 7 que o comando ESC/POS aceita)
+  // — usada só no NOME do item nas vias de produção (ver buildTicketText/uso abaixo). Nunca
+  // usa ESC.doubleOff (reset pra ZERO) pra voltar — sempre volta pro `on` normal configurado,
+  // senão perderia o tamanho escolhido pelo lojista pro resto do ticket depois do nome.
+  const nWide = (Math.min(larguraMult + 1, 7) << 4) | alturaMult;
+  return { on: '\x1D\x21' + String.fromCharCode(n), off: ESC.doubleOff, wideOn: '\x1D\x21' + String.fromCharCode(nWide) };
 }
 function buildTicketText(lines, cfg) {
   const tam = tamanhoImpressaoTermica(cfg && cfg.printSize);
@@ -2047,9 +2053,28 @@ function sendNetworkPrint(ip, port, text) {
 
 // Envia para um dispositivo USB local (ex: /dev/usb/lp0) — só funciona quando o
 // servidor roda na mesma máquina física conectada à impressora (ex: Raspberry Pi/PC local).
+// v128 — BUG CORRIGIDO ("imprimir várias vias na cozinha trava o sistema"): fs.writeFile
+// NÃO TEM TIMEOUT NENHUM por padrão — se a impressora USB estivesse travada, offline, sem
+// papel de um jeito que trava o buffer, ou o cabo desconectado bem na hora, essa escrita
+// podia ficar PENDURADA PRA SEMPRE, nunca resolvendo nem rejeitando. Como as vias diretas
+// (USB/rede) são todas enviadas juntas num Promise.all (ver /api/print no painel.html, pra
+// imprimir tudo ao mesmo tempo em vez de esperar via por via), UMA impressora USB travada
+// travava a impressão de TODAS as vias do pedido — inclusive vias que estavam funcionando
+// perfeitamente (ex.: a cozinha ficava esperando pra sempre por causa de uma impressora de
+// sushibar travada, ou vice-versa). Agora tem um teto de 8 segundos: se a escrita não
+// terminar até lá, rejeita com um erro claro em vez de travar o pedido inteiro.
 function sendUSBPrint(devicePath, text) {
   return new Promise((resolve, reject) => {
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      reject(new Error(`Impressora USB (${devicePath}) não respondeu em 8s — pode estar travada, offline ou sem papel. As outras vias não foram afetadas.`));
+    }, 8000);
     fs.writeFile(devicePath, Buffer.from(text, 'binary'), (err) => {
+      if (settled) return; // já estourou o timeout — ignora essa resposta tardia
+      settled = true;
+      clearTimeout(timer);
       if (err) return reject(err);
       resolve(true);
     });
@@ -3862,7 +3887,7 @@ function estimateDeliveryWindow(order, cfg) {
       try { fs.accessSync(file, fs.constants.R_OK | fs.constants.W_OK); checks[name] = true; } catch (_) { checks[name] = false; }
     }
     const ok = Object.values(checks).every(Boolean);
-    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.127', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
+    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.128', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
   }
 
   // ── GET /api/print-agent/status — o painel consulta pra mostrar se tem algum Agente Local
@@ -4098,6 +4123,10 @@ function estimateDeliveryWindow(order, cfg) {
       const cols = printCols(cfg);
       const HR = '-'.repeat(cols);
       const HR2 = '='.repeat(cols);
+      // v128 — usado só nas linhas de nome do item (ver items.forEach mais abaixo) — reaproveita
+      // o mesmo cálculo do buildTicketText, então "wideOn" já parte do tamanho configurado em
+      // Fonte de Impressão, só com a largura +1 nível.
+      const tamItem = tamanhoImpressaoTermica(cfg.printSize);
       const money = v => 'R$ ' + Number(v || 0).toFixed(2).replace('.', ',');
       const rightAlignRow = (label, value) => {
         const pad = Math.max(1, cols - label.length - value.length);
@@ -4170,7 +4199,13 @@ function estimateDeliveryWindow(order, cfg) {
         lines.push(HR);
         lines.push(ESC.boldOn + ('ITENS DA ' + (((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase())) + ESC.boldOff);
         lines.push(HR);
-        items.forEach(i => lines.push('* ' + i.qty + 'x ' + i.name));
+        // v128 — NOVO ("nome do item deve ser maior e em negrito na comanda da cozinha e
+        // sushibar pra melhor visualização"): só na via de PRODUÇÃO (cozinha/sushibar/etc,
+        // não no comprovante do caixa) — quem está preparando o prato precisa bater o olho e
+        // reconhecer o item rápido, sem ter que ler letrinha miúda no meio da correria.
+        // Quantidade fica normal (bold sozinho já chama atenção o suficiente sem quebrar a
+        // linha) e só o NOME do item vem maior (largura dobrada) + negrito.
+        items.forEach(i => lines.push('* ' + i.qty + 'x ' + ESC.boldOn + tamItem.wideOn + i.name + tamItem.on + ESC.boldOff));
         lines.push(HR);
         lines.push('Observacoes:');
         if (order.obs) lines.push(order.obs);
