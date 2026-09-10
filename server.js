@@ -206,8 +206,18 @@ const DEFAULT_CFG = {
     cozinha:   { label: 'Cozinha',   icon: '🍳', method: 'navegador', ip: '', port: 9100, device: '', prepTime: 20, active: true },
     sushibar:  { label: 'Sushibar',  icon: '🍣', method: 'navegador', ip: '', port: 9100, device: '', prepTime: 15, active: true },
     bar:       { label: 'Bar',       icon: '🍹', method: 'navegador', ip: '', port: 9100, device: '', prepTime: 8, active: true },
-    delivery:  { label: 'Delivery',  icon: '🛵', method: 'navegador', ip: '', port: 9100, device: '', prepTime: 0, active: true },
-    expedicao: { label: 'Expedição', icon: '📦', method: 'navegador', ip: '', port: 9100, device: '', prepTime: 5, active: true }
+    // v129 — NOVO ("via do motoboy/expedição deve mostrar cliente/endereço/pagamento, não a
+    // lista de itens como cozinha/sushibar"): campo `kind: 'dispatch'` marca essas duas vias
+    // como "despacho" — usa o MESMO layout de dados de entrega da via do Caixa (cliente,
+    // telefone, endereço completo, referência, forma de pagamento, troco, motoboy, horário de
+    // saída), só que SEM os dados financeiros internos (custo/margem não existem nesse
+    // layout de qualquer forma) e sem a lista de itens do pedido — quem está saindo pra
+    // entregar não precisa conferir prato por prato, só pra onde ir e quanto cobrar. Qualquer
+    // via SEM "kind" (cozinha, sushibar, bar, ou uma via customizada nova) continua no layout
+    // de PRODUÇÃO de sempre (lista de itens). "caixa" é sempre comprovante — nunca usa este
+    // campo. Ver isCaixa/kind mais abaixo em POST /api/print.
+    delivery:  { label: 'Delivery',  icon: '🛵', method: 'navegador', ip: '', port: 9100, device: '', prepTime: 0, active: true, kind: 'dispatch' },
+    expedicao: { label: 'Expedição', icon: '📦', method: 'navegador', ip: '', port: 9100, device: '', prepTime: 5, active: true, kind: 'dispatch' }
     // v46: método "automatica" — imprime sozinho, sem abrir navegador nem pedir confirmação,
     // através do Agente Local de Impressão (print-agent/), que roda num computador dentro da
     // loja ligado na impressora. Ver POST /api/print abaixo e print-agent/print-agent.js.
@@ -1940,6 +1950,17 @@ function sugerirNovoProdutoIA(iaCfg, cfg, menu, ingredientes, tema) {
 // Comandos ESC/POS básicos
 const ESC = {
   init: '\x1B\x40',
+  // v129 — BUG CORRIGIDO ("erro de encoding, caracteres ã ç é ê ó"): a impressão direta
+  // (USB/rede, sem Agente Local) nunca mandava pra impressora QUAL código de página usar pra
+  // interpretar os bytes de acento — o texto sai codificado em Latin-1/Windows-1252 (é o que
+  // `Buffer.from(text,'binary')` produz lá embaixo em sendUSBPrint/sendNetworkPrint), mas sem
+  // esse comando a impressora fica no código de página que ela trouxer de fábrica (geralmente
+  // PC437, que não tem os acentos do português nesses mesmos bytes — sai símbolo errado). O
+  // Agente Local (print-agent.js) já resolve isso corretamente há tempos, com a biblioteca
+  // convertendo pra PC860 Português (ver characterSet em buildPrinter) — só faltava esse
+  // mesmo cuidado no caminho direto do servidor. ESC t 16 seleciona WPC1252 (Windows-1252),
+  // compatível com os bytes que já geramos.
+  codepage: '\x1B\x74\x10',
   boldOn: '\x1B\x45\x01', boldOff: '\x1B\x45\x00',
   center: '\x1B\x61\x01', left: '\x1B\x61\x00',
   doubleOn: '\x1D\x21\x11', doubleOff: '\x1D\x21\x00',
@@ -2005,7 +2026,7 @@ function buildTicketText(lines, cfg) {
   // v126 — bipe duplo ao final de toda impressão direta (USB/rede), depois do corte —
   // avisa quem está no balcão/cozinha que saiu uma comanda nova sem precisar olhar pra
   // impressora o tempo todo.
-  return ESC.init + body + ESC.feed + ESC.cut + ESC.beep;
+  return ESC.init + ESC.codepage + body + ESC.feed + ESC.cut + ESC.beep;
 }
 
 // v93 — via de RESERVA DE MESA (impressora de rede/USB direta). Mesma ideia/layout das vias de
@@ -3887,7 +3908,7 @@ function estimateDeliveryWindow(order, cfg) {
       try { fs.accessSync(file, fs.constants.R_OK | fs.constants.W_OK); checks[name] = true; } catch (_) { checks[name] = false; }
     }
     const ok = Object.values(checks).every(Boolean);
-    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.128', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
+    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.129', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
   }
 
   // ── GET /api/print-agent/status — o painel consulta pra mostrar se tem algum Agente Local
@@ -3998,6 +4019,11 @@ function estimateDeliveryWindow(order, cfg) {
       if (!order) return sendJSON(res, 404, { error: 'Pedido não encontrado.' });
 
       const isCaixa = st === 'caixa';
+      // v129 — NOVO ("via do motoboy/expedição deve focar em cliente/endereço/pagamento, não
+      // na lista de itens como cozinha/sushibar"): ver DEFAULT_CFG.stations.delivery/expedicao
+      // acima — qualquer via marcada com kind:'dispatch' usa o layout de despacho (mesmos
+      // dados de entrega do Caixa, sem lista de itens) em vez do layout de produção.
+      const isDispatch = !isCaixa && !!(cfg.stations[st] && cfg.stations[st].kind === 'dispatch');
 
       // v106 — REMOVIDO: a trava "só a Estação Ativa pode imprimir" (v90) que existia aqui.
       // Motivo: ela bloqueava IMPRESSÃO MANUAL (clique em Imprimir/Reimprimir, inclusive do
@@ -4020,9 +4046,14 @@ function estimateDeliveryWindow(order, cfg) {
       }
 
       // Caixa: comprovante completo (todos os itens + dados do cliente + horário).
+      // Despacho (delivery/expedição): dados de entrega do Caixa, sem lista de itens — quem
+      // sai pra entregar não precisa conferir prato por prato, só pra onde ir e quanto cobrar.
       // Cozinha/Sushibar/Bar: só os itens daquela estação + observações, sem dados pessoais.
-      const items = isCaixa ? order.items : order.items.filter(i => (i.stations || []).includes(st));
-      if (!items.length) return sendJSON(res, 200, { ok: true, printed: false, skipped: true, order, station: st });
+      const items = (isCaixa || isDispatch) ? order.items : order.items.filter(i => (i.stations || []).includes(st));
+      // v129: via de despacho só faz sentido pra pedido DELIVERY (retirada não tem motoboy pra
+      // avisar) — pula sem erro, igual já acontece quando uma via de produção não tem itens.
+      if (isDispatch && order.mode !== 'delivery') return sendJSON(res, 200, { ok: true, printed: false, skipped: true, order, station: st });
+      if (!isDispatch && !items.length) return sendJSON(res, 200, { ok: true, printed: false, skipped: true, order, station: st });
 
       // v86 — CORRIGIDO ("imprimiu 3 cópias da mesma via"): cfg.print (auto-impressão) é um
       // interruptor GLOBAL — todo painel aberto e conectado, em qualquer aparelho (ou aba),
@@ -4172,6 +4203,37 @@ function estimateDeliveryWindow(order, cfg) {
         lines.push('Pagamento: ' + payMethodTicketLabel(order) + (order.troco ? ' (troco para ' + order.troco + ')' : ''));
         lines.push(ESC.center + 'Obrigado pela preferencia!' + ESC.left);
         if (cfg.siteUrl) lines.push(ESC.center + cfg.siteUrl + ESC.left);
+      } else if (isDispatch) {
+        // v129 — NOVO ("via do motoboy/expedição deve focar em cliente/endereço/pagamento"):
+        // mesmo bloco de dados de entrega do Caixa (endereço, pagamento, troco), sem a lista
+        // de itens — quem vai entregar não precisa conferir prato por prato, só pra onde ir e
+        // quanto cobrar/receber. Reaproveita os mesmos campos do pedido que o Caixa já usa
+        // (order.address, order.courierName etc.) — não inventa estrutura de dado nova.
+        lines.push(ESC.center + ESC.boldOn + ((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase() + ESC.boldOff + ESC.left);
+        lines.push(ESC.center + 'VIA DE DESPACHO' + ESC.left);
+        lines.push(HR);
+        lines.push((order.ticketNumber ? 'Pedido Nº ' + order.ticketNumber : 'Pedido #' + order.id) + '  Ref.: #' + refShort);
+        lines.push(HR);
+        lines.push(ESC.boldOn + 'CLIENTE' + ESC.boldOff);
+        lines.push(HR);
+        lines.push(order.name);
+        lines.push('Tel: ' + order.phone);
+        lines.push(HR);
+        lines.push(ESC.boldOn + 'ENDERECO' + ESC.boldOff);
+        lines.push(HR);
+        lines.push(order.address || '—');
+        lines.push(HR);
+        lines.push(ESC.boldOn + 'PAGAMENTO' + ESC.boldOff);
+        lines.push(HR);
+        lines.push(payMethodTicketLabel(order));
+        lines.push(rightAlignRow('Total:', money(order.total)));
+        if (order.troco) lines.push(rightAlignRow('Troco para:', String(order.troco)));
+        lines.push(HR);
+        lines.push(rightAlignRow('Taxa de entrega:', money(order.fee)));
+        lines.push(rightAlignRow('Motoboy:', order.courierName || 'A definir'));
+        lines.push(rightAlignRow('Previsao entrega:', deliveryWindow));
+        if (order.obs) { lines.push(HR); lines.push(ESC.boldOn + 'OBSERVACAO' + ESC.boldOff); lines.push(order.obs); }
+        lines.push(HR2);
       } else {
         // ── Vias de produção (cozinha/sushibar/bar): layout idêntico entre as três vias ──
         // v40: previsão de saída automática = Entrada + tempo de preparo configurado pra essa estação.
@@ -4196,6 +4258,19 @@ function estimateDeliveryWindow(order, cfg) {
         // saber se o pedido é pra já ou se tem uma previsão de entrega mais folgada. Agora
         // mostra as duas linhas, igual já aparece na página de Pedidos do painel.
         lines.push(rightAlignRow(order.mode === 'delivery' ? 'Prev. entrega:' : 'Prev. retirada:', deliveryWindow));
+        // v129 — NOVO ("níveis de prioridade NORMAL/ATENÇÃO/ATRASADO"): só aparece quando o
+        // pedido JÁ está atrasado ou perto de atrasar em relação à Saída Prevista DESSA via —
+        // relevante principalmente em reimpressão manual de um pedido represado (a impressão
+        // automática sai muito perto da criação do pedido, quase sempre "NORMAL" — imprimir
+        // essa palavra toda vez seria só desperdiçar papel à toa). Sem depender só de emoji
+        // (impressora térmica às vezes não imprime emoji) — o texto "ATRASADO"/"ATENCAO" vem
+        // sempre junto.
+        {
+          const saidaMs = new Date(order.createdAt).getTime() + prepMin * 60000;
+          const atraso = Date.now() - saidaMs;
+          if (atraso >= 0) lines.push(HR2 + '\n' + ESC.center + ESC.boldOn + '*** ATRASADO ***' + ESC.boldOff + ESC.left + '\n' + HR2);
+          else if (atraso >= -5 * 60000) lines.push(HR + '\n' + ESC.center + ESC.boldOn + '** ATENCAO — QUASE NA HORA **' + ESC.boldOff + ESC.left + '\n' + HR);
+        }
         lines.push(HR);
         lines.push(ESC.boldOn + ('ITENS DA ' + (((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase())) + ESC.boldOff);
         lines.push(HR);
