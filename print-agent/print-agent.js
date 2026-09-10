@@ -85,7 +85,15 @@ function loadPrinters() {
       label: p.label || p.stations?.join(', ') || 'Impressora',
       type: p.type === 'star' ? PrinterTypes.STAR : PrinterTypes.EPSON,
       interface: p.interface,
-      width: p.width || 42,
+      // v126 — BUG CORRIGIDO ("ajuste pra caber na bobina 80mm bematech"): o padrão de
+      // fábrica era 42 colunas — nem o valor certo pra 58mm (32) nem pra 80mm (48), então
+      // QUALQUER impressora nova (58mm ou 80mm) que ninguém tivesse configurado explicitamente
+      // com "width" no config.json saía com colunas erradas pros dois casos. Ficha técnica de
+      // 80mm Bematech em modo ESC/POS (fonte A, padrão de fábrica) é 48 colunas — mesmo valor
+      // já usado no lado do servidor pra impressão direta (ver printCols() em server.js) —
+      // então 48 vira o novo padrão daqui também, mantendo os dois lados consistentes. Quem
+      // usa 58mm continua podendo sobrescrever com "width": 32 no config.json normalmente.
+      width: p.width || 48,
       stations: Array.isArray(p.stations) && p.stations.length ? p.stations : ['caixa']
     }));
   }
@@ -94,7 +102,7 @@ function loadPrinters() {
     label: 'Impressora principal',
     type: cfg.printerType === 'star' ? PrinterTypes.STAR : PrinterTypes.EPSON,
     interface: cfg.printerInterface,
-    width: cfg.printerWidth || 42,
+    width: cfg.printerWidth || 48, // v126 — mesmo ajuste acima (era 42, virou 48 = padrão 80mm)
     stations: Array.isArray(cfg.stations) && cfg.stations.length ? cfg.stations : ['caixa']
   }];
 }
@@ -194,7 +202,18 @@ function payMethodTicketLabel(order) {
 // v55: quais vias esse agente é responsável por imprimir — agora é a UNIÃO das vias de
 // TODAS as impressoras configuradas acima (antes era uma lista solta em cfg.stations).
 const MY_STATIONS = [...new Set(PRINTERS.flatMap(p => p.stations))];
-const STATION_LABELS = { caixa: 'Caixa', cozinha: 'Cozinha', sushibar: 'Sushibar', bar: 'Bar' };
+// v129 — NOVO: rótulos das duas vias que faltavam aqui (delivery/expedição já existem como
+// estação padrão do sistema desde a v46, mas essa lista hardcoded no Agente nunca foi
+// atualizada — sem entrada aqui, essas duas vias apareciam sem nome bonito nos logs/ticket).
+const STATION_LABELS = { caixa: 'Caixa', cozinha: 'Cozinha', sushibar: 'Sushibar', bar: 'Bar', delivery: 'Delivery', expedicao: 'Expedição' };
+// v129 — NOVO ("via do motoboy/expedição deve focar em cliente/endereço/pagamento, não na
+// lista de itens"): o Agente Local não tem acesso ao cfg.stations[x].kind do servidor (ele só
+// enxerga config.json PRÓPRIO, de impressora — ver loadPrinters() acima), então usa a mesma
+// convenção de nome fixo que o servidor usa como padrão de fábrica (ver DEFAULT_CFG.stations
+// em server.js). Cobre o caso de longe mais comum (as duas vias de despacho padrão do
+// sistema); uma via de despacho CUSTOMIZADA com outro nome continuaria saindo como produção
+// aqui — mesma limitação que STATION_LABELS acima já tinha pra nomes fora da lista.
+const DISPATCH_STATIONS = ['delivery', 'expedicao'];
 
 // v92 — mesma correção de tamanho de fonte feita no server.js (impressora de rede/USB direta),
 // agora espelhada aqui pro Agente Local (que usa node-thermal-printer): antes o tamanho
@@ -213,8 +232,12 @@ function tamanhoImpressaoTermica(printSize) {
 // DA <SETOR>" + espaço de observações nas vias de produção (cozinha/sushibar/bar).
 function printStationTicket(printer, order, station, storeName) {
   const isCaixa = station === 'caixa';
-  const items = isCaixa ? (order.items || []) : (order.items || []).filter(i => (i.stations || []).includes(station));
-  if (!items.length) return false; // essa via não tem nada desse pedido — não desperdiça papel
+  const isDispatch = !isCaixa && DISPATCH_STATIONS.includes(station);
+  const items = (isCaixa || isDispatch) ? (order.items || []) : (order.items || []).filter(i => (i.stations || []).includes(station));
+  // v129: despacho só imprime pra pedido DELIVERY (retirada não tem motoboy pra avisar) —
+  // não depende de item nenhum ter essa via marcada (ninguém marca comida como "via delivery").
+  if (isDispatch && order.mode !== 'delivery') return false;
+  if (!isDispatch && !items.length) return false; // essa via não tem nada desse pedido — não desperdiça papel
 
   const tam = tamanhoImpressaoTermica(order._printFontSize);
   printer.alignCenter();
@@ -249,6 +272,33 @@ function printStationTicket(printer, order, station, storeName) {
     printer.setTextDoubleHeight(); printer.bold(true);
     printer.leftRight('TOTAL', money(order.total));
     printer.bold(false); printer.setTextNormal();
+  } else if (isDispatch) {
+    // v129 — NOVO ("via do motoboy/expedição deve focar em cliente/endereço/pagamento, não
+    // na lista de itens como cozinha/sushibar"): mesmo bloco de dados de entrega do Caixa,
+    // sem lista de itens — quem sai pra entregar só precisa saber pra onde ir e quanto cobrar.
+    printer.println((STATION_LABELS[station] || station).toUpperCase());
+    printer.println('VIA DE DESPACHO');
+    printer.alignLeft();
+    printer.println((order.ticketNumber ? `Pedido Nº ${order.ticketNumber}` : `Pedido #${order.id}`) + `  Ref.: #${String(order.id).slice(-11).toUpperCase()}`);
+    printer.drawLine();
+    printer.bold(true); printer.println('CLIENTE'); printer.bold(false);
+    printer.drawLine();
+    printer.println(order.name || '-');
+    if (order.phone) printer.println('Tel: ' + order.phone);
+    printer.drawLine();
+    printer.bold(true); printer.println('ENDERECO'); printer.bold(false);
+    printer.drawLine();
+    printer.println(order.address || '-');
+    printer.drawLine();
+    printer.bold(true); printer.println('PAGAMENTO'); printer.bold(false);
+    printer.drawLine();
+    printer.println(payMethodTicketLabel(order));
+    printer.leftRight('Total:', money(order.total));
+    if (order.troco) printer.leftRight('Troco para:', String(order.troco));
+    printer.drawLine();
+    printer.leftRight('Taxa de entrega:', money(order.fee));
+    printer.leftRight('Motoboy:', order.courierName || 'A definir');
+    if (order.obs) { printer.drawLine(); printer.bold(true); printer.println('OBSERVACAO'); printer.bold(false); printer.println(order.obs); }
   } else {
     printer.println((STATION_LABELS[station] || station).toUpperCase());
     printer.println('VIA DE PRODUCAO');
@@ -258,7 +308,19 @@ function printStationTicket(printer, order, station, storeName) {
     printer.drawLine();
     printer.bold(true); printer.println('ITENS DA ' + (STATION_LABELS[station] || station).toUpperCase()); printer.bold(false);
     printer.drawLine();
-    items.forEach(it => printer.println('* ' + it.qty + 'x ' + it.name));
+    items.forEach(it => {
+      // v128 — NOVO ("nome do item deve ser maior e em negrito na comanda da cozinha e
+      // sushibar pra melhor visualização"): só o NOME do item vem com largura +1 (relativo
+      // ao tamanho já configurado em Fonte de Impressão, "tam.w" acima) + negrito —
+      // setTextDoubleWidth()/setTextNormal() reiniciariam o tamanho pro padrão de fábrica da
+      // impressora, perdendo o "tam.h/tam.w" configurado pra todo o resto do ticket; por
+      // isso usa setTextSize(tam.h, tam.w+1) e depois volta pro tam.h/tam.w original — nunca
+      // pro zero. Largura tem teto (min 5) pra não sair um nome gigante ilegível.
+      printer.print('* ' + it.qty + 'x ');
+      printer.bold(true); printer.setTextSize(tam.h, Math.min(tam.w + 1, 5));
+      printer.println(it.name);
+      printer.bold(false); printer.setTextSize(tam.h, tam.w);
+    });
     printer.drawLine();
     printer.println('Observacoes:');
     if (order.obs) printer.println(order.obs);
@@ -266,6 +328,10 @@ function printStationTicket(printer, order, station, storeName) {
   }
   printer.newLine();
   printer.cut();
+  // v126 — NOVO ("fazer um bip duplo ao imprimir"): mesmo comando de campainha dupla usado
+  // no lado do servidor (ver ESC.beep em server.js) — printer.beep(2,2) apita 2 vezes.
+  // Impressora sem campainha (ou desligada no hardware) simplesmente ignora, sem erro.
+  printer.beep(2, 2);
   return true;
 }
 
@@ -340,6 +406,7 @@ async function printReservation(reservation) {
     }
     printReservationTicket(printer, reservation, cfg.storeName);
     printer.newLine(); printer.cut();
+    printer.beep(2, 2); // v126 — bipe duplo (mesma ideia da via de pedido acima)
     if (isWinPrinter) sendRawBufferToWindowsPrinter(windowsPrinterName(printerCfg), printer.getBuffer());
     else await printer.execute();
     await completeReservationPrint(reservation.id);
@@ -519,6 +586,7 @@ async function printTestTicket(payload) {
     printer.println(new Date().toLocaleString('pt-BR'));
     printer.setTextNormal();
     printer.newLine(); printer.cut();
+    printer.beep(2, 2); // v126 — bipe duplo também no teste de impressão (consistência)
     if (isWinPrinter) {
       sendRawBufferToWindowsPrinter(windowsPrinterName(printerCfg), printer.getBuffer());
     } else {
