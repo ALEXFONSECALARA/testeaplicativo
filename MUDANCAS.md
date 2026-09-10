@@ -1,3 +1,7 @@
+# v130 — Prioridade ao vivo no Kanban
+
+- **NOVO — Contagem regressiva de preparo no Kanban**: cada pedido nas colunas "Novos"/"Preparando" agora mostra uma contagem ao vivo (atualiza a cada segundo, sem recarregar a tela) baseada no tempo de preparo de verdade das estações daquele pedido — se tem item de cozinha (20 min) e sushibar (15 min) no mesmo pedido, usa o maior (as estações preparam em paralelo, não em fila). Três estados: `⏱ MM:SS restantes` (normal), `⚠ MM:SS restantes` (últimos 5 minutos, destaque dourado) e `🚨 ATRASADO · MM:SS` (destaque vermelho). Esse indicador é só informativo (sem som) e funciona junto do alarme sonoro "⚠️ ATRASADO" que já existia — são coisas diferentes: o alarme sonoro usa um limite fixo configurado pelo admin (Configurações → Alerta de Atraso) pra tocar som, esse novo indicador calcula a previsão real por pedido a partir do tempo de preparo de cada via.
+
 # v129 — Via de despacho (motoboy), encoding corrigido, prioridade na comanda
 
 - **Bug corrigido — acentos errados na impressão direta (ã, ç, é, ê, ó)**: a impressão direta (USB/rede, sem Agente Local) nunca avisava a impressora qual código de página usar pros bytes de acento — o Agente Local já corrigia isso há tempos (PC860 Português), mas faltava esse mesmo cuidado no caminho direto do servidor. Agora envia o comando de código de página certo (WPC1252) antes do texto.
