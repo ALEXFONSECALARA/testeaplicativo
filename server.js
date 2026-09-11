@@ -2056,7 +2056,7 @@ function buildReservationTicketText(reservation, cfg) {
   lines.push('Pessoas: ' + reservation.people);
   if (reservation.notes) { lines.push(HR); lines.push('Obs: ' + reservation.notes); }
   lines.push(HR2);
-  lines.push(ESC.center + 'Reservado em ' + new Date(reservation.createdAt).toLocaleString('pt-BR') + ESC.left);
+  lines.push(ESC.center + 'Reservado em ' + new Date(reservation.createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) + ESC.left);
   return buildTicketText(lines, cfg);
 }
 
@@ -3769,7 +3769,14 @@ function estimateDeliveryWindow(order, cfg) {
   const timeText = order.mode === 'retirada' ? (cfg.timeRetirada || cfg.time) : cfg.time;
   const nums = String(timeText || '').match(/\d+/g);
   const created = new Date(order.createdAt);
-  const fmt = (d) => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  // v133 — BUG CORRIGIDO ("previsão de entrega errada na comanda", ex.: pedido feito às
+  // 00:18 mostrando previsão 03:58–04:18 em vez de 00:58–01:18): o servidor roda hospedado
+  // num relógio configurado em UTC (padrão de praticamente todo host na nuvem), e essa função
+  // formatava o horário sem dizer EM QUE FUSO — o Node então usa o fuso do SISTEMA (UTC), não
+  // o horário de Brasília (UTC-3), o que empurra a previsão pra 3 horas à frente do horário
+  // real. `timeZone: 'America/Sao_Paulo'` já era usado em outro lugar do sistema (linha ~658)
+  // exatamente por essa razão — só faltava aplicar aqui também.
+  const fmt = (d) => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
   if (nums && nums.length >= 2) {
     const from = new Date(created.getTime() + parseInt(nums[0]) * 60000);
     const to = new Date(created.getTime() + parseInt(nums[nums.length - 1]) * 60000);
@@ -3908,7 +3915,7 @@ function estimateDeliveryWindow(order, cfg) {
       try { fs.accessSync(file, fs.constants.R_OK | fs.constants.W_OK); checks[name] = true; } catch (_) { checks[name] = false; }
     }
     const ok = Object.values(checks).every(Boolean);
-    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.132', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
+    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.133', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
   }
 
   // ── GET /api/print-agent/status — o painel consulta pra mostrar se tem algum Agente Local
@@ -4201,8 +4208,13 @@ function estimateDeliveryWindow(order, cfg) {
       // agora emoldurado por linhas duplas em cima E embaixo (era só embaixo), pedido de um
       // visual mais "premium/minimalista" inspirado em comprovante de restaurante japonês.
       lines.push(HR2);
-      lines.push(ESC.center + ESC.boldOn + (cfg.name || 'SHOGATSU').toUpperCase() + ESC.boldOff);
-      lines.push((cfg.tagline || 'CULINARIA ORIENTAL').toUpperCase() + ESC.left);
+      // v133 — BUG CORRIGIDO ("cabeçalho deve ter apenas Shogatsu Culinária Oriental"): a
+      // linha de subtítulo (cfg.tagline, padrão "CULINARIA ORIENTAL") aparecia LOGO ABAIXO do
+      // nome da loja — se o nome já configurado em cfg.name for "Shogatsu Culinária Oriental"
+      // (como é o caso aqui), o cabeçalho saía com o nome inteiro e, na linha de baixo, uma
+      // repetição de parte dele ("CULINÁRIA ORIENTAL" de novo). Cabeçalho agora mostra só o
+      // nome da loja (cfg.name), uma vez só — sem linha de subtítulo separada.
+      lines.push(ESC.center + ESC.boldOn + (cfg.name || 'SHOGATSU').toUpperCase() + ESC.boldOff + ESC.left);
       lines.push(HR2);
       lines.push('');
       // v131: "PEDIDO #" é o elemento mais destacado do ticket inteiro (pedido explícito do
@@ -4222,8 +4234,8 @@ function estimateDeliveryWindow(order, cfg) {
         // disponível, só que junto do resumo de pagamento no rodapé, onde ainda serve pra
         // conferência sem disputar atenção com o número do pedido.
         lines.push(HR);
-        lines.push('DATA: ' + new Date(order.createdAt).toLocaleDateString('pt-BR'));
-        lines.push('HORA: ' + new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+        lines.push('DATA: ' + new Date(order.createdAt).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
+        lines.push('HORA: ' + new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }));
         lines.push('TIPO: ' + (order.mode === 'delivery' ? 'DELIVERY' : 'RETIRADA'));
         lines.push(HR);
         lines.push('');
@@ -4264,8 +4276,10 @@ function estimateDeliveryWindow(order, cfg) {
         lines.push(ESC.boldOn + tamItem.wideOn + money(order.total) + tamItem.on + ESC.boldOff);
         lines.push(HR2);
         lines.push('');
-        lines.push(ESC.center + ESC.boldOn + 'OBRIGADO!' + ESC.boldOff);
-        lines.push((cfg.name || 'SHOGATSU').toUpperCase() + ESC.left);
+        // v133 — BUG CORRIGIDO ("rodapé deve ter apenas Obrigado pela Preferência"): antes
+        // repetia "OBRIGADO!" + o nome da loja de novo (redundante — o nome já aparece bem
+        // no topo do ticket). Volta pra uma linha só, direta.
+        lines.push(ESC.center + ESC.boldOn + 'OBRIGADO PELA PREFERENCIA!' + ESC.boldOff + ESC.left);
         lines.push(HR2);
         if (cfg.siteUrl) { lines.push(''); lines.push(ESC.center + cfg.siteUrl + ESC.left); }
       } else if (isDispatch) {
@@ -4303,9 +4317,9 @@ function estimateDeliveryWindow(order, cfg) {
         // ── Vias de produção (cozinha/sushibar/bar): layout idêntico entre as três vias ──
         // v40: previsão de saída automática = Entrada + tempo de preparo configurado pra essa estação.
         const prepMin = Number((cfg.stations[st] && cfg.stations[st].prepTime)) || 15;
-        const entrada = new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const entrada = new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
         const saidaPrevista = new Date(new Date(order.createdAt).getTime() + prepMin * 60000)
-          .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
         lines.push(ESC.center + ESC.boldOn + ((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase() + ESC.boldOff);
         lines.push('VIA DE PRODUCAO' + ESC.left);
         lines.push(HR);
