@@ -2035,12 +2035,13 @@ function buildReservationTicketText(reservation, cfg) {
   const cols = printCols(cfg);
   const HR = '-'.repeat(cols);
   const HR2 = '='.repeat(cols);
+  const tam = tamanhoImpressaoTermica(cfg && cfg.printSize);
   const lines = [];
   lines.push(ESC.center + ESC.boldOn + (cfg.name || 'SHOGATSU').toUpperCase() + ESC.boldOff);
   lines.push((cfg.tagline || 'CULINARIA ORIENTAL').toUpperCase() + ESC.left);
   lines.push(HR2);
   lines.push(ESC.center + 'RESERVA DE MESA' + ESC.left);
-  lines.push(ESC.center + ESC.boldOn + ESC.doubleOn + (reservation.status === 'confirmada' ? 'CONFIRMADA' : 'PENDENTE') + ESC.doubleOff + ESC.boldOff + ESC.left);
+  lines.push(ESC.center + ESC.boldOn + tam.wideOn + (reservation.status === 'confirmada' ? 'CONFIRMADA' : 'PENDENTE') + tam.on + ESC.boldOff + ESC.left);
   lines.push('Ref.: ' + reservation.id);
   lines.push(HR);
   lines.push(ESC.boldOn + 'CLIENTE' + ESC.boldOff);
@@ -4166,7 +4167,9 @@ function estimateDeliveryWindow(order, cfg) {
       const refShort = String(order.id || '').slice(-11).toUpperCase();
       const lines = [];
       // v130 — NOVO VISUAL ("comprovante premium/minimalista/legível"): cabeçalho + Nº do
-      // pedido em destaque (usa ESC.doubleOn, já existente — mesmo recurso do TOTAL), dados
+      // pedido em destaque (usa tamItem.wideOn/tamItem.on — mesmo recurso já usado no nome dos
+      // itens de produção — para NUNCA resetar o tamanho de fonte pro padrão absoluto da
+      // impressora no meio do ticket; ver comentário em tamanhoImpressaoTermica acima), dados
       // agrupados por finalidade (DATA/HORA/TIPO, CLIENTE, ITENS, PAGAMENTO/TOTAL), sem
       // elementos decorativos extras. Mesmos dados de sempre — só a composição das linhas
       // mudou; nenhum comando ESC/POS novo foi criado, nenhuma via/estação/cálculo mudou.
@@ -4177,7 +4180,7 @@ function estimateDeliveryWindow(order, cfg) {
       if (isCaixa) {
         // ── Via do Caixa: comprovante completo (dados do cliente + horário estimado) ──
         lines.push(ESC.center + 'COMPROVANTE' + ESC.left);
-        lines.push(ESC.center + ESC.boldOn + ESC.doubleOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + ESC.doubleOff + ESC.boldOff + ESC.left);
+        lines.push(ESC.center + ESC.boldOn + tamItem.wideOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + tamItem.on + ESC.boldOff + ESC.left);
         lines.push(HR);
         lines.push('Data: ' + new Date(order.createdAt).toLocaleDateString('pt-BR'));
         lines.push('Hora: ' + new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
@@ -4210,7 +4213,7 @@ function estimateDeliveryWindow(order, cfg) {
         lines.push(ESC.boldOn + 'PAGAMENTO' + ESC.boldOff);
         lines.push(payMethodTicketLabel(order) + (order.troco ? ' (troco para ' + order.troco + ')' : ''));
         lines.push(HR);
-        lines.push(ESC.boldOn + ESC.doubleOn + rightAlignRow('TOTAL', money(order.total)) + ESC.doubleOff + ESC.boldOff);
+        lines.push(ESC.boldOn + tamItem.wideOn + rightAlignRow('TOTAL', money(order.total)) + tamItem.on + ESC.boldOff);
         lines.push(HR2);
         lines.push(ESC.center + 'Obrigado pela preferencia!' + ESC.left);
         if (cfg.siteUrl) lines.push(ESC.center + cfg.siteUrl + ESC.left);
@@ -4220,7 +4223,7 @@ function estimateDeliveryWindow(order, cfg) {
         // (order.address, order.courierName etc.) — não inventa estrutura de dado nova.
         lines.push(ESC.center + ESC.boldOn + ((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase() + ESC.boldOff + ESC.left);
         lines.push(ESC.center + 'VIA DE DESPACHO' + ESC.left);
-        lines.push(ESC.center + ESC.boldOn + ESC.doubleOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + ESC.doubleOff + ESC.boldOff + ESC.left);
+        lines.push(ESC.center + ESC.boldOn + tamItem.wideOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + tamItem.on + ESC.boldOff + ESC.left);
         lines.push(HR);
         lines.push('Ref.: #' + refShort);
         lines.push(HR);
@@ -4236,7 +4239,7 @@ function estimateDeliveryWindow(order, cfg) {
         lines.push(ESC.boldOn + 'PAGAMENTO' + ESC.boldOff);
         lines.push(HR);
         lines.push(payMethodTicketLabel(order));
-        lines.push(rightAlignRow('Total:', money(order.total)));
+        lines.push(rightAlignRow('Valor a receber:', money(order.total)));
         if (order.troco) lines.push(rightAlignRow('Troco para:', String(order.troco)));
         lines.push(HR);
         lines.push(rightAlignRow('Taxa de entrega:', money(order.fee)));
@@ -4253,7 +4256,7 @@ function estimateDeliveryWindow(order, cfg) {
           .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         lines.push(ESC.center + ESC.boldOn + ((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase() + ESC.boldOff);
         lines.push('VIA DE PRODUCAO' + ESC.left);
-        lines.push(ESC.center + ESC.boldOn + ESC.doubleOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + ESC.doubleOff + ESC.boldOff + ESC.left);
+        lines.push(ESC.center + ESC.boldOn + tamItem.wideOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + tamItem.on + ESC.boldOff + ESC.left);
         lines.push(HR);
         lines.push('Ref.: #' + refShort);
         lines.push(order.mode === 'delivery' ? 'DELIVERY' : 'RETIRADA');
@@ -4298,6 +4301,12 @@ function estimateDeliveryWindow(order, cfg) {
         else { lines.push('_______________________________'); lines.push('_______________________________'); }
       }
       lines.push(HR2);
+      // v131 — NOVO VISUAL (referência anexada): assinatura de rodapé (igual à via impressa
+      // pelo navegador) — usa só dados já existentes (nome da loja, nº do pedido, estação) +
+      // o horário real em que o servidor está montando esse texto agora (Date.now() local, não
+      // é um campo novo do pedido nem mexe em nenhum cálculo/estado do sistema).
+      lines.push(ESC.center + (cfg.name || 'SHOGATSU').toUpperCase() + ' - ' + (order.ticketNumber ? 'Pedido Nº ' + order.ticketNumber : 'Pedido #' + order.id) + ESC.left);
+      lines.push(ESC.center + 'Impresso: ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - Estacao: ' + (isCaixa ? 'CAIXA' : (((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase())) + ESC.left);
       const ticketText = buildTicketText(lines, cfg);
 
       try {
