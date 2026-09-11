@@ -6217,8 +6217,10 @@ function openBrowserReservationTicket(reservation){
     .t-row{font-size:${Math.round(12*scale)}px;margin:3px 0;}
   </style></head><body>
     <div class="t-center">
+      <!-- v133 — BUG CORRIGIDO ("cabeçalho deve ter apenas Shogatsu Culinária Oriental"): linha
+           de subtítulo (cfg.tagline) removida — ficava redundante quando o nome da loja já
+           configurado (cfg.name) é algo como "Shogatsu Culinária Oriental". -->
       <div class="t-title">${(cfg.name||'SHOGATSU').toUpperCase()}</div>
-      <div class="t-sub">${esc(cfg.tagline||'CULINÁRIA ORIENTAL')}</div>
     </div>
     <div class="t-hr-solid"></div>
     <div class="t-doctype">RESERVA DE MESA</div>
@@ -6330,8 +6332,10 @@ function openBrowserTicket(order, station, deliveryWindow, existingWin){
   </style></head><body>
     <div class="t-hr-solid"></div>
     <div class="t-center">
+      <!-- v133 — BUG CORRIGIDO ("cabeçalho deve ter apenas Shogatsu Culinária Oriental"): linha
+           de subtítulo (cfg.tagline) removida — ficava redundante quando o nome da loja já
+           configurado (cfg.name) é algo como "Shogatsu Culinária Oriental". -->
       <div class="t-title">${(cfg.name||'SHOGATSU').toUpperCase()}</div>
-      <div class="t-sub">${esc(cfg.tagline||'CULINÁRIA ORIENTAL')}</div>
     </div>
     <div class="t-hr-solid"></div>
     <div class="t-order-number">${order.ticketNumber?'PEDIDO Nº '+order.ticketNumber:'PEDIDO #'+order.id}</div>
@@ -6355,7 +6359,7 @@ function openBrowserTicket(order, station, deliveryWindow, existingWin){
     <div class="t-hr"></div>
     ${bodyHTML}
     <div class="t-hr-solid"></div>
-    ${isCaixa?`<div class="t-center" style="margin:8px 0;"><div class="t-block-title" style="margin:0;">OBRIGADO!</div><div class="t-row" style="font-weight:700;">${(cfg.name||'SHOGATSU').toUpperCase()}</div></div><div class="t-hr-solid"></div>${cfg.siteUrl?`<div class="t-row t-center">${esc(cfg.siteUrl)}</div>`:''}`:''}
+    ${isCaixa?`<div class="t-center" style="margin:8px 0;"><div class="t-block-title" style="margin:0;">OBRIGADO PELA PREFERÊNCIA!</div></div><div class="t-hr-solid"></div>${cfg.siteUrl?`<div class="t-row t-center">${esc(cfg.siteUrl)}</div>`:''}`:''}
     <script>
       // v45 — BUG CORRIGIDO ("impressão trava o sistema"): window.print() é uma chamada
       // BLOQUEANTE — enquanto a caixa de diálogo de impressão do navegador está aberta numa
