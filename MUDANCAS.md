@@ -1,3 +1,20 @@
+# v132 — Impressão duplicada no clique corrigida
+
+- **Bug corrigido — via impressa em duplicidade ao clicar**: a trava contra impressão duplicada só valia pra disparo AUTOMÁTICO (de propósito — reimpressão manual sempre precisa funcionar mesmo se a via já tiver sido impressa, pra staff poder forçar reimpressão quando algo dá errado). Isso deixava uma brecha real: se dois aparelhos com o painel aberto (ex: celular + tablet) clicassem "🖨 Imprimir" quase ao mesmo tempo num pedido ainda não impresso, os dois cliques manuais passavam direto sem trava nenhuma — a mesma via saía impressa 2 vezes. Agora existe uma trava igual à automática, mas que só vale pra **primeira vez** que aquela via é impressa nesse pedido — depois disso (mesmo que tenha sido só essa primeira trava, sem nunca ter chegado a imprimir), qualquer clique manual seguinte (reimpressão deliberada, minutos ou horas depois) continua funcionando sem bloqueio nenhum, exatamente como sempre funcionou.
+- **Previsão de entrega**: conferido em todos os pontos do sistema (site do cliente, os três caminhos de impressão, mensagens de confirmação) — todos usam corretamente o tempo configurado em Configurações (Delivery/Retirada). A lacuna real era a corrigida na v131 (Agente Local não recebia esse valor); já resolvida lá.
+
+# v131 — Novo visual do comprovante + previsão de entrega corrigida
+
+- **Bug corrigido — previsão de entrega**: o Agente Local nunca mostrava o horário de previsão de entrega/retirada no comprovante, mesmo com esse valor configurado em Configurações (Tempo estimado de entrega/retirada) — o cálculo só chegava pro navegador e pra impressão direta do servidor. Agora o servidor manda esse valor pronto pro Agente Local também (tanto no pedido novo em tempo real quanto na fila de recuperação, se o agente estava offline), sempre calculado a partir do que está definido no sistema.
+- **Novo visual do comprovante (só aparência — nenhuma lógica de impressão, fila, anti-duplicação, ESC/POS ou comunicação com impressora foi alterada)**: layout premium e minimalista aplicado nos três caminhos de impressão (direta, Agente Local, navegador), inspirado em comprovante de restaurante japonês —
+  - Cabeçalho emoldurado por linha dupla em cima e embaixo.
+  - "PEDIDO #" vira o elemento mais destacado do ticket inteiro (maior, negrito, centralizado).
+  - Itens com nome maior e em negrito, agrupados sem competir com preço por item — só o TOTAL no fim.
+  - Seções separadas por finalidade: DATA/HORA/TIPO, ITENS, OBSERVAÇÃO, CLIENTE/TELEFONE/ENDEREÇO, PAGAMENTO+TOTAL.
+  - Rodapé "OBRIGADO!" emoldurado com o nome da loja.
+  - Nenhum dado foi removido — subtotal, taxa de entrega, cupom/desconto e troco continuam aparecendo, só reorganizados visualmente.
+- Corrigido de passagem um bug introduzido na v129: a via de despacho (Delivery/Expedição) impressa pelo navegador ainda caía no cabeçalho "VIA DE PRODUÇÃO" com bloco de horário de preparo (que não faz sentido pra despacho) — agora tem cabeçalho próprio "VIA DE DESPACHO".
+
 # v130 — Prioridade ao vivo no Kanban
 
 - **NOVO — Contagem regressiva de preparo no Kanban**: cada pedido nas colunas "Novos"/"Preparando" agora mostra uma contagem ao vivo (atualiza a cada segundo, sem recarregar a tela) baseada no tempo de preparo de verdade das estações daquele pedido — se tem item de cozinha (20 min) e sushibar (15 min) no mesmo pedido, usa o maior (as estações preparam em paralelo, não em fila). Três estados: `⏱ MM:SS restantes` (normal), `⚠ MM:SS restantes` (últimos 5 minutos, destaque dourado) e `🚨 ATRASADO · MM:SS` (destaque vermelho). Esse indicador é só informativo (sem som) e funciona junto do alarme sonoro "⚠️ ATRASADO" que já existia — são coisas diferentes: o alarme sonoro usa um limite fixo configurado pelo admin (Configurações → Alerta de Atraso) pra tocar som, esse novo indicador calcula a previsão real por pedido a partir do tempo de preparo de cada via.

@@ -2035,14 +2035,13 @@ function buildReservationTicketText(reservation, cfg) {
   const cols = printCols(cfg);
   const HR = '-'.repeat(cols);
   const HR2 = '='.repeat(cols);
-  const tam = tamanhoImpressaoTermica(cfg && cfg.printSize);
   const lines = [];
   lines.push(ESC.center + ESC.boldOn + (cfg.name || 'SHOGATSU').toUpperCase() + ESC.boldOff);
   lines.push((cfg.tagline || 'CULINARIA ORIENTAL').toUpperCase() + ESC.left);
   lines.push(HR2);
   lines.push(ESC.center + 'RESERVA DE MESA' + ESC.left);
-  lines.push(ESC.center + ESC.boldOn + tam.wideOn + (reservation.status === 'confirmada' ? 'CONFIRMADA' : 'PENDENTE') + tam.on + ESC.boldOff + ESC.left);
   lines.push('Ref.: ' + reservation.id);
+  lines.push('Status: ' + (reservation.status === 'confirmada' ? 'CONFIRMADA' : 'PENDENTE DE CONFIRMACAO'));
   lines.push(HR);
   lines.push(ESC.boldOn + 'CLIENTE' + ESC.boldOff);
   lines.push(HR);
@@ -3909,7 +3908,7 @@ function estimateDeliveryWindow(order, cfg) {
       try { fs.accessSync(file, fs.constants.R_OK | fs.constants.W_OK); checks[name] = true; } catch (_) { checks[name] = false; }
     }
     const ok = Object.values(checks).every(Boolean);
-    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.130', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
+    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.132', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
   }
 
   // ── GET /api/print-agent/status — o painel consulta pra mostrar se tem algum Agente Local
@@ -3932,6 +3931,13 @@ function estimateDeliveryWindow(order, cfg) {
     try {
       const now = Date.now();
       const maxAgeMs = 48 * 60 * 60 * 1000;
+      // v131 — corrige "tempo de entrega deve ser o que está definido no sistema": os pedidos
+      // recuperados por aqui (Agente Local que estava offline quando o pedido chegou) não
+      // levavam o horário de previsão calculado (_deliveryWindow) — só o broadcast 'new-order'
+      // levava isso. Agora os dois caminhos calculam do mesmo jeito, com a MESMA configuração
+      // (cfg.time/cfg.timeRetirada), então o Agente Local mostra o horário certo não importa
+      // se recebeu o pedido em tempo real ou recuperou depois de reconectar.
+      const { cfg } = readConfig();
       const orders = readJSON(ORDERS_FILE)
         .filter(o => o && o.autoPrintEligible === true && !['cancelado','entregue'].includes(o.status))
         .filter(o => now - new Date(o.createdAt || 0).getTime() <= maxAgeMs)
@@ -3939,7 +3945,8 @@ function estimateDeliveryWindow(order, cfg) {
           const states = o.autoPrintState || {};
           return !o.autoPrinted || Object.keys(states).some(st => states[st]?.status !== 'done') || Object.keys(states).length === 0;
         })
-        .slice(0, 100);
+        .slice(0, 100)
+        .map(o => ({ ...o, _deliveryWindow: estimateDeliveryWindow(o, cfg) }));
       const reservations = readJSON(RESERVATIONS_FILE)
         .filter(r => r && r.autoPrintEligible === true)
         .filter(r => now - new Date(r.createdAt || 0).getTime() <= maxAgeMs)
@@ -4076,6 +4083,28 @@ function estimateDeliveryWindow(order, cfg) {
         if(state?.status==='printing' && now-Number(state.claimedAt||0)<leaseMs) return sendJSON(res,200,{ok:true,printed:false,skipped:true,alreadyAutoPrinting:true,order,station:st});
         order.autoPrintState[st]={status:'printing',claimedAt:now,owner:String(stationId||originId||'panel').slice(0,120)};
         const idx = orders.findIndex(o => o.id === order.id); if(idx>-1) orders[idx]=order; writeJSON(ORDERS_FILE,orders);
+      } else if (!order.autoPrintState || !order.autoPrintState[st]) {
+        // v132 — BUG CORRIGIDO ("vias imprimindo duplicado ao clicar"): a trava acima (v86)
+        // só valia pra disparo AUTOMÁTICO, de propósito — reimpressão manual sempre deveria
+        // funcionar sem trava nenhuma (v106), pra staff poder forçar reimpressão de uma via
+        // que travou/errou. Só que isso deixava uma brecha real: se DOIS aparelhos (ex.:
+        // celular + tablet, os dois com o painel de um pedido NOVO aberto) clicassem
+        // "🖨 Imprimir" quase ao mesmo tempo, os dois cliques manuais passavam direto sem
+        // trava nenhuma — a mesma via saía impressa 2 vezes. Agora aplica essa MESMA trava de
+        // 90s (idêntica à automática), só que É SÓ PRA PRIMEIRA VEZ — se essa via NUNCA foi
+        // impressa nesse pedido (nem automático nem manual, `autoPrintState[st]` não existe),
+        // protege contra o clique duplicado de dois aparelhos. Assim que existe QUALQUER
+        // registro pra essa via — mesmo que tenha sido só essa primeira trava, sem nunca ter
+        // sido marcado "done" — os próximos cliques manuais (reimpressão deliberada, minutos
+        // ou horas depois) pulam esse bloco inteiro e imprimem sem nenhum bloqueio, igual
+        // sempre funcionou. Ou seja: protege só a corrida do primeiro clique, nunca atrapalha
+        // uma reimpressão de propósito.
+        const now=Date.now(); const leaseMs=90000;
+        if(!order.autoPrintState) order.autoPrintState={};
+        const state=order.autoPrintState[st];
+        if(state?.status==='printing' && now-Number(state.claimedAt||0)<leaseMs) return sendJSON(res,200,{ok:true,printed:false,skipped:true,alreadyPrinting:true,order,station:st});
+        order.autoPrintState[st]={status:'printing',claimedAt:now,owner:String(stationId||originId||'panel').slice(0,120)};
+        const idx = orders.findIndex(o => o.id === order.id); if(idx>-1) orders[idx]=order; writeJSON(ORDERS_FILE,orders);
       }
 
       const deliveryWindow = estimateDeliveryWindow(order, cfg);
@@ -4166,64 +4195,87 @@ function estimateDeliveryWindow(order, cfg) {
       };
       const refShort = String(order.id || '').slice(-11).toUpperCase();
       const lines = [];
-      // v130 — NOVO VISUAL ("comprovante premium/minimalista/legível"): cabeçalho + Nº do
-      // pedido em destaque (usa tamItem.wideOn/tamItem.on — mesmo recurso já usado no nome dos
-      // itens de produção — para NUNCA resetar o tamanho de fonte pro padrão absoluto da
-      // impressora no meio do ticket; ver comentário em tamanhoImpressaoTermica acima), dados
-      // agrupados por finalidade (DATA/HORA/TIPO, CLIENTE, ITENS, PAGAMENTO/TOTAL), sem
-      // elementos decorativos extras. Mesmos dados de sempre — só a composição das linhas
-      // mudou; nenhum comando ESC/POS novo foi criado, nenhuma via/estação/cálculo mudou.
+      // v131 — NOVO VISUAL DO COMPROVANTE (só layout — nenhuma lógica de impressão, fila,
+      // anti-duplicação, ESC/POS de corte/bipe/código-de-página ou comunicação com impressora
+      // foi tocada aqui, só o TEXTO/formatação das linhas do corpo do ticket): cabeçalho
+      // agora emoldurado por linhas duplas em cima E embaixo (era só embaixo), pedido de um
+      // visual mais "premium/minimalista" inspirado em comprovante de restaurante japonês.
+      lines.push(HR2);
       lines.push(ESC.center + ESC.boldOn + (cfg.name || 'SHOGATSU').toUpperCase() + ESC.boldOff);
       lines.push((cfg.tagline || 'CULINARIA ORIENTAL').toUpperCase() + ESC.left);
       lines.push(HR2);
+      lines.push('');
+      // v131: "PEDIDO #" é o elemento mais destacado do ticket inteiro (pedido explícito do
+      // novo layout) — maior + negrito, centralizado, sozinho na própria linha.
+      lines.push(ESC.center + ESC.boldOn + tamItem.wideOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + tamItem.on + ESC.boldOff + ESC.left);
+      lines.push('');
 
       if (isCaixa) {
         // ── Via do Caixa: comprovante completo (dados do cliente + horário estimado) ──
-        lines.push(ESC.center + 'COMPROVANTE' + ESC.left);
-        lines.push(ESC.center + ESC.boldOn + tamItem.wideOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + tamItem.on + ESC.boldOff + ESC.left);
+        // v131 — NOVO VISUAL (só formatação/ordem das linhas — nenhum dado novo, nenhum
+        // cálculo novo, nenhuma lógica de impressão mudou): layout "premium minimalista"
+        // pedido, agrupado por finalidade (DATA/HORA/TIPO, ITENS, OBSERVAÇÃO, CLIENTE/
+        // TELEFONE/ENDEREÇO, PAGAMENTO+TOTAL), com separadores simples e o nome dos produtos
+        // maior e em negrito — mesmo tratamento que a via de produção já ganhou na v128.
+        // "Ref.: #" (código curto) saiu do topo pra não competir visualmente com "PEDIDO #"
+        // (agora o elemento mais destacado, no cabeçalho compartilhado acima) — continua
+        // disponível, só que junto do resumo de pagamento no rodapé, onde ainda serve pra
+        // conferência sem disputar atenção com o número do pedido.
         lines.push(HR);
-        lines.push('Data: ' + new Date(order.createdAt).toLocaleDateString('pt-BR'));
-        lines.push('Hora: ' + new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
-        lines.push('Ref.: #' + refShort);
-        lines.push('Tipo: ' + (order.mode === 'delivery' ? 'ENTREGA (DELIVERY)' : 'RETIRADA'));
+        lines.push('DATA: ' + new Date(order.createdAt).toLocaleDateString('pt-BR'));
+        lines.push('HORA: ' + new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+        lines.push('TIPO: ' + (order.mode === 'delivery' ? 'DELIVERY' : 'RETIRADA'));
         lines.push(HR);
-        lines.push(ESC.boldOn + 'CLIENTE' + ESC.boldOff);
-        lines.push(HR);
-        lines.push(order.name);
-        lines.push('Tel: ' + order.phone);
-        if (order.mode === 'delivery') lines.push('End: ' + order.address);
-        lines.push((order.mode === 'delivery' ? 'Previsao: ' : 'Previsao retirada: ') + deliveryWindow);
-        lines.push(HR);
-        lines.push(ESC.boldOn + 'ITENS' + ESC.boldOff);
-        lines.push(HR);
+        lines.push('');
         items.forEach(i => {
-          lines.push(ESC.boldOn + tamItem.wideOn + i.qty + 'x  ' + i.name + tamItem.on + ESC.boldOff);
-          lines.push(rightAlignRow('', money(i.price * i.qty)));
+          lines.push(`${i.qty}x  ` + ESC.boldOn + tamItem.wideOn + i.name + tamItem.on + ESC.boldOff);
         });
-        if (order.obs) { lines.push(HR); lines.push(ESC.boldOn + 'OBSERVACAO' + ESC.boldOff); lines.push(order.obs); }
         lines.push(HR);
-        lines.push(ESC.boldOn + 'RESUMO' + ESC.boldOff);
+        if (order.obs) {
+          lines.push('');
+          lines.push(ESC.boldOn + 'OBSERVACAO' + ESC.boldOff);
+          lines.push(order.obs);
+          lines.push(HR);
+        }
+        lines.push('');
+        lines.push(ESC.boldOn + 'CLIENTE' + ESC.boldOff);
+        lines.push(order.name);
+        lines.push('');
+        lines.push(ESC.boldOn + 'TELEFONE' + ESC.boldOff);
+        lines.push(order.phone);
+        if (order.mode === 'delivery') {
+          lines.push('');
+          lines.push(ESC.boldOn + 'ENDERECO' + ESC.boldOff);
+          lines.push(order.address);
+        }
+        lines.push((order.mode === 'delivery' ? 'Previsao: ' : 'Previsao retirada: ') + deliveryWindow + '   Ref.: #' + refShort);
         lines.push(HR);
+        lines.push('');
+        lines.push(ESC.boldOn + 'PAGAMENTO' + ESC.boldOff);
+        lines.push(payMethodTicketLabel(order) + (order.troco ? ' (troco para ' + order.troco + ')' : ''));
+        lines.push('');
         lines.push(rightAlignRow('Subtotal', money(order.subtotal)));
         lines.push(rightAlignRow('Entrega', money(order.fee)));
         if (order.discount > 0 || order.couponCode) {
           lines.push(rightAlignRow(`Cupom ${order.couponCode}`, '-' + money(order.discount || 0)));
         }
-        lines.push(HR);
-        lines.push(ESC.boldOn + 'PAGAMENTO' + ESC.boldOff);
-        lines.push(payMethodTicketLabel(order) + (order.troco ? ' (troco para ' + order.troco + ')' : ''));
-        lines.push(HR);
-        lines.push(ESC.boldOn + tamItem.wideOn + rightAlignRow('TOTAL', money(order.total)) + tamItem.on + ESC.boldOff);
+        lines.push('');
+        lines.push(ESC.boldOn + 'TOTAL' + ESC.boldOff);
+        lines.push(ESC.boldOn + tamItem.wideOn + money(order.total) + tamItem.on + ESC.boldOff);
         lines.push(HR2);
-        lines.push(ESC.center + 'Obrigado pela preferencia!' + ESC.left);
-        if (cfg.siteUrl) lines.push(ESC.center + cfg.siteUrl + ESC.left);
+        lines.push('');
+        lines.push(ESC.center + ESC.boldOn + 'OBRIGADO!' + ESC.boldOff);
+        lines.push((cfg.name || 'SHOGATSU').toUpperCase() + ESC.left);
+        lines.push(HR2);
+        if (cfg.siteUrl) { lines.push(''); lines.push(ESC.center + cfg.siteUrl + ESC.left); }
       } else if (isDispatch) {
-        // v129 — NOVO ("via do motoboy/expedição deve focar em cliente/endereço/pagamento, não
-        // na lista de itens"): reaproveita os mesmos campos do pedido que o Caixa já usa
+        // v129 — NOVO ("via do motoboy/expedição deve focar em cliente/endereço/pagamento"):
+        // mesmo bloco de dados de entrega do Caixa (endereço, pagamento, troco), sem a lista
+        // de itens — quem vai entregar não precisa conferir prato por prato, só pra onde ir e
+        // quanto cobrar/receber. Reaproveita os mesmos campos do pedido que o Caixa já usa
         // (order.address, order.courierName etc.) — não inventa estrutura de dado nova.
         lines.push(ESC.center + ESC.boldOn + ((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase() + ESC.boldOff + ESC.left);
         lines.push(ESC.center + 'VIA DE DESPACHO' + ESC.left);
-        lines.push(ESC.center + ESC.boldOn + tamItem.wideOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + tamItem.on + ESC.boldOff + ESC.left);
         lines.push(HR);
         lines.push('Ref.: #' + refShort);
         lines.push(HR);
@@ -4234,12 +4286,12 @@ function estimateDeliveryWindow(order, cfg) {
         lines.push(HR);
         lines.push(ESC.boldOn + 'ENDERECO' + ESC.boldOff);
         lines.push(HR);
-        lines.push(order.address || '-');
+        lines.push(order.address || '—');
         lines.push(HR);
         lines.push(ESC.boldOn + 'PAGAMENTO' + ESC.boldOff);
         lines.push(HR);
         lines.push(payMethodTicketLabel(order));
-        lines.push(rightAlignRow('Valor a receber:', money(order.total)));
+        lines.push(rightAlignRow('Total:', money(order.total)));
         if (order.troco) lines.push(rightAlignRow('Troco para:', String(order.troco)));
         lines.push(HR);
         lines.push(rightAlignRow('Taxa de entrega:', money(order.fee)));
@@ -4256,7 +4308,6 @@ function estimateDeliveryWindow(order, cfg) {
           .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         lines.push(ESC.center + ESC.boldOn + ((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase() + ESC.boldOff);
         lines.push('VIA DE PRODUCAO' + ESC.left);
-        lines.push(ESC.center + ESC.boldOn + tamItem.wideOn + (order.ticketNumber ? 'PEDIDO Nº ' + order.ticketNumber : 'PEDIDO #' + order.id) + tamItem.on + ESC.boldOff + ESC.left);
         lines.push(HR);
         lines.push('Ref.: #' + refShort);
         lines.push(order.mode === 'delivery' ? 'DELIVERY' : 'RETIRADA');
@@ -4296,17 +4347,11 @@ function estimateDeliveryWindow(order, cfg) {
         // linha) e só o NOME do item vem maior (largura dobrada) + negrito.
         items.forEach(i => lines.push('* ' + i.qty + 'x ' + ESC.boldOn + tamItem.wideOn + i.name + tamItem.on + ESC.boldOff));
         lines.push(HR);
-        lines.push(ESC.boldOn + 'OBSERVACOES' + ESC.boldOff);
+        lines.push('Observacoes:');
         if (order.obs) lines.push(order.obs);
         else { lines.push('_______________________________'); lines.push('_______________________________'); }
       }
       lines.push(HR2);
-      // v131 — NOVO VISUAL (referência anexada): assinatura de rodapé (igual à via impressa
-      // pelo navegador) — usa só dados já existentes (nome da loja, nº do pedido, estação) +
-      // o horário real em que o servidor está montando esse texto agora (Date.now() local, não
-      // é um campo novo do pedido nem mexe em nenhum cálculo/estado do sistema).
-      lines.push(ESC.center + (cfg.name || 'SHOGATSU').toUpperCase() + ' - ' + (order.ticketNumber ? 'Pedido Nº ' + order.ticketNumber : 'Pedido #' + order.id) + ESC.left);
-      lines.push(ESC.center + 'Impresso: ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - Estacao: ' + (isCaixa ? 'CAIXA' : (((cfg.stations[st] && cfg.stations[st].label) || st).toUpperCase())) + ESC.left);
       const ticketText = buildTicketText(lines, cfg);
 
       try {
@@ -4317,10 +4362,18 @@ function estimateDeliveryWindow(order, cfg) {
           if (!printerCfg.device) { if(auto){try{const fresh=readJSON(ORDERS_FILE);const oi=fresh.findIndex(o=>o.id===order.id);if(oi>-1){delete (fresh[oi].autoPrintState||{})[st];writeJSON(ORDERS_FILE,fresh);}}catch(e){}} return sendJSON(res, 400, { error: `Caminho do dispositivo USB da via "${st}" não configurado.`, retryable:true }); }
           await sendUSBPrint(printerCfg.device, ticketText);
         }
-        if(auto){ const fresh=readJSON(ORDERS_FILE); const oi=fresh.findIndex(o=>o.id===order.id); if(oi>-1){fresh[oi].autoPrintState=fresh[oi].autoPrintState||{};fresh[oi].autoPrintState[st]={status:'done',finishedAt:new Date().toISOString()};fresh[oi].autoPrinted=fresh[oi].autoPrinted||{};fresh[oi].autoPrinted[st]=true;writeJSON(ORDERS_FILE,fresh);} }
+        // v132 — antes só marcava "done" pra auto (`if(auto)`); a trava do primeiro-clique
+        // manual (ver bloco acima) também precisa fechar o ciclo, senão ficaria presa em
+        // "printing" pra sempre (sem travar reimpressão — isso já não trava, ver comentário
+        // acima — mas deixaria o estado incorreto pra quem for conferir o log depois).
+        { const fresh=readJSON(ORDERS_FILE); const oi=fresh.findIndex(o=>o.id===order.id); if(oi>-1){fresh[oi].autoPrintState=fresh[oi].autoPrintState||{};fresh[oi].autoPrintState[st]={status:'done',finishedAt:new Date().toISOString()};if(auto){fresh[oi].autoPrinted=fresh[oi].autoPrinted||{};fresh[oi].autoPrinted[st]=true;}writeJSON(ORDERS_FILE,fresh);} }
         return sendJSON(res, 200, { ok: true, printed: true, order, station: st, method: printerCfg.method, usedCaixaFallback });
       } catch (printErr) {
         if(auto){ try{const fresh=readJSON(ORDERS_FILE);const oi=fresh.findIndex(o=>o.id===order.id);if(oi>-1){fresh[oi].autoPrintState=fresh[oi].autoPrintState||{};delete fresh[oi].autoPrintState[st];if(fresh[oi].autoPrinted)delete fresh[oi].autoPrinted[st];writeJSON(ORDERS_FILE,fresh);}}catch(e){} }
+        // v132: mesma limpeza acima, agora também pro clique manual — se a primeira tentativa
+        // falhar (impressora offline etc.), libera a trava na hora em vez de deixar presa 90s
+        // à toa (staff geralmente tenta de novo na sequência, não faz sentido segurar).
+        else { try{const fresh=readJSON(ORDERS_FILE);const oi=fresh.findIndex(o=>o.id===order.id);if(oi>-1 && fresh[oi].autoPrintState){delete fresh[oi].autoPrintState[st];writeJSON(ORDERS_FILE,fresh);}}catch(e){} }
         try{const log=readJSON(PRINT_LOG_FILE);log.unshift({orderId,station,error:String(printErr.message||printErr).slice(0,500),ts:new Date().toISOString(),retryable:true,method:printerCfg.method});fs.writeFileSync(PRINT_LOG_FILE,JSON.stringify(log.slice(0,500),null,2));}catch(e){}
         return sendJSON(res, 502, { error: `Falha ao imprimir na via "${st}": ${printErr.message}`, retryable:true });
       }
@@ -5791,7 +5844,7 @@ function estimateDeliveryWindow(order, cfg) {
       // antes de alguém olhar. O Agente Local agora só imprime automaticamente quando essa
       // flag vier true; a impressão manual (botão "🖨 Imprimir" no painel) continua funcionando
       // sempre, com ou sem aceite automático ligado.
-      broadcast('new-order', { ...order, _printFontSize: cfg.printSize, _autoAcceptOn: !!cfg.autoAcceptOrders });
+      broadcast('new-order', { ...order, _printFontSize: cfg.printSize, _autoAcceptOn: !!cfg.autoAcceptOrders, _deliveryWindow: estimateDeliveryWindow(order, cfg) });
       // v79: alerta push pra loja em todos os aparelhos ativados (PC + celular simultâneo) —
       // além do som/SSE de quem já está com o painel aberto na tela. Não trava a resposta ao
       // cliente: dispara e segue (a função nunca rejeita, então não precisa de .catch aqui).
