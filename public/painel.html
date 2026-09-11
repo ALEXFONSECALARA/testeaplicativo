@@ -5853,32 +5853,7 @@ function registerPendingPrintAck(orderId, station){
   }, 15000);
   pendingPrintAcks.set(key, { timeout });
 }
-const printInFlight = new Set();
 async function printOrderCore(id, ev, stations, isAuto){
-  // v132 — BUG CORRIGIDO ("a mesma via imprime 2-3x seguidas"): a proteção contra duplicidade
-  // que já existia (order.autoPrintState/autoPrinted, no servidor) só cobre disparos
-  // AUTOMÁTICOS — impressão MANUAL sempre foi de propósito "sem trava" (pra reimpressão
-  // funcionar sempre que pedida). O problema: o MESMO pedido aparece em mais de um lugar na
-  // tela ao mesmo tempo (lista "Novos", modal de detalhe, cartão mobile — cada um com seu
-  // próprio botão "Imprimir"), então dois cliques em botões DIFERENTES pro mesmo pedido (ou um
-  // clique manual coincidindo com o disparo automático) disparavam duas chamadas de impressão
-  // em paralelo pra via nenhuma delas sabia da outra. Esse guard é só um SEMÁFORO do lado do
-  // navegador: enquanto uma impressão desse MESMO id já está rodando (de qualquer botão/fluxo:
-  // manual, automática ou mobile), uma nova chamada pro mesmo id é ignorada até a primeira
-  // terminar — não muda nada no servidor, no Print Agent, nem na trava de auto-impressão que já
-  // existia; só evita que o PRÓPRIO painel dispare a mesma via 2x em paralelo sem perceber.
-  if(printInFlight.has(id)){
-    if(!isAuto) showToast('🖨 Impressão já em andamento', 'Esse pedido já está sendo impresso — aguarde terminar antes de mandar de novo.', 3500);
-    return;
-  }
-  printInFlight.add(id);
-  try{
-    return await printOrderCoreInner(id, ev, stations, isAuto);
-  } finally {
-    printInFlight.delete(id);
-  }
-}
-async function printOrderCoreInner(id, ev, stations, isAuto){
   const targetStations = (Array.isArray(stations) && stations.length) ? stations : getPrintStations();
   const btn = (ev||window.event)?.currentTarget;
   if(btn) btn.classList.add('printing');
@@ -6165,37 +6140,35 @@ function buildPlainTicketLines(order, station, deliveryWindow){
   L.push({text:(cfg.tagline||'CULINARIA ORIENTAL').toUpperCase()});
   L.push(HR2);
   if(isCaixa){
-    L.push({text:'COMPROVANTE', center:true});
-    L.push({text:order.ticketNumber?`PEDIDO Nº ${order.ticketNumber}`:`PEDIDO #${order.id}`, bold:true, size:13, center:true});
-    L.push(HR);
-    L.push('Data: '+new Date(order.createdAt).toLocaleDateString('pt-BR'));
-    L.push('Hora: '+new Date(order.createdAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
-    L.push('Tipo: '+(order.mode==='delivery'?'ENTREGA (DELIVERY)':'RETIRADA'));
+    L.push('COMPROVANTE');
+    L.push(order.ticketNumber?`Pedido Nº ${order.ticketNumber}`:`Pedido #${order.id}`);
+    L.push('Hora: '+new Date(order.createdAt).toLocaleString('pt-BR'));
+    L.push(order.mode==='delivery'?'ENTREGA (DELIVERY)':'RETIRADA');
     L.push(HR); L.push({text:'CLIENTE',bold:true}); L.push(HR);
     L.push(order.name||'-');
     if(order.phone) L.push('Tel: '+order.phone);
     if(order.mode==='delivery' && order.address) L.push('End: '+order.address);
     L.push((order.mode==='delivery'?'Previsao: ':'Previsao retirada: ')+(deliveryWindow||'—'));
     L.push(HR); L.push({text:'ITENS',bold:true}); L.push(HR);
-    items.forEach(i=>{ L.push({text:`${i.qty}x ${i.name}`, bold:true}); L.push(`  ${money(i.price*i.qty)}`); });
-    if(order.obs){ L.push(HR); L.push({text:'OBSERVACAO',bold:true}); L.push(order.obs); }
+    items.forEach(i=>L.push(`${i.qty}x ${i.name}  ${money(i.price*i.qty)}`));
+    if(order.obs){ L.push(HR); L.push('Obs: '+order.obs); }
     L.push(HR); L.push({text:'RESUMO',bold:true}); L.push(HR);
     L.push(`Subtotal  ${money(order.subtotal)}`);
     L.push(`Entrega  ${money(order.fee)}`);
     L.push(HR);
-    L.push('Pagamento: '+payMethodDisplay(order));
-    L.push({text:`TOTAL  ${money(order.total)}`, bold:true, size:14});
+    L.push({text:`TOTAL  ${money(order.total)}`, bold:true, size:12});
     L.push(HR2);
+    L.push('Pagamento: '+payMethodDisplay(order));
   } else {
     L.push({text:stationLabel(station).toUpperCase(), bold:true, center:true});
     L.push('VIA DE PRODUCAO');
     L.push(HR);
-    L.push({text:order.ticketNumber?`PEDIDO Nº ${order.ticketNumber}`:`PEDIDO #${order.id}`, bold:true, size:13, center:true});
+    L.push((order.ticketNumber?`Pedido Nº ${order.ticketNumber}`:`Pedido #${order.id}`));
     L.push(order.mode==='delivery'?'DELIVERY':'RETIRADA');
     L.push(HR); L.push({text:'ITENS DA '+stationLabel(station).toUpperCase(), bold:true}); L.push(HR);
-    items.forEach(i=>L.push({text:`${i.qty}x ${i.name}`, bold:true}));
+    items.forEach(i=>L.push('* '+i.qty+'x '+i.name));
     L.push(HR);
-    L.push({text:'OBSERVACOES:',bold:true});
+    L.push('Observacoes:');
     if(order.obs) L.push(order.obs); else { L.push('_______________________________'); }
   }
   return L;
@@ -6233,53 +6206,36 @@ function openBrowserReservationTicket(reservation){
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Reserva ${reservation.id}</title>
   <style>
     @page{ margin:0; }
-    *{box-sizing:border-box;}
-    body{font-family:${pf};width:100%;max-width:384px;margin:0 auto;padding:14px 12px;color:${pc};font-size:${ps}px;line-height:1.35;overflow-wrap:anywhere;word-break:break-word;}
-    @media screen and (max-width:420px){ body{width:100vw;max-width:100vw;padding:14px 10px;overflow-x:hidden;} }
-    @media print{ body{width:100%;max-width:100%;padding:0 2px;overflow:visible;} }
+    body{font-family:${pf};width:100%;max-width:302px;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word;} @media screen and (max-width:520px){body{width:100vw;max-width:100vw;padding:10px 8px;overflow-x:hidden;} .t-item{align-items:flex-start;gap:6px;} .t-item span:first-child{min-width:0;overflow-wrap:anywhere;word-break:break-word;} .t-item span:last-child{flex:0 0 auto;} .t-row,.t-bullet-item{overflow-wrap:anywhere;word-break:break-word;}} @media print{body{width:100%;max-width:100%;padding:4px;overflow:visible;}}
     .t-center{text-align:center;}
-    .t-header{text-align:center;margin-bottom:2px;}
-    .t-title{font-size:${Math.round(19*scale)}px;font-weight:800;letter-spacing:2.5px;}
-    .t-sub{font-size:${Math.round(10.5*scale)}px;letter-spacing:2px;margin-top:3px;color:#333;}
-    .t-doctype{font-size:${Math.round(10.5*scale)}px;text-align:center;letter-spacing:2px;color:#555;margin:8px 0 4px;text-transform:uppercase;}
-    .t-pedido-num{font-size:${Math.round(22*scale)}px;font-weight:900;text-align:center;letter-spacing:1px;margin:2px 0 8px;}
-    .t-hr{border:none;border-top:1px dashed ${pc};opacity:.55;margin:10px 0;}
-    .t-hr-solid{border:none;border-top:3px double ${pc};margin:10px 0;}
-    .t-section-title{font-weight:800;font-size:${Math.round(11*scale)}px;letter-spacing:1.5px;margin:2px 0 8px;text-transform:uppercase;display:flex;align-items:center;gap:5px;}
-    .t-mt{margin-top:10px;}
-    .t-info-row{font-size:${Math.round(13*scale)}px;font-weight:600;}
-    .t-meta-row{display:flex;justify-content:space-between;gap:10px;font-size:${Math.round(11.5*scale)}px;margin:3px 0;}
-    .t-meta-row span:first-child{font-weight:700;color:#333;letter-spacing:.5px;}
-    .t-meta-row span:last-child{text-align:right;}
-    .t-footer{text-align:center;font-size:${Math.round(11*scale)}px;letter-spacing:1px;margin-top:4px;}
-    .t-brand{display:flex;align-items:center;justify-content:center;gap:6px;}
-    .t-torii{font-size:${Math.round(20*scale)}px;line-height:1;}
-    .t-sign{text-align:center;font-size:${Math.round(9.5*scale)}px;color:#555;line-height:1.5;margin-top:10px;}
-    .t-sign b{color:${pc};}
+    .t-title{font-size:${Math.round(17*scale)}px;font-weight:800;letter-spacing:2px;}
+    .t-sub{font-size:${Math.round(11*scale)}px;letter-spacing:1.5px;margin-top:2px;color:#555;}
+    .t-doctype{font-size:${Math.round(15*scale)}px;font-weight:800;text-align:center;margin:6px 0 2px;}
+    .t-hr{border-top:1px dashed ${pc};margin:8px 0;}
+    .t-hr-solid{border-top:2px solid ${pc};margin:8px 0;}
+    .t-block-title{font-weight:800;font-size:${Math.round(11*scale)}px;letter-spacing:1px;margin:4px 0 6px;}
+    .t-row{font-size:${Math.round(12*scale)}px;margin:3px 0;}
   </style></head><body>
-    <div class="t-header">
-      <div class="t-brand"><span class="t-torii">⛩️</span><span class="t-title">${esc((cfg.name||'SHOGATSU').toUpperCase())}</span></div>
-      <div class="t-sub">${esc((cfg.tagline||'CULINÁRIA ORIENTAL').toUpperCase())}</div>
+    <div class="t-center">
+      <div class="t-title">${(cfg.name||'SHOGATSU').toUpperCase()}</div>
+      <div class="t-sub">${esc(cfg.tagline||'CULINÁRIA ORIENTAL')}</div>
     </div>
     <div class="t-hr-solid"></div>
-    <div class="t-doctype">🍽️ Reserva de mesa</div>
-    <div class="t-pedido-num">${reservation.status==='confirmada'?'CONFIRMADA':'PENDENTE'}</div>
+    <div class="t-doctype">RESERVA DE MESA</div>
+    <div class="t-row">Ref.: ${reservation.id}</div>
+    <div class="t-row">Status: ${reservation.status==='confirmada'?'CONFIRMADA':'PENDENTE DE CONFIRMAÇÃO'}</div>
     <div class="t-hr"></div>
-    <div class="t-meta-row"><span>REF.</span><span>${esc(reservation.id)}</span></div>
-    <div class="t-hr-solid"></div>
-    <div class="t-section-title">👤 CLIENTE</div>
-    <div class="t-info-row">${esc(reservation.name)}</div>
-    <div class="t-section-title t-mt">📞 TELEFONE</div>
-    <div class="t-info-row">${esc(reservation.phone)}</div>
+    <div class="t-block-title">CLIENTE</div>
+    <div class="t-row">${esc(reservation.name)}</div>
+    <div class="t-row">Tel: ${esc(reservation.phone)}</div>
     <div class="t-hr"></div>
-    <div class="t-section-title">📅 DETALHES</div>
-    <div class="t-meta-row"><span>DATA</span><span>${dataFmt}</span></div>
-    <div class="t-meta-row"><span>HORA</span><span>${esc(reservation.time)}</span></div>
-    <div class="t-meta-row"><span>PESSOAS</span><span>${esc(String(reservation.people))}</span></div>
-    ${reservation.notes?`<div class="t-hr"></div><div class="t-section-title">📝 OBSERVAÇÃO</div><div class="t-info-row">${esc(reservation.notes)}</div>`:''}
+    <div class="t-block-title">DETALHES</div>
+    <div class="t-row">Data: ${dataFmt}</div>
+    <div class="t-row">Hora: ${esc(reservation.time)}</div>
+    <div class="t-row">Pessoas: ${reservation.people}</div>
+    ${reservation.notes?`<div class="t-hr"></div><div class="t-row">Obs: ${esc(reservation.notes)}</div>`:''}
     <div class="t-hr-solid"></div>
-    <div class="t-footer">Reservado em ${esc(new Date(reservation.createdAt).toLocaleString('pt-BR'))}</div>
-    <div class="t-sign"><div><b>${esc((cfg.name||'SHOGATSU').toUpperCase())}</b> · Reserva ${esc(reservation.id)}</div></div>
+    <div class="t-row t-center">Reservado em ${new Date(reservation.createdAt).toLocaleString('pt-BR')}</div>
     <script>window.onload=function(){setTimeout(function(){window.print();},60);};<\/script>
   </body></html>`);
   win.document.close();
@@ -6296,80 +6252,53 @@ function openBrowserTicket(order, station, deliveryWindow, existingWin){
   const money = v => 'R$ '+Number(v||0).toFixed(2).replace('.',',');
   const time = new Date(order.createdAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const dateStr = new Date(order.createdAt).toLocaleDateString('pt-BR');
-  // v131 — NOVO VISUAL (referência visual anexada): ícone + rótulo de tipo de pedido — mesmo
-  // dado de sempre (order.mode), só com um ícone ao lado pra aproximar do estilo da imagem de
-  // referência (impressão pelo navegador aceita emoji normalmente; a via ESC/POS direta segue
-  // sem ícone, como já era, porque a impressora térmica não garante suporte a eles).
-  const modeIcon = order.mode==='delivery' ? '🛵' : '🏪';
-  const modeTag = order.mode==='delivery' ? 'ENTREGA (DELIVERY)' : 'RETIRADA';
+  const modeTag = order.mode==='delivery' ? '🛵 ENTREGA (DELIVERY)' : '🏪 RETIRADA';
   const refShort = String(order.id||'').slice(-11).toUpperCase();
-  const pedidoLabel = order.ticketNumber ? 'PEDIDO Nº '+order.ticketNumber : 'PEDIDO #'+order.id;
-  // v131 — assinatura de rodapé (mesma ideia da referência: "IMPRESSO hh:mm:ss · ESTAÇÃO x") —
-  // usa só o horário real do momento em que o navegador monta o ticket pra imprimir (Date.now()
-  // local), não é um dado novo do pedido nem mexe em nenhum cálculo/estado do sistema.
-  const printedAtStr = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const estacaoLabel = isCaixa ? 'CAIXA' : stationLabel(station).toUpperCase();
 
   const bodyHTML = isCaixa ? `
-    <div class="t-section-title">👤 CLIENTE</div>
-    <div class="t-info-row">${esc(order.name)}</div>
-    <div class="t-section-title t-mt">📞 TELEFONE</div>
-    <div class="t-info-row">${esc(order.phone)}</div>
-    ${order.mode==='delivery'?`
-    <div class="t-section-title t-mt">📍 ENDEREÇO</div>
-    <div class="t-info-row">${esc(order.address)}</div>`:''}
     <div class="t-hr"></div>
-    <div class="t-row t-center">${order.mode==='delivery'?'Previsão de entrega':'Previsão de retirada'}: <b>${esc(deliveryWindow||'—')}</b></div>
-    <div class="t-hr-solid"></div>
-    <div class="t-section-title">🍽️ ITENS DO PEDIDO</div>
-    ${items.map(i=>`
-    <div class="t-item-row">
-      <span class="t-item-qty">${i.qty}x</span>
-      <span class="t-item-name">${esc(i.name)}</span>
-      <span class="t-item-price">${money(i.price*i.qty)}</span>
-    </div>`).join('')}
-    ${order.obs?`
+    <div class="t-row">DATA: ${dateStr}</div>
+    <div class="t-row">HORA: ${time}</div>
+    <div class="t-row">TIPO: ${order.mode==='delivery'?'DELIVERY':'RETIRADA'}</div>
     <div class="t-hr"></div>
-    <div class="t-section-title">📝 OBSERVAÇÃO</div>
-    <div class="t-obs-text">${esc(order.obs)}</div>`:''}
-    <div class="t-hr-solid"></div>
-    <div class="t-summary-row"><span>Subtotal</span><span>${money(order.subtotal)}</span></div>
-    <div class="t-summary-row"><span>Entrega</span><span>${money(order.fee)}</span></div>
-    ${(order.discount>0||order.couponCode)?`<div class="t-summary-row t-summary-highlight"><span>Cupom ${esc(order.couponCode||'')}</span><span>-${money(order.discount||0)}</span></div>`:''}
+    ${items.map(i=>`<div class="t-bullet-item">${i.qty}x  ${esc(i.name)}</div>`).join('')}
     <div class="t-hr"></div>
-    <div class="t-pay-row"><span>💳 PAGAMENTO</span><span>${esc(payMethodDisplay(order))}${order.troco?` (troco p/ ${esc(order.troco)})`:''}</span></div>
-    <div class="t-total-row"><span>🪙 TOTAL</span><span>${money(order.total)}</span></div>
+    ${order.obs?`<div class="t-block-title">OBSERVAÇÃO</div><div class="t-row">${esc(order.obs)}</div><div class="t-hr"></div>`:''}
+    <div class="t-block-title">CLIENTE</div>
+    <div class="t-row">${esc(order.name)}</div>
+    <div class="t-block-title" style="margin-top:8px;">TELEFONE</div>
+    <div class="t-row">${esc(order.phone)}</div>
+    ${order.mode==='delivery'?`<div class="t-block-title" style="margin-top:8px;">ENDEREÇO</div><div class="t-row">📍 ${esc(order.address)}</div>`:''}
+    <div class="t-row" style="margin-top:6px;">${order.mode==='delivery'?'Previsão de entrega':'Previsão de retirada'}: <b>${deliveryWindow||'—'}</b></div>
+    <div class="t-hr"></div>
+    <div class="t-block-title">PAGAMENTO</div>
+    <div class="t-row">${esc(payMethodDisplay(order))}${order.troco?` (troco para ${esc(order.troco)})`:''}</div>
+    <div class="t-item" style="margin-top:6px;"><span>Subtotal</span><span>${money(order.subtotal)}</span></div>
+    <div class="t-item"><span>Entrega</span><span>${money(order.fee)}</span></div>
+    ${(order.discount>0||order.couponCode)?`<div class="t-item" style="color:#a9873c;"><span>🎟️ Cupom ${esc(order.couponCode||'')}</span><span>-${money(order.discount||0)}</span></div>`:''}
+    <div class="t-block-title" style="margin-top:8px;">TOTAL</div>
+    <div class="t-total">${money(order.total)}</div>
   ` : isDispatch ? `
-    <div class="t-section-title">👤 CLIENTE</div>
-    <div class="t-info-row">${esc(order.name)}</div>
-    <div class="t-section-title t-mt">📞 TELEFONE</div>
-    <div class="t-info-row">${esc(order.phone)}</div>
+    <div class="t-block-title">CLIENTE</div>
+    <div class="t-row">${esc(order.name)}</div>
+    <div class="t-row">📞 ${esc(order.phone)}</div>
     <div class="t-hr"></div>
-    <div class="t-section-title">📍 ENDEREÇO DE ENTREGA</div>
-    <div class="t-info-row">${esc(order.address||'—')}</div>
+    <div class="t-block-title">ENDEREÇO</div>
+    <div class="t-row">📍 ${esc(order.address||'—')}</div>
     <div class="t-hr"></div>
-    <div class="t-section-title">💳 FORMA DE PAGAMENTO</div>
-    <div class="t-info-row">${esc(payMethodDisplay(order))}${order.troco?` (troco p/ ${esc(order.troco)})`:''}</div>
-    <div class="t-total-row"><span>🪙 VALOR A RECEBER</span><span>${money(order.total)}</span></div>
-    <div class="t-hr"></div>
-    <div class="t-section-title">🛵 INFORMAÇÕES DA ENTREGA</div>
-    <div class="t-meta-row"><span>Motoboy</span><span>${esc(order.courierName||'A definir')}</span></div>
-    <div class="t-meta-row"><span>Taxa de entrega</span><span>${money(order.fee)}</span></div>
-    <div class="t-meta-row"><span>Previsão de entrega</span><span>${esc(deliveryWindow||'—')}</span></div>
-    ${order.obs?`
-    <div class="t-hr"></div>
-    <div class="t-section-title">📝 OBSERVAÇÃO</div>
-    <div class="t-obs-text">${esc(order.obs)}</div>`:''}
+    <div class="t-block-title">PAGAMENTO</div>
+    <div class="t-row">${esc(payMethodDisplay(order))}${order.troco?` (troco para ${esc(order.troco)})`:''}</div>
+    <div class="t-item"><span>Total</span><span>${money(order.total)}</span></div>
+    <div class="t-item"><span>Taxa de entrega</span><span>${money(order.fee)}</span></div>
+    <div class="t-row">🛵 Motoboy: <b>${esc(order.courierName||'A definir')}</b></div>
+    <div class="t-row">⏰ Previsão de entrega: <b>${deliveryWindow||'—'}</b></div>
+    ${order.obs?`<div class="t-hr"></div><div class="t-row"><b>Obs:</b> ${esc(order.obs)}</div>`:''}
   ` : `
-    <div class="t-section-title">${stationIcon(station)} ITENS DA ${stationLabel(station).toUpperCase()}</div>
-    ${items.map(i=>`
-    <div class="t-item-row">
-      <span class="t-item-qty">${i.qty}x</span>
-      <span class="t-item-name">${esc(i.name)}</span>
-    </div>`).join('')}
+    <div class="t-block-title">ITENS DA ${stationLabel(station).toUpperCase()}</div>
+    ${items.map(i=>`<div class="t-bullet-item">• ${i.qty}x ${esc(i.name)}</div>`).join('')}
     <div class="t-hr"></div>
-    <div class="t-section-title">📝 OBSERVAÇÕES</div>
-    ${order.obs?`<div class="t-obs-text">${esc(order.obs)}</div>`:`<div class="t-obs-line"></div><div class="t-obs-line"></div>`}
+    <div class="t-row"><b>Observações:</b></div>
+    ${order.obs?`<div class="t-row">${esc(order.obs)}</div>`:`<div class="t-obs-line"></div><div class="t-obs-line"></div>`}
   `;
 
   const win = existingWin || window.open('', '_blank', 'width=380,height=600');
@@ -6382,87 +6311,51 @@ function openBrowserTicket(order, station, deliveryWindow, existingWin){
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pedido ${order.id}</title>
   <style>
     @page{ margin:0; }
-    *{box-sizing:border-box;}
-    /* v131 — NOVO VISUAL (referência anexada): comprovante premium inspirado em restaurantes
-       japoneses — cabeçalho com marca, Nº do pedido como elemento mais destacado, linha de
-       horário/tipo, blocos com ícone + título, separadores elegantes, item com quantidade em
-       destaque, assinatura de rodapé com estação/horário de impressão. Alto contraste, boa
-       ocupação da bobina de 80mm e quebra automática de linha (nunca corta nome/endereço/obs). */
-    body{font-family:${pf};width:100%;max-width:384px;margin:0 auto;padding:14px 12px;color:${pc};font-size:${ps}px;line-height:1.35;overflow-wrap:anywhere;word-break:break-word;}
-    @media screen and (max-width:420px){ body{width:100vw;max-width:100vw;padding:14px 10px;overflow-x:hidden;} }
-    @media print{ body{width:100%;max-width:100%;padding:0 2px;overflow:visible;} }
+    body{font-family:${pf};width:100%;max-width:302px;margin:0 auto;padding:10px 4px;color:${pc};font-size:${ps}px;box-sizing:border-box;}
     .t-center{text-align:center;}
-    .t-header{text-align:center;margin-bottom:2px;}
-    .t-brand{display:flex;align-items:center;justify-content:center;gap:6px;}
-    .t-torii{font-size:${Math.round(20*scale)}px;line-height:1;}
-    .t-title{font-size:${Math.round(19*scale)}px;font-weight:800;letter-spacing:2.5px;}
-    .t-sub{font-size:${Math.round(10.5*scale)}px;letter-spacing:2px;margin-top:3px;color:#333;}
-    .t-hr{border:none;border-top:1px dashed ${pc};opacity:.55;margin:10px 0;}
-    .t-hr-solid{border:none;border-top:3px double ${pc};margin:10px 0;}
-    .t-doctype{font-size:${Math.round(10.5*scale)}px;text-align:center;letter-spacing:2px;color:#555;margin:8px 0 4px;text-transform:uppercase;}
-    /* Elemento mais destacado do comprovante: o número do pedido. */
-    .t-pedido-num{font-size:${Math.round(25*scale)}px;font-weight:900;text-align:center;letter-spacing:1px;margin:2px 0 8px;}
-    .t-station-name{font-size:${Math.round(17*scale)}px;font-weight:800;text-align:center;letter-spacing:1px;margin-top:6px;}
-    .t-meta-line{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;font-size:${Math.round(12*scale)}px;font-weight:700;margin:2px 0 6px;}
-    .t-meta-sep{opacity:.4;}
-    .t-meta-row{display:flex;justify-content:space-between;gap:10px;font-size:${Math.round(11.5*scale)}px;margin:3px 0;}
-    .t-meta-row span:first-child{font-weight:700;color:#333;letter-spacing:.5px;}
-    .t-meta-row span:last-child{text-align:right;}
-    .t-section-title{font-weight:800;font-size:${Math.round(11*scale)}px;letter-spacing:1.5px;margin:2px 0 8px;text-transform:uppercase;display:flex;align-items:center;gap:5px;}
-    .t-mt{margin-top:10px;}
-    .t-info-row{font-size:${Math.round(13*scale)}px;font-weight:600;padding-left:1px;}
+    .t-title{font-size:${Math.round(17*scale)}px;font-weight:800;letter-spacing:2px;}
+    .t-sub{font-size:${Math.round(11*scale)}px;letter-spacing:1.5px;margin-top:2px;color:#555;}
+    .t-sector{font-size:${Math.round(15*scale)}px;font-weight:800;text-align:center;margin:6px 0 2px;}
+    .t-doctype{font-size:${Math.round(11*scale)}px;text-align:center;letter-spacing:1.5px;color:#555;margin-bottom:2px;}
+    .t-hr{border-top:1px dashed ${pc};margin:8px 0;}
+    .t-hr-solid{border-top:2px solid ${pc};margin:8px 0;}
+    .t-block-title{font-weight:800;font-size:${Math.round(11*scale)}px;letter-spacing:1px;margin:4px 0 6px;}
     .t-row{font-size:${Math.round(12*scale)}px;margin:3px 0;}
-    /* Item: quantidade + nome são o elemento mais fácil de identificar da via de produção. */
-    .t-item-row{display:flex;align-items:baseline;gap:8px;margin:7px 0;flex-wrap:wrap;}
-    .t-item-qty{font-weight:900;font-size:${Math.round(15*scale)}px;flex:0 0 auto;min-width:${Math.round(28*scale)}px;}
-    .t-item-name{font-weight:800;font-size:${Math.round(15*scale)}px;flex:1 1 auto;min-width:0;}
-    .t-item-price{width:100%;text-align:right;font-size:${Math.round(11*scale)}px;color:#444;font-weight:500;order:3;}
-    .t-obs-text{font-size:${Math.round(12.5*scale)}px;font-weight:600;margin-top:2px;}
-    .t-obs-line{border-bottom:1px solid ${pc};height:${Math.round(16*scale)}px;margin:8px 4px;opacity:.6;}
-    .t-summary-row{display:flex;justify-content:space-between;gap:8px;font-size:${Math.round(12*scale)}px;margin:3px 0;}
-    .t-summary-highlight{color:#a9873c;}
-    .t-pay-row{display:flex;justify-content:space-between;gap:8px;font-size:${Math.round(12.5*scale)}px;font-weight:700;margin-top:10px;}
-    .t-pay-row span:last-child{text-align:right;max-width:62%;}
-    .t-total-row{display:flex;justify-content:space-between;gap:8px;font-size:${Math.round(19*scale)}px;font-weight:900;margin-top:4px;padding-top:6px;border-top:1px solid ${pc};}
-    .t-footer{text-align:center;font-size:${Math.round(11*scale)}px;letter-spacing:1px;margin-top:4px;}
-    .t-sign{text-align:center;font-size:${Math.round(9.5*scale)}px;color:#555;line-height:1.5;margin-top:10px;}
-    .t-sign b{color:${pc};}
+    .t-item{display:flex;justify-content:space-between;gap:8px;font-size:${Math.round(12*scale)}px;margin:2px 0;}
+    .t-item span:last-child{white-space:nowrap;}
+    .t-total{font-weight:800;font-size:${Math.round(16*scale)}px;padding:4px 0;}
+    .t-bullet-item{font-size:${Math.round(15*scale)}px;font-weight:700;margin:4px 0;}
+    .t-obs-line{border-bottom:1px solid ${pc};height:${Math.round(16*scale)}px;margin:6px 4px;}
+    .t-order-number{font-size:${Math.round(22*scale)}px;font-weight:800;text-align:center;margin:8px 0;letter-spacing:1px;}
   </style></head><body>
-    <div class="t-header">
-      <div class="t-brand"><span class="t-torii">⛩️</span><span class="t-title">${esc((cfg.name||'SHOGATSU').toUpperCase())}</span></div>
-      <div class="t-sub">${esc((cfg.tagline||'CULINÁRIA ORIENTAL').toUpperCase())}</div>
+    <div class="t-hr-solid"></div>
+    <div class="t-center">
+      <div class="t-title">${(cfg.name||'SHOGATSU').toUpperCase()}</div>
+      <div class="t-sub">${esc(cfg.tagline||'CULINÁRIA ORIENTAL')}</div>
     </div>
     <div class="t-hr-solid"></div>
+    <div class="t-order-number">${order.ticketNumber?'PEDIDO Nº '+order.ticketNumber:'PEDIDO #'+order.id}</div>
     ${isCaixa?`
-    <div class="t-doctype">🧾 Comprovante</div>
-    <div class="t-pedido-num">${esc(pedidoLabel)}</div>
-    <div class="t-meta-line"><span>🕐 ${time} · ${dateStr}</span><span class="t-meta-sep">|</span><span>${modeIcon} ${modeTag}</span></div>
-    <div class="t-hr"></div>
-    <div class="t-meta-row"><span>REF.</span><span>#${refShort}</span></div>
+    `:isDispatch?`
+    <div class="t-sector">${stationIcon(station)} ${stationLabel(station).toUpperCase()}</div>
+    <div class="t-doctype">VIA DE DESPACHO</div>
+    <div class="t-row t-center">Ref.: #${refShort}</div>
     `:`
-    <div class="t-station-name">${stationIcon(station)} ${esc(stationLabel(station).toUpperCase())}</div>
-    <div class="t-doctype">${isDispatch?'Via de despacho':'Via de produção'}</div>
-    <div class="t-pedido-num">${esc(pedidoLabel)}</div>
-    <div class="t-meta-line"><span>🕐 ${time} · ${dateStr}</span><span class="t-meta-sep">|</span><span>${modeIcon} ${modeTag}</span></div>
+    <div class="t-sector">${stationIcon(station)} ${stationLabel(station).toUpperCase()}</div>
+    <div class="t-doctype">VIA DE PRODUÇÃO</div>
+    <div class="t-row t-center">Ref.: #${refShort}</div>
+    <div class="t-row t-center">${modeTag}</div>
     <div class="t-hr"></div>
-    <div class="t-meta-row"><span>REF.</span><span>#${refShort}</span></div>
-    ${!isDispatch?`
-    <div class="t-hr-solid"></div>
-    <div class="t-section-title">⏱️ HORÁRIOS</div>
-    <div class="t-meta-row"><span>Entrada</span><span>${time}</span></div>
-    <div class="t-meta-row"><span>Tempo de preparo</span><span>${(cfg.stations&&cfg.stations[station]&&cfg.stations[station].prepTime)||15} min</span></div>
-    <div class="t-meta-row"><span>Saída prevista</span><span>${calcPrevisaoSaida(order.createdAt, (cfg.stations&&cfg.stations[station]&&cfg.stations[station].prepTime)||15)}</span></div>
-    <div class="t-meta-row"><span>${order.mode==='delivery'?'Prev. entrega':'Prev. retirada'}</span><span>${esc(deliveryWindow||'—')}</span></div>
-    `:''}
+    <div class="t-block-title">HORÁRIOS</div>
+    <div class="t-item"><span>Entrada:</span><span>${time}</span></div>
+    <div class="t-item"><span>Tempo de preparo:</span><span>${(cfg.stations&&cfg.stations[station]&&cfg.stations[station].prepTime)||15} min</span></div>
+    <div class="t-item"><span>Saída prevista:</span><span>${calcPrevisaoSaida(order.createdAt, (cfg.stations&&cfg.stations[station]&&cfg.stations[station].prepTime)||15)}</span></div>
+    <div class="t-item"><span>${order.mode==='delivery'?'Prev. entrega:':'Prev. retirada:'}</span><span>${deliveryWindow||'—'}</span></div>
     `}
-    <div class="t-hr-solid"></div>
+    <div class="t-hr"></div>
     ${bodyHTML}
     <div class="t-hr-solid"></div>
-    ${isCaixa?`<div class="t-footer">OBRIGADO PELA PREFERÊNCIA!</div>${cfg.siteUrl?`<div class="t-footer">${esc(cfg.siteUrl)}</div>`:''}`:''}
-    <div class="t-sign">
-      <div><b>${esc((cfg.name||'SHOGATSU').toUpperCase())}</b> · ${esc(pedidoLabel)}</div>
-      <div>IMPRESSO: ${printedAtStr} · ESTAÇÃO: ${esc(estacaoLabel)}</div>
-    </div>
+    ${isCaixa?`<div class="t-center" style="margin:8px 0;"><div class="t-block-title" style="margin:0;">OBRIGADO!</div><div class="t-row" style="font-weight:700;">${(cfg.name||'SHOGATSU').toUpperCase()}</div></div><div class="t-hr-solid"></div>${cfg.siteUrl?`<div class="t-row t-center">${esc(cfg.siteUrl)}</div>`:''}`:''}
     <script>
       // v45 — BUG CORRIGIDO ("impressão trava o sistema"): window.print() é uma chamada
       // BLOQUEANTE — enquanto a caixa de diálogo de impressão do navegador está aberta numa
