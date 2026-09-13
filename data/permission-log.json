@@ -1,1 +1,76 @@
-[]
+[
+  {
+    "at": "2026-09-13T08:52:45.498Z",
+    "id": "permlog_mtzkt4qi",
+    "actor": "master",
+    "target": "caixa",
+    "changes": {
+      "role": "caixa",
+      "criado": true
+    }
+  },
+  {
+    "at": "2026-09-13T08:48:26.552Z",
+    "id": "permlog_mtzknkxk",
+    "actor": "master",
+    "target": "caixa",
+    "changes": {
+      "role": "caixa",
+      "criado": true
+    }
+  },
+  {
+    "at": "2026-09-13T03:06:16.854Z",
+    "id": "permlog_mtz8fk46",
+    "actor": "master",
+    "target": "caixa",
+    "changes": {
+      "added": [
+        "📦 Pedidos · Ver pedidos",
+        "📦 Pedidos · Criar pedidos",
+        "📦 Pedidos · Editar pedidos",
+        "📦 Pedidos · Cancelar pedidos",
+        "📦 Pedidos · Reabrir pedidos",
+        "📦 Pedidos · Alterar status",
+        "📦 Pedidos · Imprimir pedidos",
+        "📦 Pedidos · Visualizar histórico",
+        "🍣 Cardápio · Ver cardápio",
+        "🍣 Cardápio · Criar produto",
+        "🍣 Cardápio · Editar produto",
+        "🍣 Cardápio · Excluir produto",
+        "🍣 Cardápio · Criar categoria",
+        "🍣 Cardápio · Editar categoria",
+        "🍣 Cardápio · Excluir categoria",
+        "🍣 Cardápio · Alterar preços",
+        "🍣 Cardápio · Gerenciar grupos/complementos",
+        "👥 Clientes · Ver clientes",
+        "👥 Clientes · Criar clientes",
+        "👥 Clientes · Editar clientes",
+        "👥 Clientes · Excluir clientes",
+        "👥 Clientes · Ver histórico de pedidos",
+        "🔔 Alertas · Ver alertas",
+        "🔔 Alertas · Configurar alertas",
+        "🔔 Alertas · Escolher sons",
+        "🔔 Alertas · Alterar volume",
+        "🔔 Alertas · Configurar alerta de atraso",
+        "🔔 Alertas · Ativar/desativar alertas",
+        "📱 Dispositivos · Ver dispositivos",
+        "📱 Dispositivos · Conectar celular",
+        "📱 Dispositivos · Desconectar celular",
+        "📱 Dispositivos · Gerenciar dispositivos",
+        "📱 Dispositivos · Configurar alertas do celular"
+      ],
+      "removed": []
+    }
+  },
+  {
+    "at": "2026-09-13T03:05:21.841Z",
+    "id": "permlog_mtz8edo1",
+    "actor": "master",
+    "target": "caixa",
+    "changes": {
+      "role": "caixa",
+      "criado": true
+    }
+  }
+]

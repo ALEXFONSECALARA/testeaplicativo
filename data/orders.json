@@ -1,1 +1,319 @@
-[]
+[
+  {
+    "id": "SGMTZ3QP1KUW5J",
+    "fee": 0,
+    "obs": "",
+    "hood": "",
+    "mode": "retirada",
+    "name": "Wallace",
+    "paid": true,
+    "items": [
+      {
+        "qty": 1,
+        "name": "Mignon",
+        "price": 52.9,
+        "stations": [
+          "cozinha"
+        ]
+      }
+    ],
+    "phone": "(22) 99278-6247",
+    "total": 52.9,
+    "troco": "",
+    "paidAt": null,
+    "status": "entregue",
+    "address": "RETIRADA NO RESTAURANTE",
+    "paidVia": null,
+    "discount": 0,
+    "subtotal": 52.9,
+    "createdAt": "2026-09-13T00:54:58.376Z",
+    "payMethod": "debito",
+    "couponCode": "",
+    "courierLat": null,
+    "courierLng": null,
+    "autoPrinted": {},
+    "customerLat": null,
+    "customerLng": null,
+    "deliveredAt": "2026-09-13T01:19:35.476Z",
+    "pointsEarned": 52,
+    "scheduledFor": null,
+    "ticketNumber": 20,
+    "autoPrintState": {
+      "caixa": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260932162
+      },
+      "cozinha": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260945607
+      }
+    },
+    "idempotencyKey": "6ab234a4-7c92-4e58-9686-b8739a066cbb",
+    "pointsDiscount": 0,
+    "pointsRedeemed": 0,
+    "autoPrintEligible": false,
+    "courierLocationAt": null
+  },
+  {
+    "id": "SGMTZ2VZAFZ8RY",
+    "fee": 8,
+    "obs": "",
+    "hood": "Loteamento Extensão do Serramar",
+    "mode": "delivery",
+    "name": "Maria Auxiliadora Santos Plasser",
+    "paid": false,
+    "items": [
+      {
+        "qty": 1,
+        "name": "Temaki Filadélfia Tradicional",
+        "price": 29.8,
+        "stations": [
+          "cozinha"
+        ]
+      },
+      {
+        "qty": 1,
+        "name": "Temaki Filadélfia Original (Sem Arroz)",
+        "price": 36.9,
+        "stations": [
+          "cozinha"
+        ]
+      },
+      {
+        "qty": 1,
+        "name": "Sashimi Extra",
+        "price": 63.9,
+        "stations": [
+          "cozinha"
+        ]
+      },
+      {
+        "qty": 1,
+        "name": "Frango Xadrez",
+        "price": 38.9,
+        "stations": [
+          "cozinha"
+        ]
+      }
+    ],
+    "phone": "(75) 99827-3283",
+    "total": 177.5,
+    "troco": "",
+    "paidAt": null,
+    "status": "cancelado",
+    "address": "Alameda do Canal, 24 - Loteamento Extensão do Serramar - Q11 lt 24 (Fica entre a rua  7 com a 14 em frete ao canal) · CEP 28890-826",
+    "paidVia": null,
+    "discount": 0,
+    "subtotal": 169.5,
+    "createdAt": "2026-09-13T00:31:05.319Z",
+    "payMethod": "pix",
+    "couponCode": "",
+    "courierLat": null,
+    "courierLng": null,
+    "autoPrinted": {},
+    "cancelledBy": "loja",
+    "customerLat": null,
+    "customerLng": null,
+    "cancelReason": "Pedido duplicado",
+    "pointsEarned": 177,
+    "scheduledFor": null,
+    "ticketNumber": 19,
+    "autoPrintState": {
+      "caixa": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260072180
+      },
+      "cozinha": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260085780
+      },
+      "delivery": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260086827
+      },
+      "expedicao": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260087083
+      }
+    },
+    "idempotencyKey": "59ab9cac-a6b5-410a-bc74-ea140896f39e",
+    "pointsDiscount": 0,
+    "pointsRedeemed": 0,
+    "autoPrintEligible": false,
+    "courierLocationAt": null
+  },
+  {
+    "id": "SGMTZ22DQKNUA1",
+    "fee": 8,
+    "obs": "",
+    "hood": "Loteamento Extensão do Serramar",
+    "mode": "delivery",
+    "name": "Maria Plasser",
+    "paid": false,
+    "items": [
+      {
+        "qty": 1,
+        "name": "Temaki Filadélfia Original (Sem Arroz)",
+        "price": 36.9,
+        "stations": [
+          "cozinha"
+        ]
+      },
+      {
+        "qty": 1,
+        "name": "Sashimi Extra",
+        "price": 63.9,
+        "stations": [
+          "cozinha"
+        ]
+      },
+      {
+        "qty": 1,
+        "name": "Frango Xadrez",
+        "price": 38.9,
+        "stations": [
+          "cozinha"
+        ]
+      },
+      {
+        "qty": 1,
+        "name": "Temaki Filadélfia Tradicional",
+        "price": 29.8,
+        "stations": [
+          "cozinha"
+        ]
+      }
+    ],
+    "phone": "(75) 99827-3283",
+    "total": 177.5,
+    "troco": "",
+    "paidAt": null,
+    "status": "entregue",
+    "address": "Alameda do Canal, 24 - Loteamento Extensão do Serramar - Q11 lt 24 (Fica entre a rua 7 com a 14, em frente ao canal) · CEP 28890-826",
+    "paidVia": null,
+    "discount": 0,
+    "subtotal": 169.5,
+    "createdAt": "2026-09-13T00:08:04.364Z",
+    "payMethod": "pix",
+    "couponCode": "",
+    "courierLat": null,
+    "courierLng": null,
+    "autoPrinted": {},
+    "courierName": "bryan",
+    "customerLat": null,
+    "customerLng": null,
+    "deliveredAt": "2026-09-13T06:21:17.845Z",
+    "pointsEarned": 177,
+    "scheduledFor": null,
+    "ticketNumber": 18,
+    "autoPrintState": {
+      "caixa": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260021443
+      },
+      "cozinha": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260034987
+      },
+      "delivery": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260037427
+      },
+      "expedicao": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789260038117
+      }
+    },
+    "idempotencyKey": "281dc34f-9626-4721-b545-1caf6bf2ff98",
+    "pointsDiscount": 0,
+    "pointsRedeemed": 0,
+    "autoPrintEligible": false,
+    "courierLocationAt": null
+  },
+  {
+    "id": "SGMTYXOYPVE1U8",
+    "fee": 8,
+    "obs": "",
+    "hood": "Chácara Mariléa",
+    "mode": "delivery",
+    "name": "Alessandro Fabro",
+    "paid": true,
+    "items": [
+      {
+        "qty": 2,
+        "name": "Temaki Camarão Frito",
+        "price": 33.9,
+        "stations": [
+          "cozinha"
+        ]
+      },
+      {
+        "qty": 2,
+        "name": "Frutos do Mar",
+        "price": 59.9,
+        "stations": [
+          "cozinha"
+        ]
+      }
+    ],
+    "phone": "(22) 99915-6396",
+    "total": 195.6,
+    "troco": "",
+    "paidAt": null,
+    "status": "entregue",
+    "address": "Rua Joaquim José Caridade, 345 - Chácara Mariléa - Apto 1203 (Em frente ao Caribe) · CEP 28896-190",
+    "paidVia": null,
+    "discount": 0,
+    "subtotal": 187.6,
+    "createdAt": "2026-09-12T22:05:39.908Z",
+    "payMethod": "credito",
+    "couponCode": "",
+    "courierLat": null,
+    "courierLng": null,
+    "autoPrinted": {},
+    "courierName": "BRYAN",
+    "customerLat": null,
+    "customerLng": null,
+    "deliveredAt": "2026-09-12T23:53:57.945Z",
+    "pointsEarned": 195,
+    "scheduledFor": null,
+    "ticketNumber": 5,
+    "autoPrintState": {
+      "caixa": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789250836023
+      },
+      "cozinha": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789250836840
+      },
+      "delivery": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789250855799
+      },
+      "expedicao": {
+        "owner": "stmt97fj75hyksdtkp",
+        "status": "printing",
+        "claimedAt": 1789250856030
+      }
+    },
+    "idempotencyKey": "3a18d1f3-a8f8-49c2-bd89-013375a96740",
+    "pointsDiscount": 0,
+    "pointsRedeemed": 0,
+    "autoPrintEligible": false,
+    "courierLocationAt": null
+  }
+]

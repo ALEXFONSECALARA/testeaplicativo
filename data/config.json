@@ -1,21 +1,293 @@
 {
   "cfg": {
-    "whats": "552227641333",
-    "storePhone": "(22) 2764-1333",
-    "fee": 8,
-    "min": 60,
-    "name": "Shogatsu Culinária Oriental",
-    "days": "Ter–Dom",
-    "time": "40–60 min",
-    "timeRetirada": "20–30 min",
-    "addr": "Av. Gov. Roberto Silveira, 109 · Costazul · Rio das Ostras · CEP 22896-155",
-    "hours": "18h30–23h",
-    "open": 1,
-    "schedule": {
+    "ia": {
+      "faq": [],
+      "apiKey": "",
+      "modelo": "",
       "enabled": false,
-      "openTime": "18:00",
-      "closeTime": "23:00"
+      "provider": "groq",
+      "modoBasico": true,
+      "modeloVisao": "",
+      "badgesAutoAprovar": false,
+      "fallbackAutomatico": true
     },
+    "fee": 8,
+    "min": 50,
+    "sms": {
+      "authToken": "",
+      "accountSid": "",
+      "fromNumber": "",
+      "fromWhatsApp": "",
+      "notifyWhatsApp": false
+    },
+    "addr": "Av. Gov. Roberto Silveira, 109 · Costazul · Rio das Ostras · CEP 22896-155",
+    "days": "Ter–Dom",
+    "name": "Shogatsu Culinária Oriental",
+    "open": 0,
+    "time": "40–60 min",
+    "hours": "18h30–23h",
+    "print": 0,
+    "sound": 1,
+    "theme": {
+      "bg": "#0a0a0a",
+      "accent": "#c0392b",
+      "primary": "#c9a84c"
+    },
+    "users": [
+      {
+        "role": "master",
+        "username": "master",
+        "passwordHash": "355e558f0fd8cbd3ffa4d64d2b4275f059b8dfd473f582370914fa807af655e5"
+      },
+      {
+        "role": "admin",
+        "username": "admin",
+        "passwordHash": "cfd7dba1b4c835302599ca32abf304cba178639002777996ec6c9d9b5c5f7f0e"
+      }
+    ],
+    "vapid": {
+      "subject": "mailto:contato@shogatsu.com.br",
+      "publicKey": "BKsCoEqc9Rsj0cipKcEaPhYBrhwYdfCD7ZrtLprXR0EnuxntqGqbyxuKodY9M7pEOFuRTly4dZ8TCqwLC8bsd94",
+      "privateKeyJwk": {
+        "d": "2Yz17aARTGpk4uR3e7hcmGkroWHONzbSWbrHP0qZbs0",
+        "x": "qwKgSpz1GyPRyKkpwRo-FgGuHBh18IPtmu0umtdHQSc",
+        "y": "uxntqGqbyxuKodY9M7pEOFuRTly4dZ8TCqwLC8bsd94",
+        "crv": "P-256",
+        "kty": "EC"
+      }
+    },
+    "whats": "552227641333",
+    "labels": {
+      "colNovo": "Novos",
+      "colPrep": "Preparando",
+      "btnPrint": "Imprimir",
+      "btnCancel": "Cancelar",
+      "colPronto": "Pronto",
+      "actionNovo": "Aceitar Pedido",
+      "actionPrep": "Marcar Pronto",
+      "colEntregue": "Entregue",
+      "actionPronto": "Confirmar Entrega"
+    },
+    "pixKey": "",
+    "slides": [],
+    "social": {
+      "facebook": "",
+      "instagram": ""
+    },
+    "splash": {
+      "photos": [
+        {
+          "url": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/8e25d0fedbf760ac.jpg",
+          "type": "photo"
+        }
+      ],
+      "enabled": true,
+      "transition": "zoom",
+      "durationSeconds": 15
+    },
+    "coupons": [],
+    "feeMode": "fixo",
+    "logoUrl": "",
+    "loyalty": {
+      "enabled": true,
+      "redeemValue": 10,
+      "redeemPoints": 100,
+      "pointsPerReal": 1,
+      "minOrderToRedeem": 0
+    },
+    "pixCity": "RIO DAS OSTRAS",
+    "pixName": "Shogatsu Culinaria Oriental",
+    "uiFonts": {
+      "config": 13,
+      "pedidos": 13,
+      "clientes": 13,
+      "relatorios": 13
+    },
+    "feeMaxKm": 12,
+    "feePerKm": 2.5,
+    "feeRound": 0.5,
+    "logoSize": 40,
+    "schedule": {
+      "enabled": true,
+      "openTime": "18:30",
+      "closeTime": "22:55"
+    },
+    "stations": {
+      "bar": {
+        "ip": "",
+        "icon": "🍹",
+        "port": 9100,
+        "label": "Bar",
+        "active": false,
+        "device": "",
+        "method": "navegador",
+        "prepTime": 8
+      },
+      "caixa": {
+        "ip": "",
+        "icon": "🧾",
+        "port": 9100,
+        "label": "Caixa",
+        "active": true,
+        "device": "",
+        "method": "navegador",
+        "prepTime": 0
+      },
+      "cozinha": {
+        "ip": "",
+        "icon": "🍳",
+        "port": 9100,
+        "label": "Cozinha",
+        "active": true,
+        "device": "",
+        "method": "navegador",
+        "prepTime": 20
+      },
+      "delivery": {
+        "ip": "",
+        "icon": "🛵",
+        "kind": "dispatch",
+        "port": 9100,
+        "label": "Delivery",
+        "active": false,
+        "device": "",
+        "method": "navegador",
+        "prepTime": 0
+      },
+      "sushibar": {
+        "ip": "",
+        "icon": "🍣",
+        "port": 9100,
+        "label": "Sushibar",
+        "active": true,
+        "device": "",
+        "method": "navegador",
+        "prepTime": 15
+      },
+      "expedicao": {
+        "ip": "",
+        "icon": "📦",
+        "kind": "dispatch",
+        "port": 9100,
+        "label": "Expedição",
+        "active": false,
+        "device": "",
+        "method": "navegador",
+        "prepTime": 5
+      }
+    },
+    "storeLat": null,
+    "storeLng": null,
+    "adminPass": "shogatsu2026",
+    "feeBaseKm": 2,
+    "lateAlert": {
+      "minutes": 0,
+      "repeatMinutes": 3
+    },
+    "logoShape": "retangular",
+    "printFont": "monospace",
+    "printSize": 16,
+    "courierPay": {
+      "mode": "fixo",
+      "zones": [],
+      "fixedValue": 6
+    },
+    "masterPass": "shogatsuMaster2026",
+    "pixGateway": {
+      "enabled": false,
+      "provider": "mercadopago",
+      "accessToken": ""
+    },
+    "printColor": "#000000",
+    "printWidth": "80mm",
+    "scheduling": {
+      "enabled": true,
+      "maxDaysAhead": 7,
+      "minMinutesAhead": 60
+    },
+    "storePhone": "(22) 2764-1333",
+    "feeZonesCep": [],
+    "globalBadge": {
+      "icon": "🔥",
+      "text": "Mais vendido",
+      "shadow": true,
+      "bgColor": "#c0392b",
+      "enabled": false,
+      "opacity": 100,
+      "padding": 6,
+      "fontSize": 11,
+      "position": "canto-superior-esquerdo",
+      "textColor": "#ffffff",
+      "fontWeight": 700,
+      "borderColor": "#ffffff",
+      "borderRadius": 6,
+      "borderEnabled": false
+    },
+    "feeBaseValue": 8,
+    "installPromo": {
+      "type": "cupom",
+      "enabled": true,
+      "cupomCode": "",
+      "bonusValue": "",
+      "benefitCode": ""
+    },
+    "newOrderRing": {
+      "enabled": 1,
+      "seconds": 5
+    },
+    "reservations": {
+      "note": "",
+      "enabled": true,
+      "schedule": [
+        {
+          "open": true,
+          "openTime": "18:00",
+          "closeTime": "23:00"
+        },
+        {
+          "open": false,
+          "openTime": "18:00",
+          "closeTime": "23:00"
+        },
+        {
+          "open": true,
+          "openTime": "18:00",
+          "closeTime": "23:00"
+        },
+        {
+          "open": true,
+          "openTime": "18:00",
+          "closeTime": "23:00"
+        },
+        {
+          "open": true,
+          "openTime": "18:00",
+          "closeTime": "23:00"
+        },
+        {
+          "open": true,
+          "openTime": "18:00",
+          "closeTime": "23:00"
+        },
+        {
+          "open": true,
+          "openTime": "18:00",
+          "closeTime": "23:00"
+        }
+      ],
+      "blockedDates": [
+        "2026-09-27",
+        "2026-10-25",
+        "2026-11-29",
+        "2026-12-24",
+        "2026-12-25"
+      ],
+      "useStoreSchedule": true,
+      "maxPeoplePerTable": 40
+    },
+    "reviewPrompt": "O que você achou do seu pedido? Sua opinião ajuda muito a gente! 🍣",
+    "stationOrder": [],
+    "timeRetirada": "20–30 min",
     "weekSchedule": [
       {
         "open": true,
@@ -53,118 +325,7 @@
         "closeTime": "23:00"
       }
     ],
-    "adminPass": "shogatsu2026",
-    "masterPass": "shogatsuMaster2026",
-    "users": [
-      {
-        "username": "master",
-        "password": "shogatsuMaster2026",
-        "role": "master"
-      },
-      {
-        "username": "admin",
-        "password": "shogatsu2026",
-        "role": "admin"
-      }
-    ],
-    "logoUrl": "",
-    "chatAvatarUrl": "",
-    "print": 0,
-    "autoAcceptOrders": 0,
-    "autoAcceptReservations": 0,
-    "sound": 1,
-    "customerAlertSound": "classico",
-    "customCustomerAlertSounds": [],
-    "labels": {
-      "actionNovo": "Aceitar Pedido",
-      "actionPrep": "Marcar Pronto",
-      "actionPronto": "Confirmar Entrega",
-      "colNovo": "Novos",
-      "colPrep": "Preparando",
-      "colPronto": "Pronto",
-      "colEntregue": "Entregue",
-      "btnCancel": "Cancelar",
-      "btnPrint": "Imprimir"
-    },
-    "pixKey": "",
-    "pixName": "Shogatsu Culinaria Oriental",
-    "pixCity": "RIO DAS OSTRAS",
-    "pixGateway": {
-      "enabled": false,
-      "provider": "mercadopago",
-      "accessToken": ""
-    },
-    "printFont": "Verdana, sans-serif",
-    "printSize": 20,
-    "printColor": "#000000",
-    "logoShape": "retangular",
-    "logoSize": 40,
-    "dishPhotoSize": 80,
-    "menuFontScale": 1,
-    "stations": {
-      "caixa": {
-        "label": "Caixa",
-        "icon": "🧾",
-        "method": "navegador",
-        "ip": "",
-        "port": 9100,
-        "device": "",
-        "prepTime": 0,
-        "active": true
-      },
-      "cozinha": {
-        "label": "Cozinha",
-        "icon": "🍳",
-        "method": "navegador",
-        "ip": "",
-        "port": 9100,
-        "device": "",
-        "prepTime": 20,
-        "active": true
-      },
-      "sushibar": {
-        "label": "Sushibar",
-        "icon": "🍣",
-        "method": "navegador",
-        "ip": "",
-        "port": 9100,
-        "device": "",
-        "prepTime": 15,
-        "active": true
-      },
-      "bar": {
-        "label": "Bar",
-        "icon": "🍹",
-        "method": "navegador",
-        "ip": "",
-        "port": 9100,
-        "device": "",
-        "prepTime": 8,
-        "active": true
-      },
-      "delivery": {
-        "label": "Delivery",
-        "icon": "🛵",
-        "method": "navegador",
-        "ip": "",
-        "port": 9100,
-        "device": "",
-        "prepTime": 0,
-        "active": true
-      },
-      "expedicao": {
-        "label": "Expedição",
-        "icon": "📦",
-        "method": "navegador",
-        "ip": "",
-        "port": 9100,
-        "device": "",
-        "prepTime": 5,
-        "active": true
-      }
-    },
-    "stationOrder": [],
-    "defaultStation": "cozinha",
+    "announcements": [],
     "cancelReasons": [
       "Item em falta",
       "Fora da área de entrega",
@@ -172,96 +333,9 @@
       "Cliente desistiu",
       "Loja fechada no momento"
     ],
-    "uiFonts": {
-      "pedidos": 13,
-      "config": 13,
-      "clientes": 13,
-      "relatorios": 13
-    },
-    "theme": {
-      "primary": "#c9a84c",
-      "accent": "#c0392b",
-      "bg": "#0a0a0a"
-    },
-    "slides": [],
-    "feeMode": "fixo",
-    "storeLat": null,
-    "storeLng": null,
-    "feeBaseKm": 2,
-    "feeBaseValue": 8,
-    "feePerKm": 2.5,
-    "feeMaxKm": 12,
-    "feeRound": 0.5,
-    "feeZonesCep": [],
-    "feeZonesBairro": [],
-    "feeZoneFallback": "padrao",
-    "coupons": [],
-    "installPromo": {
-      "enabled": true,
-      "type": "cupom",
-      "cupomCode": "",
-      "bonusValue": "",
-      "benefitCode": ""
-    },
-    "loyalty": {
-      "enabled": true,
-      "pointsPerReal": 1,
-      "redeemPoints": 100,
-      "redeemValue": 10,
-      "minOrderToRedeem": 0
-    },
-    "placeholderPhoto": {
-      "enabled": false,
-      "url": "",
-      "position": "esquerda",
-      "mode": "cortar",
-      "radius": "medio"
-    },
-    "globalBadge": {
-      "enabled": false,
-      "text": "Mais vendido",
-      "icon": "🔥",
-      "bgColor": "#c0392b",
-      "textColor": "#ffffff",
-      "fontSize": 11,
-      "fontWeight": 700,
-      "opacity": 100,
-      "borderEnabled": false,
-      "borderColor": "#ffffff",
-      "borderRadius": 6,
-      "padding": 6,
-      "shadow": true,
-      "position": "canto-superior-esquerdo"
-    },
-    "courierPay": {
-      "mode": "fixo",
-      "fixedValue": 6,
-      "zones": []
-    },
-    "nextTicketNumber": 1,
-    "sms": {
-      "accountSid": "",
-      "authToken": "",
-      "fromNumber": "",
-      "fromWhatsApp": "",
-      "notifyWhatsApp": false
-    },
-    "ia": {
-      "enabled": false,
-      "provider": "groq",
-      "apiKey": "",
-      "modelo": "",
-      "modeloVisao": "",
-      "faq": [],
-      "badgesAutoAprovar": false,
-      "fallbackAutomatico": true,
-      "modoBasico": true
-    },
-    "social": {
-      "instagram": "",
-      "facebook": ""
-    },
-    "reviewPrompt": "O que você achou do seu pedido? Sua opinião ajuda muito a gente! 🍣",
+    "chatAvatarUrl": "",
+    "dishPhotoSize": 90,
+    "menuFontScale": 1,
     "reviewPhrases": [
       "Comida deliciosa! 😋",
       "Entrega rápida! 🛵",
@@ -269,94 +343,26 @@
       "Embalagem caprichada 📦",
       "Voltarei a pedir com certeza! 🙌"
     ],
-    "announcements": [],
-    "vapid": {
-      "publicKey": "BKsCoEqc9Rsj0cipKcEaPhYBrhwYdfCD7ZrtLprXR0EnuxntqGqbyxuKodY9M7pEOFuRTly4dZ8TCqwLC8bsd94",
-      "privateKeyJwk": {
-        "kty": "EC",
-        "x": "qwKgSpz1GyPRyKkpwRo-FgGuHBh18IPtmu0umtdHQSc",
-        "y": "uxntqGqbyxuKodY9M7pEOFuRTly4dZ8TCqwLC8bsd94",
-        "crv": "P-256",
-        "d": "2Yz17aARTGpk4uR3e7hcmGkroWHONzbSWbrHP0qZbs0"
-      },
-      "subject": "mailto:contato@shogatsu.com.br"
-    },
-    "reservations": {
-      "enabled": true,
-      "maxPeoplePerTable": 12,
-      "note": ""
-    },
-    "scheduling": {
-      "enabled": true,
-      "minMinutesAhead": 60,
-      "maxDaysAhead": 7
-    },
-    "splash": {
-      "enabled": false,
-      "durationSeconds": 3,
-      "transition": "zoom",
-      "photos": []
-    },
     "chatBackground": {
-      "enabled": false,
-      "url": "",
-      "name": "",
-      "size": 0,
-      "width": 0,
-      "height": 0,
-      "date": "",
-      "overlay": 0.45
+      "url": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/8b0a2ffaeea86ef2.png",
+      "date": "2026-09-13T03:10:33.716Z",
+      "name": "Foto personalizada",
+      "size": 2117333,
+      "width": 853,
+      "height": 1844,
+      "enabled": true,
+      "overlay": 0.75
     },
-    "adminChatBackground": {
-      "enabled": false,
-      "url": "",
-      "name": "",
-      "size": 0,
-      "width": 0,
-      "height": 0,
-      "date": "",
-      "overlay": 0.45
-    },
+    "defaultStation": "caixa",
+    "feeZonesBairro": [],
     "rodizioPopular": {
-      "phrases": [
-        "Sushi à vontade. Sabor sem limites.",
-        "Aqui o rodízio é show — e o camarão é liberado.",
-        "Cada peça, uma experiência. Cada mesa, um banquete.",
-        "Temaki, sashimi, grelhados... e o refri é por nossa conta.",
-        "Sabor japonês de verdade, no seu ritmo, sem pressa."
-      ],
-      "heroPhoto": "",
-      "priceGroups": [
-        {
-          "label": "Terça, Quarta e Quinta",
-          "cash": "R$ 59,99",
-          "card": "R$ 79,99"
-        },
-        {
-          "label": "Sexta, Sábado e Domingo",
-          "cash": "R$ 64,99",
-          "card": "R$ 84,99"
-        }
-      ],
-      "priceNote": "Valores válidos a partir das <b>18:30</b>.",
-      "highlights": [
-        {
-          "icon": "🥤",
-          "label": "Refrigerante Liberado"
-        },
-        {
-          "icon": "🥢",
-          "label": "Temaki"
-        },
-        {
-          "icon": "🍤",
-          "label": "Camarão ao Alho e Óleo"
-        },
-        {
-          "icon": "🍄",
-          "label": "Shimeji"
-        }
-      ],
+      "theme": {
+        "bodyFont": "sans-serif",
+        "fontScale": 1,
+        "accentColor": "#c9a24a",
+        "headingFont": "serif"
+      },
+      "address": "Av. Gov. Roberto Silveira, 109 — Costa Azul, Rio das Ostras",
       "gallery": [
         {
           "photo": ""
@@ -377,10 +383,21 @@
           "photo": ""
         }
       ],
+      "phrases": [
+        "Sushi à vontade. Sabor sem limites.",
+        "Aqui o rodízio é show — e o camarão é liberado.",
+        "Cada peça, uma experiência. Cada mesa, um banquete.",
+        "Temaki, sashimi, grelhados... e o refri é por nossa conta.",
+        "Sabor japonês de verdade, no seu ritmo, sem pressa."
+      ],
+      "whatsapp": "552227641333",
+      "heroPhoto": "",
+      "instagram": "shogatsurestaurante",
+      "priceNote": "Valores válidos a partir das <b>18:30</b>.",
+      "wasteNote": "Taxa de desperdício: valor da peça do cardápio. Evite desperdício pra podermos manter nossa promoção e sempre atender melhor!",
       "categories": [
         {
           "icon": "🍙",
-          "title": "Hossomaki",
           "items": [
             "Haddock Maki",
             "Filadélfia",
@@ -392,11 +409,11 @@
             "Goiabada com Fruta do Dia",
             "Camarão Grelhado",
             "Tilápia com Geleia"
-          ]
+          ],
+          "title": "Hossomaki"
         },
         {
           "icon": "🍱",
-          "title": "Uramakis",
           "items": [
             "Salmão",
             "Filadélfia Roll",
@@ -405,762 +422,1172 @@
             "Califórnia",
             "Haddock",
             "Joy Salmão"
-          ]
+          ],
+          "title": "Uramakis"
         },
         {
           "icon": "🍣",
-          "title": "Sushis Diversos",
           "items": [
             "Sushi Salmão",
             "Sushi de Peixe Branco",
             "Sushi Skin"
-          ]
+          ],
+          "title": "Sushis Diversos"
         },
         {
           "icon": "🥢",
-          "title": "Temakis Tradicionais",
           "items": [
             "Temaki Filadélfia",
             "Temaki Hot Filadélfia"
-          ]
+          ],
+          "title": "Temakis Tradicionais"
         },
         {
           "icon": "✨",
-          "title": "Especiais",
           "items": [
             "Ceviche do Dia",
             "Sunomono com Kani",
             "Skin de Salmão com Cebolinha"
-          ]
+          ],
+          "title": "Especiais"
         },
         {
           "icon": "🍤",
-          "title": "Fritos — Empanados",
           "items": [
             "Peixe do Dia na Crosta de Ervas",
             "Lula Milanesa (Dorê)",
             "Frango Milanesa",
             "Bolinho de Salmão",
             {
-              "name": "Salmão Especial",
-              "sub": "sob consulta"
+              "sub": "sob consulta",
+              "name": "Salmão Especial"
             },
             "Frango Recheado Especial",
             "Harumaki de Camarão",
             "Harumaki de Frango",
             "Harumaki de Legumes",
             "Harumaki de Queijo e Presunto"
-          ]
+          ],
+          "title": "Fritos — Empanados"
         },
         {
           "icon": "🔥",
-          "title": "Grelhados",
           "items": [
             "Lula ao Alho e Óleo",
             "Camarão ao Alho e Óleo",
             "Yakisoba Misto (Filé Mignon e Frango)",
             {
-              "name": "Shimeji na Manteiga",
-              "sub": "sob consulta"
+              "sub": "sob consulta",
+              "name": "Shimeji na Manteiga"
             },
             "Filé Mignon Suíno Agridoce"
-          ]
+          ],
+          "title": "Grelhados"
         },
         {
           "icon": "🍰",
-          "title": "Sobremesas",
           "items": [
             "Harumaki Romeu e Julieta",
             "Harumaki Doce de Leite com Ameixa",
             "Harumaki de Chocolate com Banana",
             "Banana Empanada com Chocolate"
-          ]
+          ],
+          "title": "Sobremesas"
         }
       ],
-      "address": "Av. Gov. Roberto Silveira, 109 — Costa Azul, Rio das Ostras",
-      "whatsapp": "552227641333",
-      "instagram": "shogatsurestaurante",
+      "highlights": [
+        {
+          "icon": "🥤",
+          "label": "Refrigerante Liberado"
+        },
+        {
+          "icon": "🥢",
+          "label": "Temaki"
+        },
+        {
+          "icon": "🍤",
+          "label": "Camarão ao Alho e Óleo"
+        },
+        {
+          "icon": "🍄",
+          "label": "Shimeji"
+        }
+      ],
       "deliveryUrl": "/",
-      "wasteNote": "Taxa de desperdício: valor da peça do cardápio. Evite desperdício pra podermos manter nossa promoção e sempre atender melhor!",
-      "theme": {
-        "headingFont": "serif",
-        "bodyFont": "sans-serif",
-        "accentColor": "#c9a24a",
-        "fontScale": 1
-      }
-    }
+      "priceGroups": [
+        {
+          "card": "R$ 79,99",
+          "cash": "R$ 59,99",
+          "label": "Terça, Quarta e Quinta"
+        },
+        {
+          "card": "R$ 84,99",
+          "cash": "R$ 64,99",
+          "label": "Sexta, Sábado e Domingo"
+        }
+      ]
+    },
+    "feeZoneFallback": "padrao",
+    "autoAcceptOrders": 0,
+    "nextTicketNumber": 1,
+    "placeholderPhoto": {
+      "url": "",
+      "mode": "cortar",
+      "radius": "medio",
+      "enabled": false,
+      "position": "esquerda"
+    },
+    "customerAlertSound": "classico",
+    "adminChatBackground": {
+      "url": "",
+      "date": "",
+      "name": "",
+      "size": 0,
+      "width": 0,
+      "height": 0,
+      "enabled": false,
+      "overlay": 0.45
+    },
+    "autoAcceptReservations": 0,
+    "customCustomerAlertSounds": []
   },
   "menu": [
     {
       "id": "rodizio-master",
       "icon": "🍣",
-      "title": "Rodízio Master",
       "note": "",
       "items": [
         {
-          "name": "Rodízio Master – Combo Premium Completo",
-          "desc": "10 sashimis de salmão, 5 sashimis haddock, 5 sashimis peixe branco, 5 salmão ice, 2 skin, 2 filadélfia, 4 hot rolls, 2 camarões empanados, 1 harumaki de camarão, 2 lulas à milanesa, 1 cheesecake, 1 tako, 1 tori, 1 hot kyuubi, yakisoba e camarão ao alho e óleo.",
-          "price": 159.9,
           "qty": "",
+          "desc": "10 sashimis de salmão, 5 sashimis haddock, 5 sashimis peixe branco, 5 salmão ice, 2 skin, 2 filadélfia, 4 hot rolls, 2 camarões empanados, 1 harumaki de camarão, 2 lulas à milanesa, 1 cheesecake, 1 tako, 1 tori, 1 hot kyuubi, yakisoba e camarão ao alho e óleo.",
+          "name": "Rodízio Master – Combo Premium Completo",
           "badge": "",
-          "available": true
+          "image": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/84c8756b44304796.jpg",
+          "price": 159.9,
+          "imagePos": {
+            "x": 33,
+            "y": 41
+          },
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
+          "available": true,
+          "badgeIcon": "🔥",
+          "badgeMode": "global",
+          "badgeSize": 13,
+          "badgeColor": "#C62828",
+          "badgeTextColor": "#FFFFFF"
         }
+      ],
+      "title": "Rodízio Master",
+      "stations": [
+        "caixa",
+        "cozinha",
+        "sushibar"
       ]
     },
     {
       "id": "combos-tradicionais",
       "icon": "🍱",
-      "title": "Combos Tradicionais",
       "note": "",
       "items": [
         {
-          "name": "Combinado Super",
+          "qty": "",
           "desc": "16 sashimis, 6 sushi, 3 tekamaki, 2 skin roll, 2 california, 2 hot, 2 ebi maki",
+          "name": "Combinado Super",
+          "badge": "",
           "price": 89.99,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Combinado Shogatsu",
+          "qty": "",
           "desc": "20 sashimis, 8 sushi, 3 tekamaki, 2 skin, 2 california, 4 hot, 2 ebimaki",
+          "name": "Combinado Shogatsu",
+          "badge": "",
           "price": 106.1,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Combinado Osaka (40 peças)",
+          "qty": "",
           "desc": "6 salmão ice, 6 joy, 6 tartare, 10 sashimi salmão, 10 hot filadélfia, 2 sweet heart",
+          "name": "Combinado Osaka (40 peças)",
+          "badge": "",
           "price": 110.99,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combinado Tokyo (50 peças)",
-          "desc": "",
+          "badge": "",
           "price": 143.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combo Nagazaki (50 peças)",
-          "desc": "",
+          "badge": "",
           "price": 137.99,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combinado Ronin (80 peças)",
-          "desc": "",
-          "price": 207.2,
-          "qty": "",
           "badge": "",
+          "price": 207.2,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Combinado Ninja",
-          "desc": "",
-          "price": 129.5,
           "qty": "",
+          "desc": "",
+          "name": "Combinado Ninja",
           "badge": "",
+          "price": 129.5,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Combos Tradicionais",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "promocoes-exclusivas",
       "icon": "🎉",
-      "title": "Promoções Exclusivas",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Combinado Nori (20 peças)",
-          "desc": "",
-          "price": 58.9,
-          "qty": "",
           "badge": "",
+          "price": 58.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combinado Salmão Especial (25 peças)",
-          "desc": "",
+          "badge": "",
           "price": 84.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combinado Especial (20 peças)",
-          "desc": "",
-          "price": 58.9,
-          "qty": "",
           "badge": "",
+          "price": 58.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combinado Nirá (20 peças)",
-          "desc": "",
-          "price": 58.9,
-          "qty": "",
           "badge": "",
+          "price": 58.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combinado Sakura (21 peças)",
-          "desc": "",
+          "badge": "",
           "price": 59.8,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combinado Kyoto (50 peças)",
-          "desc": "",
+          "badge": "",
           "price": 99.39,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Premium Fusion (24 peças)",
-          "desc": "",
-          "price": 49.99,
-          "qty": "",
           "badge": "",
+          "price": 49.99,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combo Explosão de Salmão (22 peças)",
-          "desc": "",
+          "badge": "",
           "price": 49.99,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Combinado Crocância Suprema",
-          "desc": "",
-          "price": 58.9,
-          "qty": "",
           "badge": "",
+          "price": 58.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Hot Filadélfia",
-          "desc": "",
-          "price": 28.7,
           "qty": "",
+          "desc": "",
+          "name": "Hot Filadélfia",
           "badge": "",
+          "price": 28.7,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Promoções Exclusivas",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "temakis",
       "icon": "🌯",
-      "title": "Temakis",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Temaki Filadélfia Tradicional",
-          "desc": "",
+          "badge": "",
           "price": 29.8,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Temaki Camarão Tradicional",
-          "desc": "",
+          "badge": "",
           "price": 32.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Temaki Filadélfia Original (Sem Arroz)",
-          "desc": "",
-          "price": 36.9,
-          "qty": "",
           "badge": "",
+          "price": 36.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Temaki Camarão Original (Sem Arroz)",
-          "desc": "",
+          "badge": "",
           "price": 36.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Temaki Hot Filadélfia",
-          "desc": "",
-          "price": 33.9,
-          "qty": "",
           "badge": "",
+          "price": 33.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Temaki Camarão Frito",
-          "desc": "",
-          "price": 33.9,
           "qty": "",
+          "desc": "",
+          "name": "Temaki Camarão Frito",
           "badge": "",
+          "price": 33.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Temakis",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "sashimis",
       "icon": "🐟",
-      "title": "Sashimis",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Sashimi Simples",
-          "desc": "",
+          "badge": "",
           "price": 22.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Sashimi Mini",
-          "desc": "",
+          "badge": "",
           "price": 42.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Sashimi Extra",
-          "desc": "",
+          "badge": "",
           "price": 63.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Sashimi Super",
-          "desc": "",
-          "price": 79.8,
-          "qty": "",
           "badge": "",
+          "price": 79.8,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Sashimi Shogatsu",
-          "desc": "",
-          "price": 99.7,
           "qty": "",
+          "desc": "",
+          "name": "Sashimi Shogatsu",
           "badge": "",
+          "price": 99.7,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Sashimis",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "sushi",
       "icon": "🍣",
-      "title": "Sushi",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Sushi Simples",
-          "desc": "",
+          "badge": "",
           "price": 19.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Sushi Mini",
-          "desc": "",
+          "badge": "",
           "price": 39.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Sushi Extra",
-          "desc": "",
+          "badge": "",
           "price": 59.8,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Sushi Super",
-          "desc": "",
-          "price": 79.8,
-          "qty": "",
           "badge": "",
+          "price": 79.8,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Sushi Shogatsu",
-          "desc": "",
-          "price": 99.7,
           "qty": "",
+          "desc": "",
+          "name": "Sushi Shogatsu",
           "badge": "",
+          "price": 99.7,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Sushi",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "harumakis",
       "icon": "🥟",
-      "title": "Harumakis",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Harumaki Frango",
-          "desc": "",
-          "price": 17.9,
-          "qty": "",
           "badge": "",
+          "price": 17.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Harumaki Camarão",
-          "desc": "",
+          "badge": "",
           "price": 21.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Harumaki Legumes",
-          "desc": "",
+          "badge": "",
           "price": 17.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Harumaki Banana com Chocolate",
-          "desc": "",
-          "price": 17.5,
-          "qty": "",
           "badge": "",
+          "price": 17.5,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Harumaki Romeu e Julieta",
-          "desc": "",
-          "price": 17.5,
-          "qty": "",
           "badge": "",
+          "price": 17.5,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Harumaki Doce de Leite com Ameixa",
-          "desc": "",
-          "price": 17.5,
           "qty": "",
+          "desc": "",
+          "name": "Harumaki Doce de Leite com Ameixa",
           "badge": "",
+          "price": 17.5,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Harumakis",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "hot-rolls",
       "icon": "🔥",
-      "title": "Hot Rolls",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Salmão Ice Especial",
-          "desc": "",
+          "badge": "",
           "price": 35.7,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Salmão Ice",
-          "desc": "",
-          "price": 31.9,
-          "qty": "",
           "badge": "",
+          "price": 31.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Hot Filadélfia Original",
-          "desc": "",
+          "badge": "",
           "price": 31.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Hot Filadélfia Tradicional",
-          "desc": "",
-          "price": 28.7,
-          "qty": "",
           "badge": "",
+          "price": 28.7,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Skin Roll",
-          "desc": "",
-          "price": 28.7,
           "qty": "",
+          "desc": "",
+          "name": "Skin Roll",
           "badge": "",
+          "price": 28.7,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Hot Rolls",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "entradas",
       "icon": "🥗",
-      "title": "Entradas",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Sunomono",
-          "desc": "",
+          "badge": "",
           "price": 29.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Ceviche Tradicional",
-          "desc": "",
-          "price": 39.9,
-          "qty": "",
           "badge": "",
+          "price": 39.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Shimeji",
-          "desc": "",
-          "price": 0,
           "qty": "",
+          "desc": "",
+          "name": "Shimeji",
           "badge": "",
+          "price": 0,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": false
         }
+      ],
+      "title": "Entradas",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "pratos-quentes",
       "icon": "🍛",
-      "title": "Pratos Quentes",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Ika Itame",
-          "desc": "",
+          "badge": "",
           "price": 48.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Frango Agridoce",
-          "desc": "",
-          "price": 38.9,
-          "qty": "",
           "badge": "",
+          "price": 38.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Frango Xadrez",
-          "desc": "",
-          "price": 38.9,
           "qty": "",
+          "desc": "",
+          "name": "Frango Xadrez",
           "badge": "",
+          "price": 38.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Pratos Quentes",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "teppan-yaki",
       "icon": "🥩",
-      "title": "Teppan Yaki",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Teppan Salmão",
-          "desc": "",
+          "badge": "",
           "price": 75.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Teppan Mignon",
-          "desc": "",
-          "price": 68.9,
-          "qty": "",
           "badge": "",
+          "price": 68.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Teppan Frango",
-          "desc": "",
-          "price": 44.9,
           "qty": "",
+          "desc": "",
+          "name": "Teppan Frango",
           "badge": "",
+          "price": 44.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Teppan Yaki",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "yakissoba",
       "icon": "🍜",
-      "title": "Yakissoba",
       "note": "",
       "items": [
         {
+          "qty": "",
+          "desc": "",
           "name": "Legumes Especial",
-          "desc": "",
-          "price": 43.9,
-          "qty": "",
           "badge": "",
+          "price": 43.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Legumes",
-          "desc": "",
+          "badge": "",
           "price": 33.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Mignon",
-          "desc": "",
-          "price": 52.9,
-          "qty": "",
           "badge": "",
+          "price": 52.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Camarão",
-          "desc": "",
+          "badge": "",
           "price": 58.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Misto Frango e Mignon",
-          "desc": "",
+          "badge": "",
           "price": 52.9,
-          "qty": "",
-          "badge": "",
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
+          "qty": "",
+          "desc": "",
           "name": "Frutos do Mar",
-          "desc": "",
-          "price": 59.9,
-          "qty": "",
           "badge": "",
+          "price": 59.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Frango",
-          "desc": "",
-          "price": 43.9,
           "qty": "",
+          "desc": "",
+          "name": "Frango",
           "badge": "",
+          "price": 43.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Yakissoba",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "yakimeshi",
       "icon": "🍚",
-      "title": "Yakimeshi",
       "note": "",
       "items": [
         {
-          "name": "Camarão",
+          "qty": "",
           "desc": "",
+          "name": "Camarão yakimeshi",
+          "badge": "",
+          "image": "",
           "price": 58.9,
-          "qty": "",
-          "badge": "",
-          "available": true
+          "imagePos": {
+            "x": 50,
+            "y": 50
+          },
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
+          "available": true,
+          "badgeIcon": "🔥",
+          "badgeMode": "global",
+          "badgeSize": 13,
+          "badgeColor": "#C62828",
+          "badgeTextColor": "#FFFFFF"
         },
         {
-          "name": "Frango",
+          "qty": "",
           "desc": "",
+          "name": "Frango  yakimeshi",
+          "badge": "",
+          "image": "",
           "price": 43.9,
-          "qty": "",
-          "badge": "",
-          "available": true
+          "imagePos": {
+            "x": 50,
+            "y": 50
+          },
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
+          "available": true,
+          "badgeIcon": "🔥",
+          "badgeMode": "global",
+          "badgeSize": 13,
+          "badgeColor": "#C62828",
+          "badgeTextColor": "#FFFFFF"
         },
         {
-          "name": "Frutos do Mar",
-          "desc": "",
-          "price": 59.9,
           "qty": "",
+          "desc": "",
+          "name": "Frutos do Mar  yakimeshi",
           "badge": "",
-          "available": true
+          "image": "",
+          "price": 59.9,
+          "imagePos": {
+            "x": 50,
+            "y": 50
+          },
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
+          "available": true,
+          "badgeIcon": "🔥",
+          "badgeMode": "global",
+          "badgeSize": 13,
+          "badgeColor": "#C62828",
+          "badgeTextColor": "#FFFFFF"
         }
+      ],
+      "title": "Yakimeshi",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "burgers-e-dogs",
       "icon": "🍔",
-      "title": "Burgers e Dogs",
       "note": "",
       "items": [
         {
-          "name": "Japaburguer Salmão",
-          "desc": "",
-          "price": 31.9,
           "qty": "",
+          "desc": "",
+          "name": "Japaburguer Salmão",
           "badge": "",
+          "price": 31.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Japa Dog Salmão",
-          "desc": "",
-          "price": 31.9,
           "qty": "",
+          "desc": "",
+          "name": "Japa Dog Salmão",
           "badge": "",
+          "price": 31.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Burgers e Dogs",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "sobremesas",
       "icon": "🍰",
-      "title": "Sobremesas",
       "note": "",
       "items": [
         {
-          "name": "Petit Gateau",
-          "desc": "",
-          "price": 25.9,
           "qty": "",
+          "desc": "",
+          "name": "Petit Gateau",
           "badge": "",
+          "image": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/b8ce39b3840d5d77.jpg",
+          "price": 25.9,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         },
         {
-          "name": "Hotnana",
-          "desc": "",
-          "price": 28.7,
           "qty": "",
+          "desc": "",
+          "name": "Hotnana",
           "badge": "",
+          "image": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/d06da5dc5b51b648.jpg",
+          "price": 28.7,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
           "available": true
         }
+      ],
+      "title": "Sobremesas",
+      "stations": [
+        "cozinha"
       ]
     },
     {
       "id": "bebidas",
       "icon": "🥤",
-      "title": "Bebidas",
       "note": "",
-      "items": []
+      "items": [],
+      "title": "Bebidas",
+      "stations": [
+        "caixa",
+        "cozinha",
+        "sushibar"
+      ]
     }
   ]
 }

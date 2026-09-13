@@ -1,1 +1,42 @@
-[]
+{
+  "0567f5072d4761858bbf82de743823d50b63ae9158e92966": {
+    "role": "master",
+    "username": "master",
+    "expiresAt": 1789311483406
+  },
+  "0a10931318c8ff3ba890e29cf7f827c94a2883978a28aab1": {
+    "role": "admin",
+    "username": "admin",
+    "expiresAt": 1789292709950
+  },
+  "0c3dd893f564798a6be4c3e6aa1e25e6315c18148b68f3c5": {
+    "role": "master",
+    "username": "master",
+    "expiresAt": 1789311493689
+  },
+  "41342c2590995e57996c2aa1b917c64365a60bef5049d49c": {
+    "role": "master",
+    "username": "master",
+    "expiresAt": 1789311879688
+  },
+  "5f39f3fbd5aa5cdae79c2d979031172727d4aead59008a6e": {
+    "role": "master",
+    "username": "master",
+    "expiresAt": 1789294552092
+  },
+  "796f8eb0e0e9eed78d6707d51b6cc9d4c117ac84dfa9e68c": {
+    "role": "master",
+    "username": "master",
+    "expiresAt": 1789332458071
+  },
+  "b06c00bc1223685bbe17792cc059aa58e4939ddf51c964ba": {
+    "role": "master",
+    "username": "master",
+    "expiresAt": 1789323668406
+  },
+  "efe5ec6fc310558dc84e9665d11648f450ae03fc9e18b6ec": {
+    "role": "admin",
+    "username": "admin",
+    "expiresAt": 1789294302053
+  }
+}

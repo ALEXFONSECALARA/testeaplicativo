@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "id": "RSMTQDBG6W",
+    "date": "2026-09-06",
+    "name": "Thamires Sant'anna",
+    "time": "21:30",
+    "notes": "",
+    "phone": "21975531757",
+    "people": 2,
+    "status": "confirmada",
+    "createdAt": "2026-09-06T22:13:07.640Z",
+    "storeReply": "",
+    "autoPrinted": true
+  },
+  {
+    "id": "RSMTQ6X0QB",
+    "date": "2026-09-08",
+    "name": "Fellype Gabriel da Silva Miguel",
+    "time": "19:00",
+    "notes": "Aniversario",
+    "phone": "27992457804",
+    "people": 12,
+    "status": "confirmada",
+    "createdAt": "2026-09-06T19:13:56.723Z",
+    "storeReply": "",
+    "autoPrinted": true
+  }
+]

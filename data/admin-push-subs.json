@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "keys": {
+      "auth": "WruD3FybwFlDcrp43dgOHA",
+      "p256dh": "BGG0HvSMjtHk2olSOFyI3fIFd_6GRIPVdN0oPiQx60soJJQgUDgwrYz4NPrRW9t2_HIozeBzVjjOBYgQtzZeQ8A"
+    },
+    "silent": false,
+    "addedBy": "master",
+    "endpoint": "https://fcm.googleapis.com/fcm/send/dqnOQZRpT0U:APA91bHWMAZgpf7oJxvLSEib_naMmbdLkmnHYbaPK3SeH50Vl9Tp8RNxLHwwNjphE0uqjFBWL6d3kEcI7-NG6xYJsQdBj4MBzW3pLJ3f9KRnz64t0GznH_dN0llP8vBxIxxClZ_K9S96",
+    "createdAt": "2026-09-02T18:12:51.762Z",
+    "lastSeenAt": "2026-09-02T18:12:51.762Z",
+    "deviceLabel": "Windows · Chrome"
+  }
+]

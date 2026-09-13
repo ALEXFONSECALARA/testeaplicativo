@@ -1,1 +1,1150 @@
-[]
+[
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-09-02T20:32:05.065Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 9
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-09-02T20:31:55.668Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-26T16:58:07.625Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 4
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-26T16:57:50.230Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-20T17:08:40.723Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 2
+  },
+  {
+    "orderId": "SGMSZ64P34",
+    "deletedAt": "2026-08-19T03:10:16.167Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Diego Lima",
+      "total": 58.5,
+      "status": "preparando",
+      "createdAt": "2026-08-18T21:22:08.512Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSZC7SCF",
+    "deletedAt": "2026-08-19T03:10:07.690Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Diego Lima",
+      "total": 70.8,
+      "status": "preparando",
+      "createdAt": "2026-08-19T00:12:30.399Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-18T21:20:45.503Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 6
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-18T18:02:52.288Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-18T18:02:33.164Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-17T21:33:05.299Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-17T21:32:56.402Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 2
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-17T19:41:33.942Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-17T19:41:10.348Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 1
+  },
+  {
+    "orderId": "SGMSXMYFFT",
+    "deletedAt": "2026-08-17T19:40:43.038Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Carla Souza",
+      "total": 110.8,
+      "status": "preparando",
+      "createdAt": "2026-08-17T19:37:37.193Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-17T02:46:14.157Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 3
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-16T18:01:30.661Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-16T03:10:12.108Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 5
+  },
+  {
+    "orderId": "SGMSTSJMDW",
+    "deletedAt": "2026-08-15T03:07:47.943Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Ana Clara",
+      "total": 270.2,
+      "status": "preparando",
+      "createdAt": "2026-08-15T03:02:59.348Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSTSMSWF",
+    "deletedAt": "2026-08-15T03:07:38.282Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Fernanda Costa",
+      "total": 64.8,
+      "status": "novo",
+      "createdAt": "2026-08-15T03:05:27.759Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSTSOYE6",
+    "deletedAt": "2026-08-15T03:07:27.614Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Gabriel Oliveira",
+      "total": 171.8,
+      "status": "novo",
+      "createdAt": "2026-08-15T03:07:08.190Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-14T17:50:10.593Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 5
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-14T16:12:20.267Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 2
+  },
+  {
+    "orderId": "SGMSSBXT5Z",
+    "deletedAt": "2026-08-14T02:46:56.400Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Fernanda Costa",
+      "total": 104.7,
+      "status": "cancelado",
+      "createdAt": "2026-08-14T02:30:21.672Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-14T02:20:00.797Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-14T02:19:38.043Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 4
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-12T20:43:19.344Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 2
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-12T16:50:55.283Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-12T16:48:00.640Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-12T16:46:40.273Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 8
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-12T03:16:00.757Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 4
+  },
+  {
+    "orderId": "SGMSP9FY3L",
+    "deletedAt": "2026-08-12T03:12:30.674Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Vagner Romão Benevides",
+      "total": 65.9,
+      "status": "cancelado",
+      "createdAt": "2026-08-11T22:57:10.497Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-11T18:44:38.887Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 5
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-10T17:23:15.799Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 5
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-10T15:34:59.771Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 1
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-10T15:33:27.497Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-10T15:33:16.118Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 6
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-09T20:34:55.916Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-09T20:34:48.944Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 9
+  },
+  {
+    "orderId": "SGMSM9D9FQ",
+    "deletedAt": "2026-08-09T20:32:13.629Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Fernanda Costa",
+      "total": 178.1,
+      "status": "preparando",
+      "createdAt": "2026-08-09T20:31:46.694Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSM63T33",
+    "deletedAt": "2026-08-09T19:00:56.778Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Carla Souza",
+      "total": 112,
+      "status": "preparando",
+      "createdAt": "2026-08-09T19:00:26.751Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-09T18:55:55.458Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-09T18:55:46.401Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 5
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-09T18:13:12.336Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-09T18:13:04.595Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-09T03:47:19.470Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 3
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-09T03:47:10.965Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "orderId": "SGMSL9G3PI",
+    "deletedAt": "2026-08-09T03:46:38.839Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Bruno Mendes",
+      "total": 177.5,
+      "status": "preparando",
+      "createdAt": "2026-08-09T03:46:13.062Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-06T06:22:36.450Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 1
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-06T06:10:37.167Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-06T06:10:29.463Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 2
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-05T21:07:18.464Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 2
+  },
+  {
+    "orderId": "SGMSGKSUHS",
+    "deletedAt": "2026-08-05T21:05:37.625Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Diego Lima",
+      "total": 103.69999999999999,
+      "status": "preparando",
+      "createdAt": "2026-08-05T21:05:12.544Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSGKMVY5",
+    "deletedAt": "2026-08-05T21:01:52.468Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 63.9,
+      "status": "cancelado",
+      "createdAt": "2026-08-05T21:00:34.493Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-05T20:55:50.050Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 7
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-05T20:55:37.517Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "orderId": "SGMSEYZYJ1",
+    "deletedAt": "2026-08-04T20:45:12.049Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "RESTAURANTE SHOGATSU",
+      "total": 159.9,
+      "status": "novo",
+      "createdAt": "2026-08-04T18:07:06.637Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-03T15:50:46.772Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 0
+  },
+  {
+    "orderId": "SGMSC9RCHL",
+    "deletedAt": "2026-08-02T21:14:22.912Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "cancelado",
+      "createdAt": "2026-08-02T20:45:02.073Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSAV1AYP",
+    "deletedAt": "2026-08-02T05:07:10.684Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Helena Rocha",
+      "total": 47.9,
+      "status": "cancelado",
+      "createdAt": "2026-08-01T21:05:06.241Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSB9T24T",
+    "deletedAt": "2026-08-02T05:06:43.796Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Carla Souza",
+      "total": 143.7,
+      "status": "preparando",
+      "createdAt": "2026-08-02T03:58:35.789Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSAPXW2U",
+    "deletedAt": "2026-08-01T20:47:32.839Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Helena Rocha",
+      "total": 58.5,
+      "status": "cancelado",
+      "createdAt": "2026-08-01T18:42:28.902Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSAHY9RA",
+    "deletedAt": "2026-08-01T18:37:12.661Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Carla Souza",
+      "total": 37.9,
+      "status": "cancelado",
+      "createdAt": "2026-08-01T14:58:49.702Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSAJ8111",
+    "deletedAt": "2026-08-01T18:36:55.906Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "entregue",
+      "createdAt": "2026-08-01T15:34:24.565Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMSAI7C0S",
+    "deletedAt": "2026-08-01T15:07:12.128Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Carla Souza",
+      "total": 124.3,
+      "status": "cancelado",
+      "createdAt": "2026-08-01T15:05:52.540Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS9ZA0FD",
+    "deletedAt": "2026-08-01T06:19:33.657Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Bruno Mendes",
+      "total": 230.39999999999998,
+      "status": "novo",
+      "createdAt": "2026-08-01T06:16:04.777Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-01T06:02:08.847Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-01T06:02:01.939Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 5
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-08-01T03:06:00.347Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-08-01T03:05:54.078Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 6
+  },
+  {
+    "orderId": "SGMS9E61ND",
+    "deletedAt": "2026-07-31T21:07:33.902Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "cancelado",
+      "createdAt": "2026-07-31T20:25:07.801Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS9CRZCF",
+    "deletedAt": "2026-07-31T19:47:18.691Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 148.9,
+      "status": "cancelado",
+      "createdAt": "2026-07-31T19:46:12.015Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS98U5YE",
+    "deletedAt": "2026-07-31T19:47:08.086Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "cancelado",
+      "createdAt": "2026-07-31T17:55:55.430Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-31T05:44:55.507Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 2
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-31T05:44:46.904Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-31T05:38:46.858Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-31T05:38:35.239Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 8
+  },
+  {
+    "orderId": "SGMS80MDKL",
+    "deletedAt": "2026-07-31T03:46:15.944Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "cancelado",
+      "createdAt": "2026-07-30T21:18:08.949Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS7XP853",
+    "deletedAt": "2026-07-30T20:37:56.379Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Helena Rocha",
+      "total": 101.4,
+      "status": "novo",
+      "createdAt": "2026-07-30T19:56:23.031Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-30T19:56:11.935Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-30T19:56:02.523Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 4
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-30T02:58:58.728Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-30T02:58:53.291Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 4
+  },
+  {
+    "orderId": "SGMS6BXB6I",
+    "deletedAt": "2026-07-29T17:00:22.008Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 159.9,
+      "status": "cancelado",
+      "createdAt": "2026-07-29T16:59:02.490Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS6BUSKM",
+    "deletedAt": "2026-07-29T16:58:12.121Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 58.9,
+      "status": "preparando",
+      "createdAt": "2026-07-29T16:57:05.062Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-29T16:56:13.437Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-29T16:55:15.938Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 8
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-29T16:55:08.392Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-29T03:18:17.401Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 2
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-29T03:18:07.807Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 2
+  },
+  {
+    "orderId": "SGMS5543UP",
+    "deletedAt": "2026-07-28T21:09:58.846Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 167.9,
+      "status": "cancelado",
+      "createdAt": "2026-07-28T21:00:36.097Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS55F2E0",
+    "deletedAt": "2026-07-28T21:09:55.739Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Gabriel Oliveira",
+      "total": 204.4,
+      "status": "entregue",
+      "createdAt": "2026-07-28T21:09:07.416Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-28T20:55:51.461Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 0
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-28T20:55:43.535Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 3
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-28T19:56:19.518Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 1
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-28T19:56:13.837Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 10
+  },
+  {
+    "orderId": "SGMS4Y3FTF",
+    "deletedAt": "2026-07-28T17:54:30.427Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 148.91,
+      "status": "entregue",
+      "createdAt": "2026-07-28T17:44:07.635Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS4793XO",
+    "deletedAt": "2026-07-28T17:51:25.730Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 85.99,
+      "status": "entregue",
+      "createdAt": "2026-07-28T05:12:42.540Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-28T05:11:50.334Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 3
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-28T05:11:41.860Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 0
+  },
+  {
+    "orderId": "SGMS3W9QMF",
+    "deletedAt": "2026-07-28T05:06:23.791Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "entregue",
+      "createdAt": "2026-07-28T00:05:16.167Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-28T00:03:08.966Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 0
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-28T00:03:01.581Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 1
+  },
+  {
+    "orderId": "SGMS3QMRIA",
+    "deletedAt": "2026-07-27T23:59:55.717Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Helena Rocha",
+      "total": 80.8,
+      "status": "preparando",
+      "createdAt": "2026-07-27T21:27:26.146Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-27T20:51:23.912Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 3
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-27T20:51:17.489Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 0
+  },
+  {
+    "orderId": "SGMS2QA7I8",
+    "deletedAt": "2026-07-27T20:50:52.403Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "entregue",
+      "createdAt": "2026-07-27T04:29:54.176Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS3A9Y4A",
+    "deletedAt": "2026-07-27T20:50:48.716Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "entregue",
+      "createdAt": "2026-07-27T13:49:34.330Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS3CZXI1",
+    "deletedAt": "2026-07-27T20:50:44.311Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "entregue",
+      "createdAt": "2026-07-27T15:05:45.817Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS3F1SKU",
+    "deletedAt": "2026-07-27T20:50:40.113Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Alexsandro Fonseca",
+      "total": 164.9,
+      "status": "entregue",
+      "createdAt": "2026-07-27T16:03:11.982Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS3KR1G0",
+    "deletedAt": "2026-07-27T20:50:35.663Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "saiu",
+      "createdAt": "2026-07-27T18:42:47.952Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS3L6KPC",
+    "deletedAt": "2026-07-27T20:50:31.957Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "Helena Rocha",
+      "total": 47.9,
+      "status": "saiu",
+      "createdAt": "2026-07-27T18:54:52.752Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-27T03:14:53.787Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 6
+  },
+  {
+    "action": "reset-menu",
+    "deletedAt": "2026-07-27T03:14:32.432Z",
+    "deletedBy": "master",
+    "deletedByRole": "master"
+  },
+  {
+    "action": "reset-orders",
+    "deletedAt": "2026-07-27T03:13:38.747Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "ordersRemoved": 2
+  },
+  {
+    "action": "reset-reservations",
+    "deletedAt": "2026-07-26T22:37:11.721Z",
+    "deletedBy": "master",
+    "deletedByRole": "master",
+    "reservationsRemoved": 4
+  },
+  {
+    "orderId": "SGMRZS63CF",
+    "deletedAt": "2026-07-26T21:25:50.966Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 26.9,
+      "status": "entregue",
+      "createdAt": "2026-07-25T02:59:22.863Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMRZETOHW",
+    "deletedAt": "2026-07-26T21:25:48.193Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TETSTE",
+      "total": 26.9,
+      "status": "cancelado",
+      "createdAt": "2026-07-24T20:45:48.740Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMRZEIJNY",
+    "deletedAt": "2026-07-26T21:25:44.260Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 26.9,
+      "status": "cancelado",
+      "createdAt": "2026-07-24T20:37:09.262Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMRZS8DIH",
+    "deletedAt": "2026-07-26T21:25:38.464Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 26.9,
+      "status": "entregue",
+      "createdAt": "2026-07-25T03:01:09.353Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS1Y02TG",
+    "deletedAt": "2026-07-26T21:25:35.261Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "entregue",
+      "createdAt": "2026-07-26T15:18:12.292Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS0OB75C",
+    "deletedAt": "2026-07-26T21:25:32.054Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "cancelado",
+      "createdAt": "2026-07-25T17:59:08.784Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS0PWRSR",
+    "deletedAt": "2026-07-26T21:25:28.893Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 164.9,
+      "status": "entregue",
+      "createdAt": "2026-07-25T18:43:54.939Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS24MIL3",
+    "deletedAt": "2026-07-26T21:25:24.645Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 6.899999999999999,
+      "status": "entregue",
+      "createdAt": "2026-07-26T18:23:36.855Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS24P4C1",
+    "deletedAt": "2026-07-26T21:25:21.273Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 36.9,
+      "status": "entregue",
+      "createdAt": "2026-07-26T18:25:38.353Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS24W9I6",
+    "deletedAt": "2026-07-26T21:25:17.687Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 30.9,
+      "status": "entregue",
+      "createdAt": "2026-07-26T18:31:11.646Z"
+    },
+    "deletedByRole": "master"
+  },
+  {
+    "orderId": "SGMS24YZKR",
+    "deletedAt": "2026-07-26T21:25:13.341Z",
+    "deletedBy": "master",
+    "orderSummary": {
+      "name": "TESTE",
+      "total": 30.9,
+      "status": "entregue",
+      "createdAt": "2026-07-26T18:33:18.747Z"
+    },
+    "deletedByRole": "master"
+  }
+]

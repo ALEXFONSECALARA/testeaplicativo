@@ -1,1 +1,658 @@
-[]
+[
+  {
+    "id": "9bd4c5c9ebdcd279",
+    "nome": "Rodízio Master – Combo Premium Completo",
+    "itens": [],
+    "categoria": "Rodízio Master",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 159.9
+  },
+  {
+    "id": "1bf9344793df7ef6",
+    "nome": "Combinado Super",
+    "itens": [],
+    "categoria": "Combos Tradicionais",
+    "rendimento": 1,
+    "atualizadoEm": "2026-08-16T18:02:12.377Z",
+    "multiplicador": null,
+    "margemDesejada": null,
+    "precoVendaAtual": 89.99
+  },
+  {
+    "id": "2191bbf66b668bd0",
+    "nome": "Combinado Shogatsu",
+    "itens": [],
+    "categoria": "Combos Tradicionais",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 106.1
+  },
+  {
+    "id": "42c64a29a89ccf73",
+    "nome": "Combinado Osaka (40 peças)",
+    "itens": [],
+    "categoria": "Combos Tradicionais",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 110.99
+  },
+  {
+    "id": "53416feef296acf7",
+    "nome": "Combinado Tokyo (50 peças)",
+    "itens": [],
+    "categoria": "Combos Tradicionais",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 143.9
+  },
+  {
+    "id": "5c98a4640782c060",
+    "nome": "Combo Nagazaki (50 peças)",
+    "itens": [],
+    "categoria": "Combos Tradicionais",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 137.99
+  },
+  {
+    "id": "c0f673c58cafb79f",
+    "nome": "Combinado Ronin (80 peças)",
+    "itens": [],
+    "categoria": "Combos Tradicionais",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 207.2
+  },
+  {
+    "id": "f076c5ecb4f0ec05",
+    "nome": "Combinado Ninja",
+    "itens": [],
+    "categoria": "Combos Tradicionais",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 129.5
+  },
+  {
+    "id": "2b208819604390ae",
+    "nome": "Combinado Nori (20 peças)",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 58.9
+  },
+  {
+    "id": "70ca834b9727c9e1",
+    "nome": "Combinado Salmão Especial (25 peças)",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 84.9
+  },
+  {
+    "id": "7167d03a71aa4f19",
+    "nome": "Combinado Especial (20 peças)",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 58.9
+  },
+  {
+    "id": "3408919590776b10",
+    "nome": "Combinado Nirá (20 peças)",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 58.9
+  },
+  {
+    "id": "12a5552d9cb9d2a7",
+    "nome": "Combinado Sakura (21 peças)",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 59.8
+  },
+  {
+    "id": "b8a4896d9886b841",
+    "nome": "Combinado Kyoto (50 peças)",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 99.39
+  },
+  {
+    "id": "ea2728ab870bcc3a",
+    "nome": "Premium Fusion (24 peças)",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 49.99
+  },
+  {
+    "id": "3bf5d1bd26138b7c",
+    "nome": "Combo Explosão de Salmão (22 peças)",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 49.99
+  },
+  {
+    "id": "46911925d8bbae60",
+    "nome": "Combinado Crocância Suprema",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 58.9
+  },
+  {
+    "id": "9fcf919b182e5257",
+    "nome": "Hot Filadélfia",
+    "itens": [],
+    "categoria": "Promoções Exclusivas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 28.7
+  },
+  {
+    "id": "068fc76f6d982865",
+    "nome": "Temaki Filadélfia Tradicional",
+    "itens": [],
+    "categoria": "Temakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 29.8
+  },
+  {
+    "id": "4f622715c23df6e0",
+    "nome": "Temaki Camarão Tradicional",
+    "itens": [],
+    "categoria": "Temakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 32.9
+  },
+  {
+    "id": "d94dde3544145a96",
+    "nome": "Temaki Filadélfia Original (Sem Arroz)",
+    "itens": [],
+    "categoria": "Temakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 36.9
+  },
+  {
+    "id": "d57a33c849afa18d",
+    "nome": "Temaki Camarão Original (Sem Arroz)",
+    "itens": [],
+    "categoria": "Temakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 36.9
+  },
+  {
+    "id": "fca9c2db9bc84ac8",
+    "nome": "Temaki Hot Filadélfia",
+    "itens": [],
+    "categoria": "Temakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 33.9
+  },
+  {
+    "id": "4647e610ee96baf3",
+    "nome": "Temaki Camarão Frito",
+    "itens": [],
+    "categoria": "Temakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 33.9
+  },
+  {
+    "id": "2d02b2391a88a6e0",
+    "nome": "Sashimi Simples",
+    "itens": [],
+    "categoria": "Sashimis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 22.9
+  },
+  {
+    "id": "6a87be3042a46cf0",
+    "nome": "Sashimi Mini",
+    "itens": [],
+    "categoria": "Sashimis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 42.9
+  },
+  {
+    "id": "0deea71b5a67f7b5",
+    "nome": "Sashimi Extra",
+    "itens": [],
+    "categoria": "Sashimis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 63.9
+  },
+  {
+    "id": "7528fc4e4498ae84",
+    "nome": "Sashimi Super",
+    "itens": [],
+    "categoria": "Sashimis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 79.8
+  },
+  {
+    "id": "18956813b9fd63f5",
+    "nome": "Sashimi Shogatsu",
+    "itens": [],
+    "categoria": "Sashimis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 99.7
+  },
+  {
+    "id": "7d868c5408ecde6a",
+    "nome": "Sushi Simples",
+    "itens": [],
+    "categoria": "Sushi",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 19.9
+  },
+  {
+    "id": "a3dc9adfa9185850",
+    "nome": "Sushi Mini",
+    "itens": [],
+    "categoria": "Sushi",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 39.9
+  },
+  {
+    "id": "89d02c24139a9c1b",
+    "nome": "Sushi Extra",
+    "itens": [],
+    "categoria": "Sushi",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 59.8
+  },
+  {
+    "id": "1f67709e78d62cc1",
+    "nome": "Sushi Super",
+    "itens": [],
+    "categoria": "Sushi",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 79.8
+  },
+  {
+    "id": "affc73e7ffd046d7",
+    "nome": "Sushi Shogatsu",
+    "itens": [],
+    "categoria": "Sushi",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 99.7
+  },
+  {
+    "id": "2831ce0462415066",
+    "nome": "Harumaki Frango",
+    "itens": [],
+    "categoria": "Harumakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 17.9
+  },
+  {
+    "id": "1f97573b1a138d6e",
+    "nome": "Harumaki Camar��o",
+    "itens": [],
+    "categoria": "Harumakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 21.9
+  },
+  {
+    "id": "3c0f1f0ee2e2092a",
+    "nome": "Harumaki Legumes",
+    "itens": [],
+    "categoria": "Harumakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 17.9
+  },
+  {
+    "id": "f925976060129b34",
+    "nome": "Harumaki Banana com Chocolate",
+    "itens": [],
+    "categoria": "Harumakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 17.5
+  },
+  {
+    "id": "eb0e1642da58bd3c",
+    "nome": "Harumaki Romeu e Julieta",
+    "itens": [],
+    "categoria": "Harumakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 17.5
+  },
+  {
+    "id": "b9b042e5b41624f5",
+    "nome": "Harumaki Doce de Leite com Ameixa",
+    "itens": [],
+    "categoria": "Harumakis",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 17.5
+  },
+  {
+    "id": "01866a1fb182639e",
+    "nome": "Salmão Ice Especial",
+    "itens": [],
+    "categoria": "Hot Rolls",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 35.7
+  },
+  {
+    "id": "e6e5b57004b1af2c",
+    "nome": "Salmão Ice",
+    "itens": [],
+    "categoria": "Hot Rolls",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 31.9
+  },
+  {
+    "id": "67b7cadfde478c46",
+    "nome": "Hot Filadélfia Original",
+    "itens": [],
+    "categoria": "Hot Rolls",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 31.9
+  },
+  {
+    "id": "352bbc0220f526ca",
+    "nome": "Hot Filadélfia Tradicional",
+    "itens": [],
+    "categoria": "Hot Rolls",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 28.7
+  },
+  {
+    "id": "af20b93b22b8919f",
+    "nome": "Skin Roll",
+    "itens": [],
+    "categoria": "Hot Rolls",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 28.7
+  },
+  {
+    "id": "7311a4038cc68461",
+    "nome": "Sunomono",
+    "itens": [],
+    "categoria": "Entradas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 29.9
+  },
+  {
+    "id": "1cc63e49f360e611",
+    "nome": "Ceviche Tradicional",
+    "itens": [],
+    "categoria": "Entradas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 39.9
+  },
+  {
+    "id": "dd8d0a21fff63b65",
+    "nome": "Shimeji",
+    "itens": [],
+    "categoria": "Entradas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 0
+  },
+  {
+    "id": "74e0b5e545068cc7",
+    "nome": "Ika Itame",
+    "itens": [],
+    "categoria": "Pratos Quentes",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 48.9
+  },
+  {
+    "id": "ecd0915ca895d025",
+    "nome": "Frango Agridoce",
+    "itens": [],
+    "categoria": "Pratos Quentes",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 38.9
+  },
+  {
+    "id": "2a3dd823d6985211",
+    "nome": "Frango Xadrez",
+    "itens": [],
+    "categoria": "Pratos Quentes",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 38.9
+  },
+  {
+    "id": "f718d2d1436b7b9c",
+    "nome": "Teppan Salmão",
+    "itens": [],
+    "categoria": "Teppan Yaki",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 75.9
+  },
+  {
+    "id": "43322644722f02a7",
+    "nome": "Teppan Mignon",
+    "itens": [],
+    "categoria": "Teppan Yaki",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 68.9
+  },
+  {
+    "id": "5c1a586874a2c093",
+    "nome": "Teppan Frango",
+    "itens": [],
+    "categoria": "Teppan Yaki",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 44.9
+  },
+  {
+    "id": "7902698c6790ccbe",
+    "nome": "Legumes Especial",
+    "itens": [],
+    "categoria": "Yakissoba",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 43.9
+  },
+  {
+    "id": "e9ee3d32a7f1ed2a",
+    "nome": "Legumes",
+    "itens": [],
+    "categoria": "Yakissoba",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 33.9
+  },
+  {
+    "id": "6b9f3138a8f1d9a6",
+    "nome": "Mignon",
+    "itens": [],
+    "categoria": "Yakissoba",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 52.9
+  },
+  {
+    "id": "123b6d909c189057",
+    "nome": "Camarão",
+    "itens": [],
+    "categoria": "Yakissoba",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 58.9
+  },
+  {
+    "id": "d9bf60cbcae7fe63",
+    "nome": "Misto Frango e Mignon",
+    "itens": [],
+    "categoria": "Yakissoba",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 52.9
+  },
+  {
+    "id": "97357a8db88a39ef",
+    "nome": "Frutos do Mar",
+    "itens": [],
+    "categoria": "Yakissoba",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 59.9
+  },
+  {
+    "id": "138b87683b675f74",
+    "nome": "Frango",
+    "itens": [],
+    "categoria": "Yakissoba",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 43.9
+  },
+  {
+    "id": "7b37a6ead9e2e2d0",
+    "nome": "Japaburguer Salmão",
+    "itens": [],
+    "categoria": "Burgers e Dogs",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 31.9
+  },
+  {
+    "id": "a3c936bee1d96470",
+    "nome": "Japa Dog Salmão",
+    "itens": [],
+    "categoria": "Burgers e Dogs",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 31.9
+  },
+  {
+    "id": "d923b2332c5d332a",
+    "nome": "Petit Gateau",
+    "itens": [],
+    "categoria": "Sobremesas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 25.9
+  },
+  {
+    "id": "266b062af3a38758",
+    "nome": "Hotnana",
+    "itens": [],
+    "categoria": "Sobremesas",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": 28.7
+  },
+  {
+    "id": "f699e24e662eacea",
+    "nome": "HOT FILADELFIA",
+    "itens": [],
+    "categoria": "FRITO",
+    "rendimento": 1,
+    "margemDesejada": null,
+    "precoVendaAtual": "3.59"
+  },
+  {
+    "id": "1cd752e5b58fe877",
+    "nome": "Harumaki Camarão",
+    "itens": [],
+    "origem": "Importada do cardápio (sem ingredientes ainda)",
+    "status": "revisao",
+    "criadoEm": "2026-09-13T08:49:59.508Z",
+    "categoria": "Harumakis",
+    "rendimento": 1,
+    "fichaBaseId": null,
+    "atualizadoEm": "2026-09-13T08:49:59.508Z",
+    "multiplicador": null,
+    "margemDesejada": null,
+    "precoVendaAtual": 21.9
+  },
+  {
+    "id": "3c4e21c2f5cae4a7",
+    "nome": "Camarão yakimeshi",
+    "itens": [],
+    "origem": "Importada do cardápio (sem ingredientes ainda)",
+    "status": "revisao",
+    "criadoEm": "2026-09-13T08:49:59.508Z",
+    "categoria": "Yakimeshi",
+    "rendimento": 1,
+    "fichaBaseId": null,
+    "atualizadoEm": "2026-09-13T08:49:59.508Z",
+    "multiplicador": null,
+    "margemDesejada": null,
+    "precoVendaAtual": 58.9
+  },
+  {
+    "id": "e20a2da6b56f59d9",
+    "nome": "Frango  yakimeshi",
+    "itens": [],
+    "origem": "Importada do cardápio (sem ingredientes ainda)",
+    "status": "revisao",
+    "criadoEm": "2026-09-13T08:49:59.508Z",
+    "categoria": "Yakimeshi",
+    "rendimento": 1,
+    "fichaBaseId": null,
+    "atualizadoEm": "2026-09-13T08:49:59.508Z",
+    "multiplicador": null,
+    "margemDesejada": null,
+    "precoVendaAtual": 43.9
+  },
+  {
+    "id": "a40d89b6a1bfdfd6",
+    "nome": "Frutos do Mar  yakimeshi",
+    "itens": [],
+    "origem": "Importada do cardápio (sem ingredientes ainda)",
+    "status": "revisao",
+    "criadoEm": "2026-09-13T08:49:59.508Z",
+    "categoria": "Yakimeshi",
+    "rendimento": 1,
+    "fichaBaseId": null,
+    "atualizadoEm": "2026-09-13T08:49:59.508Z",
+    "multiplicador": null,
+    "margemDesejada": null,
+    "precoVendaAtual": 59.9
+  }
+]
