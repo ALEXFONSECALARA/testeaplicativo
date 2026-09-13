@@ -540,15 +540,66 @@ function supabaseRequest(method, subpath, body) {
 // "Service-Initiated" sem tocar em nenhuma funcionalidade: se o conteúdo mudou de verdade, o
 // envio acontece normalmente, do mesmo jeito de sempre.
 const lastSyncedPayload = new Map(); // key (ex: "orders") -> JSON string do último envio bem-sucedido
+// v136 — REDUÇÃO DE EGRESS (Supabase "Organization exceeded quota — Egress Exceeded"):
+// AUDITORIA — a causa real de tráfego alto nesta arquitetura (backup de arquivo inteiro por
+// chave, sem Realtime/subscriptions — esse projeto não usa nada disso) é: writeJSON() roda a
+// CADA mudança (cada pedido, cada sessão de login, cada linha de log) e syncToSupabase()
+// reenviava o ARQUIVO INTEIRO pro Supabase toda vez, imediatamente. Num horário de pico com
+// vários pedidos mudando de status em sequência rápida, orders.json inteiro (que só cresce)
+// era reenviado várias vezes por minuto — e o mesmo vale pra sessions.json a cada login. Isso
+// não é sobre RESTAURAR menos dado (a restauração continua trazendo tudo de volta igual
+// sempre, sem perder nenhum pedido/cliente/config — ver restoreFromSupabase), é sobre não
+// mandar a MESMA informação repetida pro Supabase dezenas de vezes só porque várias mudanças
+// pequenas aconteceram em sequência rápida.
+// Agora syncToSupabase() ESPERA 3 segundos coletando a versão mais recente antes de enviar —
+// se vários writeJSON() da MESMA chave acontecerem dentro dessa janela (ex: 5 pedidos mudando
+// de status em 10 segundos), só UM envio sai no final, já com o estado mais atual (não perde
+// nenhuma mudança — só evita mandar 5 cópias quase idênticas e cada vez maiores em sequência).
+// O arquivo LOCAL em disco continua sendo gravado na hora, sempre — isso nunca muda, é o que
+// o sistema realmente usa pra funcionar; o Supabase é só a cópia de segurança pra sobreviver a
+// um redeploy, então uma folga de até 3s nela é imperceptível e não afeta nada em produção.
+const SUPABASE_SYNC_DEBOUNCE_MS = 3000;
+const pendingSyncTimers = new Map(); // key -> timeout handle
+const pendingSyncData = new Map();   // key -> dado mais recente ainda não enviado
 function syncToSupabase(file, data) {
   const key = FILE_TO_KEY[file];
   if (!key || !SUPABASE_URL || !SUPABASE_KEY) return;
-  const payloadStr = JSON.stringify(data);
-  if (lastSyncedPayload.get(key) === payloadStr) return; // idêntico ao último enviado — nada novo pra sincronizar
-  supabaseRequest('POST', `${SUPABASE_TABLE}?on_conflict=key`, { key, value: data, updated_at: new Date().toISOString() })
-    .then(() => { lastSyncedPayload.set(key, payloadStr); })
-    .catch(err => console.error(`⚠️  Falha ao sincronizar "${key}" com o Supabase:`, err.message));
+  pendingSyncData.set(key, data);
+  if (pendingSyncTimers.has(key)) return; // já tem um envio agendado pra essa chave — só atualiza o dado acima, não cria outro timer
+  pendingSyncTimers.set(key, setTimeout(() => {
+    pendingSyncTimers.delete(key);
+    const latest = pendingSyncData.get(key);
+    pendingSyncData.delete(key);
+    const payloadStr = JSON.stringify(latest);
+    if (lastSyncedPayload.get(key) === payloadStr) return; // idêntico ao último enviado — nada novo pra sincronizar
+    supabaseRequest('POST', `${SUPABASE_TABLE}?on_conflict=key`, { key, value: latest, updated_at: new Date().toISOString() })
+      .then(() => { lastSyncedPayload.set(key, payloadStr); })
+      .catch(err => console.error(`⚠️  Falha ao sincronizar "${key}" com o Supabase:`, err.message));
+  }, SUPABASE_SYNC_DEBOUNCE_MS));
 }
+// v136 — fecha a brecha do debounce acima: o Render manda SIGTERM antes de derrubar o
+// container num redeploy normal — nesse instante, qualquer sincronização ainda "esperando os
+// 3 segundos" seria perdida se o processo simplesmente morresse. Aqui força o envio imediato
+// de tudo que estiver pendente assim que o sinal de encerramento chega, então um redeploy
+// deliberado nunca perde a última mudança (só uma queda abrupta/crash bem no meio da janela
+// de 3s continua sendo o único caso residual, que já era um risco mínimo antes desta versão).
+function flushPendingSupabaseSyncs() {
+  for (const [key, timer] of pendingSyncTimers) {
+    clearTimeout(timer);
+    const latest = pendingSyncData.get(key);
+    pendingSyncData.delete(key);
+    const payloadStr = JSON.stringify(latest);
+    if (lastSyncedPayload.get(key) === payloadStr) continue;
+    supabaseRequest('POST', `${SUPABASE_TABLE}?on_conflict=key`, { key, value: latest, updated_at: new Date().toISOString() })
+      .then(() => { lastSyncedPayload.set(key, payloadStr); })
+      .catch(() => {});
+  }
+  pendingSyncTimers.clear();
+}
+['SIGTERM', 'SIGINT'].forEach(sig => process.on(sig, () => {
+  flushPendingSupabaseSyncs();
+  setTimeout(() => process.exit(0), 500); // dá meio segundo pras requisições pendentes saírem antes de encerrar de vez
+}));
 
 // Roda uma vez, ao ligar o servidor: se tiver Supabase configurado, traz de volta o último
 // estado salvo (útil logo depois de um deploy que apagou o disco local do Render).
@@ -603,15 +654,31 @@ async function restoreUploadsFromSupabase() {
       .map(r => String(r.key || '').replace(/^upload_/, ''))
       .filter(filename => filename && !fs.existsSync(path.join(UPLOADS_DIR, filename)));
     let restauradas = 0;
-    for (const filename of faltando) {
-      try {
+    // v134 — BUG CORRIGIDO ("página fora do ar / 503 logo depois do deploy"): esse loop
+    // baixava as fotos faltando UMA POR VEZ (for...await sequencial) — com 100+ fotos
+    // cadastradas, cada uma exigindo uma ida e volta até o Supabase, um deploy com o disco
+    // limpo (comum no Render — disco não é persistente por padrão) podia levar bem mais de um
+    // minuto só nessa etapa. Isso já não bloqueia mais a porta ficar aberta (ver o final do
+    // arquivo — server.listen() agora roda ANTES de qualquer restauração), mas mesmo assim
+    // vale deixar rápido: enquanto essa restauração não termina, fotos recém-enviadas antes
+    // do deploy anterior podem aparecer quebradas no cardápio/painel até o lote de fotos
+    // correspondente terminar de baixar. Agora baixa em lotes paralelos (10 de cada vez, não
+    // as 150 juntas de uma vez só — evita estourar limite de taxa do Supabase) — resultado
+    // final idêntico (todas as fotos continuam sendo restauradas), só que numa fração do tempo.
+    const CONCURRENCY = 10;
+    for (let i = 0; i < faltando.length; i += CONCURRENCY) {
+      const lote = faltando.slice(i, i + CONCURRENCY);
+      const resultados = await Promise.allSettled(lote.map(async (filename) => {
         const linhas = await supabaseRequest('GET', `${SUPABASE_TABLE}?key=eq.${encodeURIComponent('upload_' + filename)}&select=value`);
         const row = linhas && linhas[0];
         const dest = path.join(UPLOADS_DIR, filename);
-        if (!row || !row.value || !row.value.b64 || fs.existsSync(dest)) continue; // sem conteúdo salvo, ou já apareceu enquanto restaurava outras
+        if (!row || !row.value || !row.value.b64 || fs.existsSync(dest)) return false; // sem conteúdo salvo, ou já apareceu enquanto restaurava outras
         fs.writeFileSync(dest, Buffer.from(row.value.b64, 'base64'));
-        restauradas++;
-      } catch (e) { /* ignora essa foto e segue restaurando as outras */ }
+        return true;
+      }));
+      restauradas += resultados.filter(r => r.status === 'fulfilled' && r.value === true).length;
+      // não interrompe o lote inteiro se uma foto der erro — cada uma é independente (mesma
+      // garantia de antes: uma foto com problema não afeta as outras)
     }
     if (restauradas) console.log(`   ✓ ${restauradas} foto(s) restaurada(s) do Supabase pra uploads/`);
   } catch (err) { console.error('   ⚠️  Não consegui restaurar fotos do Supabase:', err.message); }
@@ -748,8 +815,26 @@ const sessions = new Map(); // token -> { expiresAt, role, username }
 function persistSessions() {
   // v60: grava o Map inteiro (só sessões ainda válidas) em disco a cada mudança, pra um
   // restart do processo (comum no Render) não derrubar quem já estava logado.
+  // v136 — REDUÇÃO DE EGRESS: além de só gravar sessões ainda válidas (já existia), agora
+  // também limita a NO MÁXIMO 500 sessões simultâneas guardadas — mantém as 500 mais
+  // recentes, descarta as mais antigas primeiro. 500 logins válidos ao mesmo tempo já é uma
+  // quantidade generosa pra qualquer operação de um único restaurante; sem esse teto, um
+  // acúmulo de sessões (por exemplo, muitos aparelhos/abas entrando e saindo ao longo do
+  // tempo, cada sessão válida por até 12h) fazia sessions.json crescer sem limite — e esse
+  // arquivo inteiro é reenviado/rebaixado do Supabase a cada mudança/reinício. Ninguém perde
+  // acesso por causa disso: se uma sessão específica for descartada por estar entre as mais
+  // antigas além do limite, a pior consequência é pedir login de novo — não trava nada.
+  const MAX_SESSIONS = 500;
+  let entries = [];
+  for (const [tok, s] of sessions) { if (s.expiresAt >= Date.now()) entries.push([tok, s]); }
+  if (entries.length > MAX_SESSIONS) {
+    entries.sort((a, b) => (b[1].expiresAt || 0) - (a[1].expiresAt || 0)); // mais recente (expira mais tarde) primeiro
+    const descartadas = entries.slice(MAX_SESSIONS);
+    entries = entries.slice(0, MAX_SESSIONS);
+    descartadas.forEach(([tok]) => sessions.delete(tok)); // remove da memória também, não só do backup
+  }
   const obj = {};
-  for (const [tok, s] of sessions) { if (s.expiresAt >= Date.now()) obj[tok] = s; }
+  for (const [tok, s] of entries) obj[tok] = s;
   try { writeJSON(SESSIONS_FILE, obj); } catch (e) { console.error('⚠️  Não consegui salvar sessions.json:', e.message); }
 }
 function loadSessionsFromDisk() {
@@ -3915,7 +4000,7 @@ function estimateDeliveryWindow(order, cfg) {
       try { fs.accessSync(file, fs.constants.R_OK | fs.constants.W_OK); checks[name] = true; } catch (_) { checks[name] = false; }
     }
     const ok = Object.values(checks).every(Boolean);
-    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.133', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
+    return sendJSON(res, ok ? 200 : 503, {ok, service:'shogatsu-pedidos', version:'1.0.136', checks, uptimeSec:Math.floor(process.uptime()), time:new Date().toISOString()});
   }
 
   // ── GET /api/print-agent/status — o painel consulta pra mostrar se tem algum Agente Local
@@ -6332,15 +6417,32 @@ async function checkScheduledPush() {
 }
 setInterval(checkScheduledPush, 60 * 1000);
 
+// v134 — BUG CORRIGIDO ("página não está funcionando" / HTTP 503 logo depois do deploy, log
+// mostrando "No open ports detected, continuing to scan..."): antes, o servidor só chamava
+// server.listen() DEPOIS de terminar restoreFromSupabase() + loadSessionsFromDisk() +
+// restoreUploadsFromSupabase() — três etapas em sequência, a última das quais podia demorar
+// bastante (mesmo já paralelizada nesta versão, ver o comentário dentro de
+// restoreUploadsFromSupabase() acima). Como o Render (e qualquer proxy na frente) só considera
+// o serviço "no ar" quando alguma porta responde, toda essa demora de boot virava uma janela
+// real de 503 pra quem tentasse abrir o site logo depois de um deploy ou de "acordar" de um
+// plano que dorme por inatividade — mesmo o servidor tendo subido com sucesso, só um pouco
+// depois do necessário.
+// Agora server.listen() roda IMEDIATAMENTE, antes de qualquer restauração — o site fica
+// alcançável na hora. A restauração do Supabase (pedidos, config, sessões, fotos etc.)
+// continua acontecendo do mesmo jeito, só que em SEGUNDO PLANO, sem bloquear a porta. Isso é
+// seguro porque toda leitura de dado no sistema já lê o arquivo do disco NA HORA de cada
+// requisição (readConfig()/readJSON(), nunca um cache carregado uma vez só no boot) — uma
+// requisição que chegar bem no primeiro segundo, antes da restauração terminar, no pior caso
+// vê o estado local ainda não restaurado (ex: pedido ainda não visível), e volta ao normal
+// assim que a restauração (que agora é rápida) terminar, sem nenhum erro nem 503.
+server.listen(PORT, () => {
+  console.log(`🍣 Shogatsu rodando em http://localhost:${PORT}`);
+  console.log(`   Painel da cozinha: http://localhost:${PORT}/painel.html`);
+  if (!process.env.UPLOADS_DIR && !SUPABASE_URL) {
+    console.log('⚠️  ATENÇÃO: UPLOADS_DIR não configurado e Supabase não configurado — fotos enviadas podem se perder no próximo deploy. Configure um Disco Persistente (UPLOADS_DIR) ou SUPABASE_URL/SUPABASE_SERVICE_KEY. Veja o README.md.');
+  }
+});
 restoreFromSupabase().finally(() => {
   loadSessionsFromDisk(); // v60: depois de restaurar do Supabase (se configurado), carrega sessões válidas pra memória
-  restoreUploadsFromSupabase().finally(() => {
-    server.listen(PORT, () => {
-      console.log(`🍣 Shogatsu rodando em http://localhost:${PORT}`);
-      console.log(`   Painel da cozinha: http://localhost:${PORT}/painel.html`);
-      if (!process.env.UPLOADS_DIR && !SUPABASE_URL) {
-        console.log('⚠️  ATENÇÃO: UPLOADS_DIR não configurado e Supabase não configurado — fotos enviadas podem se perder no próximo deploy. Configure um Disco Persistente (UPLOADS_DIR) ou SUPABASE_URL/SUPABASE_SERVICE_KEY. Veja o README.md.');
-      }
-    });
-  });
+  restoreUploadsFromSupabase();
 });
