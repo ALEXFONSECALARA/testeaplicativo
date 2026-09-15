@@ -10,6 +10,7 @@ const path = require('path');
 const crypto = require('crypto');
 const url = require('url');
 const os = require('os');
+const zlib = require('zlib'); // v137 — compressão gzip das respostas (módulo nativo do Node, sem adicionar dependência nenhuma)
 
 const PORT = process.env.PORT || 3000;
 // IMPORTANTE: por padrão os dados ficam numa pasta ao lado do server.js, que é APAGADA a cada novo
@@ -2260,14 +2261,33 @@ function buildPixPayload({ pixKey, merchantName, merchantCity, amount, txid }) {
 }
 
 // ─── Helpers HTTP ───
+// v137 — REDUÇÃO DE BANDWIDTH (auditoria de consumo do Render): nenhuma resposta era comprimida
+// antes. sendJSON() é usada em centenas de lugares no arquivo como sendJSON(res, status, obj) —
+// pra não precisar mudar a assinatura (e portanto nenhuma dessas centenas de chamadas), o `req`
+// correspondente é guardado num WeakMap logo no início de handleRequest() (ver mais abaixo) e
+// recuperado aqui só pra checar se o navegador aceita gzip. Corpos pequenos (<800 bytes) não são
+// comprimidos — o overhead do próprio gzip anularia a economia nesse tamanho.
+const reqByRes = new WeakMap();
 function sendJSON(res, status, obj) {
   const body = JSON.stringify(obj);
-  res.writeHead(status, {
+  const headers = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET,POST,PATCH,OPTIONS'
-  });
+  };
+  const req = reqByRes.get(res);
+  const acceptsGzip = !!(req && /gzip/i.test(req.headers['accept-encoding'] || ''));
+  if (acceptsGzip && Buffer.byteLength(body) > 800) {
+    zlib.gzip(body, (err, compressed) => {
+      if (err || res.writableEnded) { try { res.writeHead(status, headers); res.end(body); } catch (e) {} return; }
+      headers['Content-Encoding'] = 'gzip';
+      res.writeHead(status, headers);
+      res.end(compressed);
+    });
+    return;
+  }
+  res.writeHead(status, headers);
   res.end(body);
 }
 function readBody(req, maxBytes = 10e6) {
@@ -2343,7 +2363,21 @@ function serveStatic(req, res, pathname) {
     const cacheControl = (isHtml || isSw)
       ? 'no-cache, no-store, must-revalidate'
       : 'public, max-age=31536000, immutable';
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Cache-Control': cacheControl });
+    const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Cache-Control': cacheControl };
+    // v137 — REDUÇÃO DE BANDWIDTH: HTML/CSS/JS/SVG/JSON comprimem muito bem com gzip (texto puro);
+    // imagens/vídeo já são formatos comprimidos, então ficam de fora (gzip não ajudaria e só
+    // gastaria CPU à toa). Igual em sendJSON: só comprime se valer a pena (corpo > 800 bytes).
+    const isCompressible = ['.html', '.css', '.js', '.svg', '.json'].includes(ext);
+    const acceptsGzip = /gzip/i.test(req.headers['accept-encoding'] || '');
+    if (isCompressible && acceptsGzip && data.length > 800) {
+      return zlib.gzip(data, (err2, compressed) => {
+        if (err2) { res.writeHead(200, headers); return res.end(data); }
+        headers['Content-Encoding'] = 'gzip';
+        res.writeHead(200, headers);
+        res.end(compressed);
+      });
+    }
+    res.writeHead(200, headers);
     res.end(data);
   });
 }
@@ -2378,6 +2412,7 @@ process.on('unhandledRejection', (reason) => { console.error('⚠️  unhandledR
 process.on('uncaughtException', (err) => { console.error('⚠️  uncaughtException:', err && err.stack || err); });
 
 async function handleRequest(req, res) {
+  reqByRes.set(res, req); // v137 — permite sendJSON() checar Accept-Encoding sem mudar sua assinatura
   // v39: `url.parse()` está deprecated no Node (DEP0169) — trocado pela WHATWG URL API.
   // `query` continua sendo um objeto simples { chave: valor }, igual antes, pra não precisar
   // mexer em nenhum lugar do código que já usa `query.algumaCoisa`.
@@ -2845,13 +2880,30 @@ async function handleRequest(req, res) {
     return sendJSON(res, 200, { conversa });
   }
   // Painel — listar e responder conversas
+  // v137 — REDUÇÃO DE BANDWIDTH (auditoria de consumo do Render): o painel busca essa lista a
+  // cada 5 segundos enquanto estiver logado (loadAtendimentoConversas() no painel.html), e antes
+  // ela sempre incluía TODO o histórico de mensagens de TODAS as conversas — mesmo das que nem
+  // estavam abertas na tela. A lista em si só usa a ÚLTIMA mensagem e a contagem total (pra
+  // detectar mensagem nova); o histórico completo só é realmente exibido quando o atendente abre
+  // uma conversa específica (renderConversaAdmin). Agora, com `?ativa=<id>`, só a conversa aberta
+  // no momento vem com `mensagens` completo — as demais vêm só com as últimas 3 (suficiente pra
+  // prévia) e um `totalMensagens` explícito. Nenhuma mensagem é apagada do arquivo — isso é só o
+  // que trafega nesse polling específico; abrir qualquer conversa continua mostrando o histórico
+  // inteiro normalmente (ver GET /api/admin/atendimento/:id logo abaixo, se existir, ou o próprio
+  // ?ativa= pra essa mesma conversa na próxima rodada de 5s).
   if (pathname === '/api/admin/atendimento' && req.method === 'GET') {
     if (!checkAuth(getToken(req, query))) return sendJSON(res, 401, { error: 'unauthorized' });
     const todas = lerAtendimentos();
+    const ativaId = query.ativa || null;
+    const PREVIA = 3;
     const lista = Object.values(todas)
       .filter(c => c.mensagens.length > 0)
       .sort((a, b) => new Date(b.ultimaAtividade) - new Date(a.ultimaAtividade))
-      .slice(0, 200);
+      .slice(0, 200)
+      .map(c => {
+        if (c.id === ativaId) return c; // conversa aberta na tela: manda o histórico completo, como sempre
+        return { ...c, totalMensagens: c.mensagens.length, mensagens: c.mensagens.slice(-PREVIA) };
+      });
     return sendJSON(res, 200, { conversas: lista });
   }
   // ── POST /api/admin/atendimento/nova (v70) — atendente inicia uma conversa com um cliente já
@@ -5965,11 +6017,29 @@ function estimateDeliveryWindow(order, cfg) {
   }
 
   // ── GET /api/orders — lista pedidos (painel, requer auth) ──
+  // v137 — REDUÇÃO DE BANDWIDTH (auditoria de consumo do Render): o painel chama essa rota a
+  // cada 30s (ver resyncOrders() no painel.html) só pra pegar pedido novo/mudança de status —
+  // mas ela sempre devolvia o ARQUIVO INTEIRO de pedidos, que só cresce com o tempo (sem
+  // arquivamento automático). Com `?light=1` (usado só pelo polling automático, nunca pelos
+  // relatórios/carregamento inicial/busca de histórico, que continuam recebendo tudo sem
+  // filtro nenhum, exatamente como antes), a resposta passa a trazer: TODO pedido ainda em
+  // andamento (novo/preparando/saiu — não importa a idade, pra nunca perder uma mudança de
+  // status de um pedido esquecido) + qualquer pedido criado nas últimas 6 horas (cobre pedidos
+  // finalizados/cancelados recentes que ainda fazem sentido aparecer no turno atual). Pedidos
+  // mais antigos que isso e já finalizados continuam existindo no arquivo normalmente — só não
+  // são reenviados a cada 30 segundos pra cada tela aberta do painel.
   if (pathname === '/api/orders' && req.method === 'GET') {
     const session = getSession(getToken(req, query));
     if (!session) return sendJSON(res, 401, { error: 'unauthorized' });
     if (!hasPermission(session, 'pedidos', 'ver')) return sendJSON(res, 403, { error: 'Seu usuário não tem permissão pra ver os pedidos.' });
-    return sendJSON(res, 200, readJSON(ORDERS_FILE));
+    const all = readJSON(ORDERS_FILE);
+    if (query.light !== '1') return sendJSON(res, 200, all);
+    const cutoff = Date.now() - 6 * 60 * 60 * 1000;
+    const light = all.filter(o =>
+      ['novo', 'preparando', 'saiu'].includes(o.status) ||
+      new Date(o.createdAt || 0).getTime() >= cutoff
+    );
+    return sendJSON(res, 200, light);
   }
 
   // ── PATCH /api/orders/:id — atualiza status (painel) ──

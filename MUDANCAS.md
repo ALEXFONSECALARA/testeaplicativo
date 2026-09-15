@@ -1,3 +1,83 @@
+# v137 — Redução de bandwidth do Render (HTTP Responses)
+
+Auditoria pedida a partir de "workspace ultrapassou o limite gratuito de 5 GB de bandwidth" no
+Render. O v136 já tinha resolvido a parte do **Supabase** (egress); esta versão olha o lado
+**navegador ↔ servidor**, que ainda não tinha sido auditado.
+
+### Antes
+```
+Problema: GET /api/orders devolvia o arquivo INTEIRO de pedidos (sem filtro, sem paginação),
+          e o painel chama essa rota a cada 30 segundos (resyncOrders), de cada tela aberta —
+          e o arquivo só cresce (não existe arquivamento automático de pedidos antigos).
+Arquivo:  server.js (GET /api/orders) + public/painel.html (resyncOrders)
+```
+```
+Problema: GET /api/admin/atendimento devolvia até 200 conversas com TODO o histórico de
+          mensagens de cada uma, e o painel chama essa rota a cada 5 segundos enquanto
+          estiver logado — mesmo pras conversas que nem estão abertas na tela.
+Arquivo:  server.js (GET /api/admin/atendimento) + public/painel.html (loadAtendimentoConversas)
+```
+```
+Problema: nenhuma resposta do servidor era comprimida (nem HTML/CSS/JS estáticos, nem JSON
+          de API) — gzip reduz texto normalmente entre 60–80%.
+Arquivo:  server.js (sendJSON, serveStatic)
+```
+
+### Correção
+```
+Arquivo:   server.js — GET /api/orders
+Alteração: novo parâmetro opcional ?light=1, usado só pelo polling automático de 30s do painel.
+           Com ele, a resposta inclui todo pedido ainda em andamento (novo/preparando/saiu,
+           qualquer idade) + pedidos criados nas últimas 6h. Sem o parâmetro (carregamento
+           inicial da página, Relatórios, Dashboard, busca de histórico), a resposta continua
+           IDÊNTICA a antes — arquivo inteiro, sem filtro nenhum.
+Arquivo:   public/painel.html — resyncOrders()
+Alteração: passou a chamar /api/orders?light=1 e faz MERGE no array local (atualiza só os
+           pedidos que vieram na resposta enxuta) em vez de substituir `orders` inteiro — assim
+           pedidos mais antigos que os Relatórios/Dashboard usam continuam em memória.
+Impacto esperado: reduz drasticamente o tamanho da resposta desse polling à medida que o
+           histórico de pedidos cresce ao longo do tempo (antes: reenviava tudo; agora: só o
+           que está relevante pro turno atual).
+```
+```
+Arquivo:   server.js — GET /api/admin/atendimento
+Alteração: novo parâmetro opcional ?ativa=<id>, usado pelo painel pra dizer qual conversa está
+           aberta na tela agora. Só essa conversa vem com o histórico completo de mensagens
+           (igual sempre foi); as outras 199 vêm só com as últimas 3 mensagens + um campo
+           totalMensagens explícito (suficiente pra prévia da lista e pra detectar mensagem
+           nova — nenhuma funcionalidade removida, a lista nunca exibiu mais que isso mesmo).
+Arquivo:   public/painel.html — loadAtendimentoConversas()
+Alteração: manda ?ativa=<conversaAdminAtivaId atual> em toda chamada, e passou a usar
+           c.totalMensagens (com fallback pro tamanho do array) em vez de contar só pelo
+           array, que agora pode vir cortado pras conversas não abertas.
+Impacto esperado: reduz o tamanho desse polling de 5 em 5 segundos proporcionalmente ao
+           histórico acumulado das conversas — quanto mais mensagens antigas existirem, maior
+           a economia (antes: reenviava tudo a cada 5s; agora: só a prévia + o que está aberto).
+```
+```
+Arquivo:   server.js — sendJSON() e serveStatic()
+Alteração: respostas JSON (via sendJSON, sem precisar mudar nenhuma das centenas de chamadas
+           existentes — usa um WeakMap interno pra achar o `req` correspondente) e arquivos
+           estáticos de texto (.html/.css/.js/.svg/.json, nunca imagem/vídeo) agora vêm
+           comprimidos com gzip quando o navegador manda Accept-Encoding: gzip (todo navegador
+           moderno manda). Corpos pequenos (<800 bytes) não são comprimidos — o overhead do
+           gzip nesse tamanho anularia a economia. SSE (/api/stream) nunca passa por sendJSON
+           nem serveStatic, então não é afetado — continua streaming exatamente como antes.
+Impacto esperado: reduz o peso de toda resposta de texto em ~60–80%, em qualquer rota, sem
+           exceção — é a correção de maior alcance desta versão.
+```
+
+### Verificado e preservado
+- Nenhuma função foi removida — as respostas "cheias" (sem `light`/`ativa`) continuam
+  existindo e retornam exatamente o que retornavam antes, byte a byte, pra quem não pedir a
+  versão enxuta.
+- Print Agent: sua requisição HTTP interna (`print-agent.js`, função `request()`) não manda
+  `Accept-Encoding`, então nunca recebe resposta comprimida — zero mudança de comportamento
+  pra ele. Testado localmente (`node --check`, boot do servidor, checagem de headers com e
+  sem `Accept-Encoding: gzip`).
+- SSE (`/api/stream`), upload de fotos e exclusão de pedido continuam com o comportamento de
+  sempre — nenhum desses caminhos passa pelas funções alteradas.
+
 # v136 — Redução de Egress do Supabase
 
 Auditoria feita a partir de um alerta de "Organization exceeded quota — Egress Exceeded" do Supabase. Importante: este projeto **não usa Supabase Realtime, channels, subscriptions nem RLS multi-tenant** — o Supabase aqui funciona só como backup de chave-valor (um arquivo local = uma chave), e a sincronização ao vivo entre painel/Kanban/cliente é feita por Server-Sent Events do próprio servidor Node, não pelo Supabase. A auditoria focou no que realmente existe nesta arquitetura.
