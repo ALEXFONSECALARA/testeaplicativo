@@ -560,1190 +560,859 @@
   },
   "menu": [
     {
-      "id": "rodizio-master",
+      "id": "combinados-tradicionais",
       "icon": "🍣",
+      "title": "COMBINADOS TRADICIONAIS",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "10 sashimis de salmão, 5 sashimis haddock, 5 sashimis peixe branco, 5 salmão ice, 2 skin, 2 filadélfia, 4 hot rolls, 2 camarões empanados, 1 harumaki de camarão, 2 lulas à milanesa, 1 cheesecake, 1 tako, 1 tori, 1 hot kyuubi, yakisoba e camarão ao alho e óleo.",
-          "name": "Rodízio Master – Combo Premium Completo",
-          "badge": "",
-          "image": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/84c8756b44304796.jpg",
+          "name": "Rodízio Master — Combo Premium Completo",
+          "desc": "10 sashimis de salmão, 5 sashimis de haddock, 5 sashimis de peixe branco, 5 Salmão Ice, 2 Skin, 2 Filadélfia, 4 Hot Rolls, 2 camarões empanados, 1 Harumaki de camarão, 2 lulas à milanesa, 1 cheesecake, 1 Tako, 1 Tori, 1 Hot Kyuubi, yakisoba e camarão ao alho e óleo.",
           "price": 159.9,
-          "imagePos": {
-            "x": 33,
-            "y": 41
-          },
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
+          "qty": "",
+          "badge": "",
           "available": true,
-          "badgeIcon": "🔥",
-          "badgeMode": "global",
-          "badgeSize": 13,
-          "badgeColor": "#C62828",
-          "badgeTextColor": "#FFFFFF"
-        }
-      ],
-      "title": "Rodízio Master",
-      "stations": [
-        "caixa",
-        "cozinha",
-        "sushibar"
-      ]
-    },
-    {
-      "id": "combos-tradicionais",
-      "icon": "🍱",
-      "note": "",
-      "items": [
+          "image": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/84c8756b44304796.jpg"
+        },
         {
-          "qty": "",
-          "desc": "16 sashimis, 6 sushi, 3 tekamaki, 2 skin roll, 2 california, 2 hot, 2 ebi maki",
-          "name": "Combinado Super",
-          "badge": "",
+          "name": "Combinado Super — 33 peças",
+          "desc": "33 peças com 16 sashimis, 6 sushis, 3 Tekka Maki, 2 Salmão Skin Roll, 2 Califórnias, 2 Hot Filadélfia e 2 camarões.",
           "price": 89.99,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/201911211758_9VxL_c.jpg"
         },
         {
-          "qty": "",
-          "desc": "20 sashimis, 8 sushi, 3 tekamaki, 2 skin, 2 california, 4 hot, 2 ebimaki",
-          "name": "Combinado Shogatsu",
-          "badge": "",
+          "name": "Combinado Shogatsu — 41 peças",
+          "desc": "41 peças com 20 sashimis, 8 sushis, 3 Tekka Maki, 2 Salmão Skin Roll, 2 Califórnias, 4 Hot Filadélfia e 2 camarões.",
           "price": 106.1,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/201911211758_aM4t_c.png"
         },
         {
-          "qty": "",
-          "desc": "6 salmão ice, 6 joy, 6 tartare, 10 sashimi salmão, 10 hot filadélfia, 2 sweet heart",
-          "name": "Combinado Osaka (40 peças)",
-          "badge": "",
+          "name": "Combinado Osaka — 40 peças",
+          "desc": "",
           "price": 110.99,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
-          "name": "Combinado Tokyo (50 peças)",
-          "badge": "",
+          "name": "Combinado Tóquio — 50 peças",
+          "desc": "50 peças com 10 Hot Filadélfia, 10 Filadélfia Roll, 10 Salmão Maki, 10 Skin Roll, 5 sashimis de salmão e 5 sashimis de peixe branco.",
           "price": 143.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202201262144_7C27_i.jpg"
         },
         {
-          "qty": "",
+          "name": "Combo Nagazaki — 50 peças",
           "desc": "",
-          "name": "Combo Nagazaki (50 peças)",
-          "badge": "",
           "price": 137.99,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
+          "name": "Combinado Ronin — 80 peças",
           "desc": "",
-          "name": "Combinado Ronin (80 peças)",
-          "badge": "",
           "price": 207.2,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Combinado Ninja",
-          "badge": "",
+          "desc": "",
           "price": 129.5,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         }
-      ],
-      "title": "Combos Tradicionais",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "promocoes-exclusivas",
-      "icon": "🎉",
+      "icon": "🔥",
+      "title": "PROMOÇÕES EXCLUSIVAS",
       "note": "",
       "items": [
         {
-          "qty": "",
+          "name": "Combinado Nori — 20 peças",
           "desc": "",
-          "name": "Combinado Nori (20 peças)",
-          "badge": "",
           "price": 58.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
+          "name": "Combinado Salmão Especial — 25 peças",
+          "desc": "25 peças com 5 sashimis de salmão, 5 uramakis Filadélfia, 5 Hot Filadélfia, 5 Joes e 5 Salmões Ice.",
+          "price": 84.99,
           "qty": "",
-          "desc": "",
-          "name": "Combinado Salmão Especial (25 peças)",
           "badge": "",
-          "price": 84.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202505040222_N135_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
-          "name": "Combinado Especial (20 peças)",
-          "badge": "",
+          "name": "Combinado Especial — 20 peças",
+          "desc": "Seleção especial com 4 sashimis de salmão, 2 sushis de camarão, 6 Hot Filadélfia, 4 uramakis Filadélfia e 4 Ice Filadélfia.",
           "price": 58.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202607070354_Q664_i.jpg"
         },
         {
-          "qty": "",
-          "desc": "",
-          "name": "Combinado Nirá (20 peças)",
-          "badge": "",
+          "name": "Combinado Nirá — 20 peças",
+          "desc": "20 peças com 4 sashimis de salmão, 4 uramakis Filadélfia, 4 Tartares Skin, 4 Hot Filadélfia e 4 Hot Nana com Chocolate.",
           "price": 58.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202404100040_G48O_i.jpg"
         },
         {
+          "name": "Combinado Sakura — 21 peças",
+          "desc": "21 peças com 4 sashimis de salmão, 5 Sushi Skin Lemon, 4 Califórnias, 6 Hot Filadélfia e 2 Sweet Heart.",
+          "price": 60.9,
           "qty": "",
-          "desc": "",
-          "name": "Combinado Sakura (21 peças)",
           "badge": "",
-          "price": 59.8,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202404100036_JBA2_i.jpg"
         },
         {
-          "qty": "",
+          "name": "Combinado Kyoto — 50 peças",
           "desc": "",
-          "name": "Combinado Kyoto (50 peças)",
-          "badge": "",
           "price": 99.39,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
-        },
-        {
           "qty": "",
-          "desc": "",
-          "name": "Premium Fusion (24 peças)",
           "badge": "",
-          "price": 49.99,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": ""
         },
         {
+          "name": "Premium Fusion — 24 peças",
+          "desc": "24 peças com 4 sashimis de salmão, 4 nigiris de salmão, 8 uramakis Filadélfia e 8 Hot Filadélfia.",
+          "price": 79.99,
           "qty": "",
-          "desc": "",
-          "name": "Combo Explosão de Salmão (22 peças)",
           "badge": "",
-          "price": 49.99,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202605291314_STF4_i.jpg"
         },
         {
+          "name": "Combo Explosão de Salmão — 22 peças",
+          "desc": "Combinação com 4 sashimis de salmão, 4 Joes de salmão, 6 Hot Filadélfia e 8 uramakis Filadélfia.",
+          "price": 88.0,
           "qty": "",
-          "desc": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202605291334_0E7X_i.jpg"
+        },
+        {
           "name": "Combinado Crocância Suprema",
-          "badge": "",
+          "desc": "",
           "price": 58.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Hot Filadélfia",
-          "badge": "",
+          "desc": "Salmão, queijo Filadélfia, alga e cebolinha, empanados na panko e fritos, sem arroz.",
           "price": 28.7,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202404090018_PV4U_i.jpg"
         }
-      ],
-      "title": "Promoções Exclusivas",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "temakis",
-      "icon": "🌯",
+      "icon": "🍙",
+      "title": "TEMAKIS",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Temaki Filadélfia Tradicional",
-          "badge": "",
+          "desc": "Salmão enrolado em alga, arroz, cream cheese, cebolinha e gergelim.",
           "price": 29.8,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202211_7Q3o_f.png"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Temaki Camarão Tradicional",
-          "badge": "",
+          "desc": "Camarão grelhado enrolado em alga, com cream cheese, cebolinha e gergelim.",
           "price": 32.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
-        },
-        {
           "qty": "",
-          "desc": "",
-          "name": "Temaki Filadélfia Original (Sem Arroz)",
           "badge": "",
-          "price": 36.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202251_ijCK_.jpeg"
         },
         {
+          "name": "Temaki Filadélfia Original — Sem Arroz",
+          "desc": "Salmão enrolado em alga, cream cheese, cebolinha e gergelim.",
+          "price": 36.9,
           "qty": "",
-          "desc": "",
-          "name": "Temaki Camarão Original (Sem Arroz)",
           "badge": "",
-          "price": 36.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202228_s29i_f.png"
         },
         {
+          "name": "Temaki Camarão Original — Sem Arroz",
+          "desc": "Camarão grelhado enrolado em alga, com cream cheese, cebolinha e gergelim, sem arroz.",
+          "price": 36.9,
           "qty": "",
-          "desc": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202251_ijCK_.jpeg"
+        },
+        {
           "name": "Temaki Hot Filadélfia",
-          "badge": "",
+          "desc": "",
           "price": 33.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Temaki Camarão Frito",
-          "badge": "",
+          "desc": "",
           "price": 33.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         }
-      ],
-      "title": "Temakis",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "sashimis",
       "icon": "🐟",
+      "title": "SASHIMIS",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Sashimi Simples",
-          "badge": "",
+          "desc": "5 fatias de salmão fresco, cuidadosamente cortadas para preservar a textura e o sabor do peixe.",
           "price": 22.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202101_EXab_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Sashimi Mini",
-          "badge": "",
+          "desc": "10 fatias de salmão fresco, com textura macia e sabor delicado.",
           "price": 42.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202101_EXab_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Sashimi Extra",
-          "badge": "",
+          "desc": "15 fatias generosas de salmão fresco, cuidadosamente cortadas para uma experiência autêntica.",
           "price": 63.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202102_3q6B_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Sashimi Super",
+          "desc": "20 fatias de salmão fresco, ideal para compartilhar ou para os apaixonados por sashimi.",
+          "price": 83.9,
+          "qty": "",
           "badge": "",
-          "price": 79.8,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202101_EXab_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Sashimi Shogatsu",
-          "badge": "",
+          "desc": "",
           "price": 99.7,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         }
-      ],
-      "title": "Sashimis",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "sushi",
       "icon": "🍣",
+      "title": "SUSHI",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Sushi Simples",
-          "badge": "",
+          "desc": "",
           "price": 19.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Sushi Mini",
-          "badge": "",
+          "desc": "10 unidades de sushi de salmão, preparados com peixe fresco e arroz japonês.",
           "price": 39.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202204_A2IA_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Sushi Extra",
-          "badge": "",
+          "desc": "15 unidades de sushi de salmão, preparados com peixe fresco e arroz japonês.",
           "price": 59.8,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202205_18ju_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Sushi Super",
-          "badge": "",
+          "desc": "20 unidades de sushi de salmão, preparados com peixe fresco e arroz japonês.",
           "price": 79.8,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202205_pFeH_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Sushi Shogatsu",
-          "badge": "",
+          "desc": "",
           "price": 99.7,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         }
-      ],
-      "title": "Sushi",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "harumakis",
-      "icon": "🥟",
+      "icon": "🥢",
+      "title": "HARUMAKIS",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Harumaki Frango",
-          "badge": "",
+          "desc": "",
           "price": 17.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Harumaki Camarão",
-          "badge": "",
+          "desc": "",
           "price": 21.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Harumaki Legumes",
-          "badge": "",
+          "desc": "",
           "price": 17.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Harumaki Banana com Chocolate",
-          "badge": "",
+          "desc": "",
           "price": 17.5,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Harumaki Romeu e Julieta",
-          "badge": "",
+          "desc": "Harumaki crocante recheado com queijo e goiabada. Porção com 2 unidades.",
           "price": 17.5,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202305020028_LVFX_i.jpg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Harumaki Doce de Leite com Ameixa",
-          "badge": "",
+          "desc": "Harumaki crocante recheado com doce de leite e ameixa. Porção com 2 unidades.",
           "price": 17.5,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202305012324_24GS_i.jpg"
         }
-      ],
-      "title": "Harumakis",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "hot-rolls",
       "icon": "🔥",
+      "title": "HOT ROLLS",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Salmão Ice Especial",
-          "badge": "",
+          "desc": "",
           "price": 35.7,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Salmão Ice",
-          "badge": "",
+          "desc": "",
           "price": 31.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Hot Filadélfia Original",
-          "badge": "",
+          "desc": "Salmão, queijo Filadélfia, alga e cebolinha, empanados na panko e fritos, sem arroz.",
           "price": 31.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202404090018_PV4U_i.jpg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Hot Filadélfia Tradicional",
-          "badge": "",
+          "desc": "Arroz, salmão, queijo Filadélfia, alga e cebolinha, empanados na panko e fritos.",
           "price": 28.7,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202305031053_L711_i.jpg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Skin Roll",
-          "badge": "",
+          "desc": "Casquinha de salmão grelhado, pepino, gergelim e cream cheese.",
           "price": 28.7,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202404090020_7WVQ_i.jpg"
         }
-      ],
-      "title": "Hot Rolls",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "entradas",
       "icon": "🥗",
+      "title": "ENTRADAS",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Sunomono",
-          "badge": "",
+          "desc": "",
           "price": 29.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Ceviche Tradicional",
-          "badge": "",
-          "price": 39.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
-        },
-        {
-          "qty": "",
           "desc": "",
-          "name": "Shimeji",
+          "price": 39.9,
+          "qty": "",
           "badge": "",
-          "price": 0,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": false
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Fatias finas de peixe branco ou salmão com molho ponzu.",
-          "name": "Ussuzukuri (15 fatias)",
-          "badge": "SEM PREÇO",
+          "name": "Shimeji",
+          "desc": "",
           "price": 0,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": false
+          "qty": "",
+          "badge": "",
+          "available": false,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Filé de coxa de frango crocante, marinado no gengibre, alho e molho oriental.",
-          "name": "Tori Tatsutaague (3 espetinhos)",
-          "badge": "SEM PREÇO",
+          "name": "Usuzukuri — 15 fatias",
+          "desc": "Fatias finas de peixe branco ou salmão com molho ponzu.",
           "price": 0,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": false
+          "qty": "",
+          "badge": "",
+          "available": false,
+          "image": ""
         },
         {
+          "name": "Tori Tatsutaage — 3 espetinhos",
+          "desc": "Coxa de frango crocante, gengibre, alho e molho oriental.",
+          "price": 21.9,
           "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Polvo japonês frito, marinado no gengibre, alho e molho oriental.",
-          "name": "Tako Karaague (3 espetinhos)",
-          "badge": "SEM PREÇO",
-          "price": 0,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": false
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Fatias de salmão seladas no gergelim, com molho ponzu, cebolinha e gergelim.",
-          "name": "Tataki Especial (10 peças)",
-          "badge": "SEM PREÇO",
+          "name": "Tako Karaage — 3 espetinhos",
+          "desc": "Polvo japonês frito, gengibre, alho e molho oriental.",
           "price": 0,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": false
+          "qty": "",
+          "badge": "",
+          "available": false,
+          "image": ""
         },
         {
+          "name": "Tataki Especial — 10 peças",
+          "desc": "Fatias de salmão seladas no gergelim, ponzu, cebolinha e gergelim.",
+          "price": 41.9,
           "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Sashimi de salmão com azeite quente e toque cítrico de limão.",
-          "name": "Sashimi Morno (10 peças)",
-          "badge": "SEM PREÇO",
-          "price": 0,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": false
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202404090041_24FP_i.jpg"
+        },
+        {
+          "name": "Sashimi Morno — 10 peças",
+          "desc": "Sashimi de salmão com azeite de oliva quente e limão cítrico.",
+          "price": 41.9,
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202305020254_2826_i.jpg"
         }
-      ],
-      "title": "Entradas",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "pratos-quentes",
       "icon": "🍛",
+      "title": "PRATOS QUENTES",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Ika Itame",
+          "desc": "Lula refogada com pimenta chinesa e molho de ostras, acompanhada de arroz japonês temperado (Gohan).",
+          "price": 58.0,
+          "qty": "",
           "badge": "",
-          "price": 48.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202143_qdKb_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Frango Agridoce",
+          "desc": "Frango em cubos com cebola, pimentão e abacaxi ao molho agridoce, acompanhado de arroz japonês temperado (Gohan).",
+          "price": 43.5,
+          "qty": "",
           "badge": "",
-          "price": 38.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202200_UOhX_.jpeg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Frango Xadrez",
+          "desc": "Frango com cebola e pimentão em pequenos cubos, acompanhado de arroz branco.",
+          "price": 43.5,
+          "qty": "",
           "badge": "",
-          "price": 38.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202011202148_knOy_.jpeg"
         }
-      ],
-      "title": "Pratos Quentes",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "teppan-yaki",
-      "icon": "🥩",
+      "icon": "🔥",
+      "title": "TEPPAN YAKI",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Teppan Salmão",
-          "badge": "",
+          "desc": "",
           "price": 75.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Teppan Mignon",
-          "badge": "",
+          "desc": "",
           "price": 68.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Teppan Frango",
-          "badge": "",
+          "desc": "",
           "price": 44.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
+        },
+        {
+          "name": "Teppan Tilápia",
+          "desc": "",
+          "price": 62.9,
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         }
-      ],
-      "title": "Teppan Yaki",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "yakissoba",
       "icon": "🍜",
+      "title": "YAKISSOBA",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Legumes Especial",
-          "badge": "",
+          "desc": "",
           "price": 43.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Legumes",
-          "badge": "",
+          "desc": "",
           "price": 33.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Mignon",
-          "badge": "",
+          "desc": "",
           "price": 52.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Camarão",
-          "badge": "",
+          "desc": "",
           "price": 58.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Misto Frango e Mignon",
-          "badge": "",
+          "desc": "",
           "price": 52.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Frutos do Mar",
-          "badge": "",
+          "desc": "Macarrão frito com lula, camarão e polvo, repolho roxo, repolho verde, brócolis, couve-flor, cebolinha e gergelim, com molho oriental artesanal.",
           "price": 59.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202305031218_1QO5_i.jpg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Frango",
-          "badge": "",
+          "desc": "",
           "price": 43.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         }
-      ],
-      "title": "Yakissoba",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "yakimeshi",
-      "icon": "🍚",
+      "icon": "🍳",
+      "title": "YAKIMESHI",
       "note": "",
       "items": [
         {
-          "qty": "",
+          "name": "Camarão Yakimeshi",
           "desc": "",
-          "name": "Camarão yakimeshi",
-          "badge": "",
-          "image": "",
           "price": 58.9,
-          "imagePos": {
-            "x": 50,
-            "y": 50
-          },
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
+          "qty": "",
+          "badge": "Mais vendido",
           "available": true,
-          "badgeIcon": "🔥",
-          "badgeMode": "global",
-          "badgeSize": 13,
-          "badgeColor": "#C62828",
-          "badgeTextColor": "#FFFFFF"
+          "image": ""
         },
         {
-          "qty": "",
+          "name": "Frango Yakimeshi",
           "desc": "",
-          "name": "Frango  yakimeshi",
-          "badge": "",
-          "image": "",
           "price": 43.9,
-          "imagePos": {
-            "x": 50,
-            "y": 50
-          },
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
+          "qty": "",
+          "badge": "Mais vendido",
           "available": true,
-          "badgeIcon": "🔥",
-          "badgeMode": "global",
-          "badgeSize": 13,
-          "badgeColor": "#C62828",
-          "badgeTextColor": "#FFFFFF"
+          "image": ""
         },
         {
-          "qty": "",
+          "name": "Frutos do Mar Yakimeshi",
           "desc": "",
-          "name": "Frutos do Mar  yakimeshi",
-          "badge": "",
-          "image": "",
           "price": 59.9,
-          "imagePos": {
-            "x": 50,
-            "y": 50
-          },
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
+          "qty": "",
+          "badge": "Mais vendido",
           "available": true,
-          "badgeIcon": "🔥",
-          "badgeMode": "global",
-          "badgeSize": 13,
-          "badgeColor": "#C62828",
-          "badgeTextColor": "#FFFFFF"
+          "image": ""
         }
-      ],
-      "title": "Yakimeshi",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "burgers-e-dogs",
       "icon": "🍔",
+      "title": "BURGERS E DOGS",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "",
           "name": "Japaburguer Salmão",
-          "badge": "",
+          "desc": "",
           "price": 31.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Japa Dog Salmão",
-          "badge": "",
+          "desc": "",
           "price": 31.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         }
-      ],
-      "title": "Burgers e Dogs",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "sobremesas",
       "icon": "🍰",
+      "title": "SOBREMESAS",
       "note": "",
       "items": [
         {
-          "qty": "",
+          "name": "Petit Gâteau",
           "desc": "",
-          "name": "Petit Gateau",
-          "badge": "",
-          "image": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/b8ce39b3840d5d77.jpg",
           "price": 25.9,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/b8ce39b3840d5d77.jpg"
         },
         {
-          "qty": "",
-          "desc": "",
           "name": "Hotnana",
-          "badge": "",
-          "image": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/d06da5dc5b51b648.jpg",
+          "desc": "",
           "price": 28.7,
-          "stations": [
-            "cozinha"
-          ],
-          "variants": [],
-          "available": true
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://srccpsqnfdzhgbhjwwgy.supabase.co/storage/v1/object/public/BANCO%20DE%20FOTS/d06da5dc5b51b648.jpg"
         }
-      ],
-      "title": "Sobremesas",
-      "stations": [
-        "cozinha"
       ]
     },
     {
       "id": "bebidas",
       "icon": "🥤",
+      "title": "BEBIDAS",
       "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar.",
           "name": "Cerveja Long Neck Heineken",
-          "badge": "SEM PREÇO",
-          "price": 0,
-          "stations": [
-            "caixa"
-          ],
-          "variants": [],
-          "available": false
+          "desc": "Cerveja Heineken em embalagem long neck.",
+          "price": 14.9,
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202108261108_CQKE_i.jpg"
         },
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar.",
           "name": "Coca-Cola Lata",
-          "badge": "SEM PREÇO",
-          "price": 0,
-          "stations": [
-            "caixa"
-          ],
-          "variants": [],
-          "available": false
+          "desc": "",
+          "price": 9.9,
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar.",
           "name": "H2O 500ml",
-          "badge": "SEM PREÇO",
-          "price": 0,
-          "stations": [
-            "caixa"
-          ],
-          "variants": [],
-          "available": false
+          "desc": "H2O em garrafa de 500 ml.",
+          "price": 10.9,
+          "qty": "",
+          "badge": "",
+          "available": true,
+          "image": ""
         }
-      ],
-      "title": "Bebidas",
-      "stations": [
-        "caixa",
-        "cozinha",
-        "sushibar"
       ]
     },
     {
       "id": "adicionais",
-      "title": "Adicionais",
+      "icon": "➕",
+      "title": "ADICIONAIS",
+      "note": "",
       "items": [
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Raiz forte, 50g",
-          "name": "Adicional de Wasabi",
-          "badge": "SEM PREÇO",
+          "name": "Adicional de Wasabi — 50g",
+          "desc": "Raiz forte, 50g.",
           "price": 0,
-          "stations": [
-            "caixa"
-          ],
-          "variants": [],
-          "available": false
+          "qty": "",
+          "badge": "",
+          "available": false,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202305020323_5YL0_i.jpg"
         },
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Gengibre em porção, 50g",
-          "name": "Adicional de Gengibre",
-          "badge": "SEM PREÇO",
+          "name": "Adicional de Gengibre — 50g",
+          "desc": "Gengibre em porção, 50g.",
           "price": 0,
-          "stations": [
-            "caixa"
-          ],
-          "variants": [],
-          "available": false
+          "qty": "",
+          "badge": "",
+          "available": false,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202608031429_S433_i.jpg"
         },
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Unidade",
-          "name": "Hashi",
-          "badge": "SEM PREÇO",
+          "name": "Hashi — unidade",
+          "desc": "Unidade.",
           "price": 0,
-          "stations": [
-            "caixa"
-          ],
-          "variants": [],
-          "available": false
+          "qty": "",
+          "badge": "",
+          "available": false,
+          "image": ""
         },
         {
-          "qty": "",
-          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Unidade",
-          "name": "Clip Adaptador de Hashi",
-          "badge": "SEM PREÇO",
+          "name": "Clip Adaptador de Hashi — unidade",
+          "desc": "Unidade.",
           "price": 0,
-          "stations": [
-            "caixa"
-          ],
-          "variants": [],
-          "available": false
+          "qty": "",
+          "badge": "",
+          "available": false,
+          "image": "https://static.ifood-static.com.br/image/upload/t_low/pratos/d49b46fd-fdfa-40ed-bec1-987e93e94550/202305031025_764G_i.jpg"
         }
       ]
     }
