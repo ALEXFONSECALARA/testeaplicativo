@@ -3862,13 +3862,19 @@ async function resyncOrders(){
   if(!token || (navigator && navigator.onLine === false)) return;
   resyncInFlight = true;
   try {
-    const fresh = await apiGet('/api/orders');
+    // v137 — antes buscava o arquivo INTEIRO de pedidos a cada 30s; agora usa a versão enxuta
+    // (pedidos em andamento + últimas 6h — ver server.js) e faz MERGE no array local em vez de
+    // substituir tudo, pra não apagar da memória pedidos mais antigos que Relatórios/Dashboard
+    // ainda precisam mostrar (esses continuam vindo completos no carregamento inicial da página).
+    const fresh = await apiGet('/api/orders?light=1');
     const knownIds = new Set(orders.map(o => o.id));
     const now = Date.now();
     // Limpa memória de alertas antigos para não crescer indefinidamente.
     for(const [id, ts] of alertedOrderIds){ if(now-ts > 10*60*1000) alertedOrderIds.delete(id); }
     const missing = fresh.filter(o => !knownIds.has(o.id) && o.status === 'novo');
-    orders = fresh;
+    const freshById = new Map(fresh.map(o => [o.id, o]));
+    orders = orders.map(o => freshById.get(o.id) || o);
+    for(const o of fresh){ if(!knownIds.has(o.id)) orders.push(o); }
     updateNewBadge();
     refreshCurrentPage();
     missing.forEach(o => {
@@ -9323,23 +9329,28 @@ async function loadAtendimentoConversas(){
   // nem tenta: só busca as conversas depois que existe uma sessão válida.
   if(!token) return;
   let data;
-  try{ data = await apiGet('/api/admin/atendimento'); }catch(e){ return; }
+  // v137 — REDUÇÃO DE BANDWIDTH: manda qual conversa está aberta na tela agora, pra o servidor
+  // incluir o histórico completo só dela — as outras vêm enxutas (ver server.js). `totalMensagens`
+  // é a contagem real mesmo quando o array vier cortado; pra conversa aberta (que vem sem corte),
+  // cai no fallback `c.mensagens.length`, que já é o total de qualquer forma.
+  try{ data = await apiGet('/api/admin/atendimento?ativa='+encodeURIComponent(conversaAdminAtivaId||'')); }catch(e){ return; }
   conversasAdminCache = (data?.conversas || []).slice().sort((a,b)=> new Date(b.ultimaAtividade) - new Date(a.ultimaAtividade));
   // v61: compara com a rodada anterior de polling pra saber se chegou mensagem nova de cliente,
   // ou se um cliente acabou de pedir pra falar com atendente — só nesses casos toca um aviso
   // sonoro (senão tocaria a cada 5s à toa, mesmo sem nada de novo).
   conversasAdminCache.forEach(c=>{
+    const totalMsg = c.totalMensagens ?? c.mensagens.length;
     const antes = atdSnapshotAnterior[c.id];
-    const qtdMsgAntes = antes ? antes.qtdMsg : c.mensagens.length;
+    const qtdMsgAntes = antes ? antes.qtdMsg : totalMsg;
     const chamandoAntes = antes ? antes.chamando : (c.modo==='humano' && c.naoLidaAtendente);
     const chamandoAgora = c.modo==='humano' && c.naoLidaAtendente;
     if(antes){
       const ultima = c.mensagens[c.mensagens.length-1];
-      const chegouMsgNova = c.mensagens.length > qtdMsgAntes && ultima && ultima.de==='cliente';
+      const chegouMsgNova = totalMsg > qtdMsgAntes && ultima && ultima.de==='cliente';
       if(!chamandoAntes && chamandoAgora) playChatSound('chamar', c.id);
       else if(chegouMsgNova) playChatSound('receber', c.id);
     }
-    atdSnapshotAnterior[c.id] = { qtdMsg: c.mensagens.length, chamando: chamandoAgora };
+    atdSnapshotAnterior[c.id] = { qtdMsg: totalMsg, chamando: chamandoAgora };
   });
   const aguardando = conversasAdminCache.filter(c=>c.modo==='humano' && c.naoLidaAtendente).length;
   const nbMsg = document.getElementById('nb-mensagens');
