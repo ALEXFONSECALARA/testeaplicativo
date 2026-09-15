@@ -43,6 +43,13 @@
         "role": "admin",
         "username": "admin",
         "passwordHash": "cfd7dba1b4c835302599ca32abf304cba178639002777996ec6c9d9b5c5f7f0e"
+      },
+      {
+        "username": "caixa",
+        "displayName": "Caixa",
+        "passwordHash": "d621f7eda53ccc408423351c665d1f25cb405959dcd35503fecacd66ebdf52d7",
+        "role": "caixa",
+        "active": true
       }
     ],
     "vapid": {
@@ -110,7 +117,7 @@
     "schedule": {
       "enabled": true,
       "openTime": "18:30",
-      "closeTime": "22:55"
+      "closeTime": "23:00"
     },
     "stations": {
       "bar": {
@@ -291,37 +298,37 @@
     "weekSchedule": [
       {
         "open": true,
-        "openTime": "18:00",
+        "openTime": "18:30",
         "closeTime": "23:00"
       },
       {
         "open": false,
-        "openTime": "18:00",
+        "openTime": "18:30",
         "closeTime": "23:00"
       },
       {
         "open": true,
-        "openTime": "18:00",
+        "openTime": "18:30",
         "closeTime": "23:00"
       },
       {
         "open": true,
-        "openTime": "18:00",
+        "openTime": "18:30",
         "closeTime": "23:00"
       },
       {
         "open": true,
-        "openTime": "18:00",
+        "openTime": "18:30",
         "closeTime": "23:00"
       },
       {
         "open": true,
-        "openTime": "18:00",
+        "openTime": "18:30",
         "closeTime": "23:00"
       },
       {
         "open": true,
-        "openTime": "18:00",
+        "openTime": "18:30",
         "closeTime": "23:00"
       }
     ],
@@ -1232,6 +1239,66 @@
           ],
           "variants": [],
           "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Fatias finas de peixe branco ou salmão com molho ponzu.",
+          "name": "Ussuzukuri (15 fatias)",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
+          "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Filé de coxa de frango crocante, marinado no gengibre, alho e molho oriental.",
+          "name": "Tori Tatsutaague (3 espetinhos)",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
+          "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Polvo japonês frito, marinado no gengibre, alho e molho oriental.",
+          "name": "Tako Karaague (3 espetinhos)",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
+          "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Fatias de salmão seladas no gergelim, com molho ponzu, cebolinha e gergelim.",
+          "name": "Tataki Especial (10 peças)",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
+          "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Sashimi de salmão com azeite quente e toque cítrico de limão.",
+          "name": "Sashimi Morno (10 peças)",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "cozinha"
+          ],
+          "variants": [],
+          "available": false
         }
       ],
       "title": "Entradas",
@@ -1581,12 +1648,103 @@
       "id": "bebidas",
       "icon": "🥤",
       "note": "",
-      "items": [],
+      "items": [
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar.",
+          "name": "Cerveja Long Neck Heineken",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "caixa"
+          ],
+          "variants": [],
+          "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar.",
+          "name": "Coca-Cola Lata",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "caixa"
+          ],
+          "variants": [],
+          "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar.",
+          "name": "H2O 500ml",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "caixa"
+          ],
+          "variants": [],
+          "available": false
+        }
+      ],
       "title": "Bebidas",
       "stations": [
         "caixa",
         "cozinha",
         "sushibar"
+      ]
+    },
+    {
+      "id": "adicionais",
+      "title": "Adicionais",
+      "items": [
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Raiz forte, 50g",
+          "name": "Adicional de Wasabi",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "caixa"
+          ],
+          "variants": [],
+          "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Gengibre em porção, 50g",
+          "name": "Adicional de Gengibre",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "caixa"
+          ],
+          "variants": [],
+          "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Unidade",
+          "name": "Hashi",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "caixa"
+          ],
+          "variants": [],
+          "available": false
+        },
+        {
+          "qty": "",
+          "desc": "⚠️ SEM PREÇO — defina antes de ativar. Unidade",
+          "name": "Clip Adaptador de Hashi",
+          "badge": "SEM PREÇO",
+          "price": 0,
+          "stations": [
+            "caixa"
+          ],
+          "variants": [],
+          "available": false
+        }
       ]
     }
   ]
